@@ -1,0 +1,56 @@
+@import 'tw-animate-css';
+
+@layer base {
+  /* button active */
+  button:active {
+    transform: scale(0.97);
+    filter: brightness(0.9);
+  }
+
+  :root {
+    /* Catppuccin Latte (Light) */
+    --background: 220 22% 92%; /* base */
+    --foreground: 234 16% 35%; /* text */
+    --muted: 223 16% 83%; /* surface0 */
+    --muted-foreground: 233 13% 53%; /* subtext0 */
+    --popover: 220 22% 92%; /* base */
+    --popover-foreground: 234 16% 35%;
+    --card: 220 22% 92%; /* base */
+    --card-foreground: 234 16% 35%;
+    --border: 223 16% 83%; /* surface0 */
+    --input: 223 16% 83%;
+    --primary: 266 85% 58%; /* mauve - 品牌主色 */
+    --primary-foreground: 220 22% 92%;
+    --secondary: 225 15% 88%; /* mantle */
+    --secondary-foreground: 234 16% 35%;
+    --accent: 225 15% 88%;
+    --accent-foreground: 234 16% 35%;
+    --destructive: 0 78% 62%; /* red */
+    --destructive-foreground: 220 22% 92%;
+    --ring: 266 85% 58%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Catppuccin Macchiato (Dark) */
+    --background: 231 23% 16%; /* base */
+    --foreground: 227 70% 87%; /* text */
+    --muted: 233 20% 27%; /* surface0 */
+    --muted-foreground: 228 15% 63%; /* subtext0 */
+    --popover: 231 23% 16%;
+    --popover-foreground: 227 70% 87%;
+    --card: 231 23% 16%;
+    --card-foreground: 227 70% 87%;
+    --border: 233 20% 27%;
+    --input: 233 20% 27%;
+    --primary: 267 83% 80%; /* mauve */
+    --primary-foreground: 231 23% 16%;
+    --secondary: 232 20% 12%; /* mantle */
+    --secondary-foreground: 227 70% 87%;
+    --accent: 232 20% 12%;
+    --accent-foreground: 227 70% 87%;
+    --destructive: 355 83% 76%; /* red */
+    --destructive-foreground: 231 23% 16%;
+    --ring: 267 83% 80%;
+  }
+}
