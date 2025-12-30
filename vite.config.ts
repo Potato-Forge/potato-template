@@ -13,6 +13,8 @@ const getPath = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 
 // https://vite.dev/config/
 export default defineConfig({
+  envDir: getPath('./env'),
+
   plugins: [
     vue(),
 
