@@ -1,9 +1,32 @@
 import { defineConfig, presetIcons, transformerVariantGroup, transformerDirectives } from 'unocss'
 import presetWind4 from '@unocss/preset-wind4'
 import presetAnimations from 'unocss-preset-animations'
+import fs from 'node:fs'
+import path from 'node:path'
 
 export default defineConfig({
-  presets: [presetWind4(), presetIcons(), presetAnimations()],
+  presets: [
+    presetWind4(),
+    presetIcons({
+      collections: {
+        pf: {
+          logo: () =>
+            fs.readFileSync(path.resolve(__dirname, './src/assets/potato-forge.svg'), 'utf-8'),
+        },
+      },
+      // 为图标设置默认样式：使用 currentColor 填充、统一尺寸与对齐['display:inline-block;width:1.5em;height:1.5em;vertical-align:middle;fill:currentColor;',]
+      extraProperties: {
+        display: 'inline-block',
+        width: '1.5em',
+        height: '1.5em',
+        'vertical-align': 'middle',
+        fill: 'currentColor',
+      },
+      // scale: 1 保持原始视窗尺寸，defaultClass 便于统一覆盖样式
+      scale: 1,
+    }),
+    presetAnimations(), // custom icons
+  ],
   content: {
     pipeline: {
       include: [
@@ -15,6 +38,8 @@ export default defineConfig({
     },
   },
   transformers: [transformerVariantGroup(), transformerDirectives()],
+
+  // theme
   theme: {
     colors: {
       border: 'hsl(var(--border))',

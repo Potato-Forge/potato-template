@@ -9,48 +9,60 @@
 
   :root {
     /* Catppuccin Latte (Light) */
-    --background: 220 22% 92%; /* base */
-    --foreground: 234 16% 35%; /* text */
-    --muted: 223 16% 83%; /* surface0 */
-    --muted-foreground: 233 13% 53%; /* subtext0 */
-    --popover: 220 22% 92%; /* base */
-    --popover-foreground: 234 16% 35%;
-    --card: 220 22% 92%; /* base */
-    --card-foreground: 234 16% 35%;
-    --border: 223 16% 83%; /* surface0 */
-    --input: 223 16% 83%;
-    --primary: 266 85% 58%; /* mauve - 品牌主色 */
-    --primary-foreground: 220 22% 92%;
-    --secondary: 225 15% 88%; /* mantle */
-    --secondary-foreground: 234 16% 35%;
-    --accent: 225 15% 88%;
-    --accent-foreground: 234 16% 35%;
-    --destructive: 0 78% 62%; /* red */
-    --destructive-foreground: 220 22% 92%;
-    --ring: 266 85% 58%;
+    --background: 220 22% 92%; /* #e5e8ed - base */
+    --foreground: 234 16% 35%; /* #4c5264 - text */
+    --muted: 223 16% 83%; /* #d4d7dd - surface0 */
+    --muted-foreground: 233 13% 53%; /* #797d8c - subtext0 */
+    --popover: 220 22% 92%; /* #e5e8ed - base */
+    --popover-foreground: 234 16% 35%; /* #4c5264 */
+    --card: 220 22% 92%; /* #e5e8ed - base */
+    --card-foreground: 234 16% 35%; /* #4c5264 */
+    --border: 223 16% 83%; /* #d4d7dd - surface0 */
+    --input: 223 16% 83%; /* #d4d7dd */
+    --primary: 169, 50%, 32%; /* #58B19F - mauve - 品牌主色 */
+    --primary-foreground: 220 22% 92%; /* #e5e8ed */
+    --secondary: 225 15% 88%; /* #e1e3e8 - mantle */
+    --secondary-foreground: 234 16% 35%; /* #4c5264 */
+    --accent: 225 15% 88%; /* #e1e3e8 */
+    --accent-foreground: 234 16% 35%; /* #4c5264 */
+    --success: 105.5 59.8% 43.3%; /* #40a02b - green */
+    --success-foreground: 220 22% 92%; /* #e5e8ed */
+    --info: 220.3 91.4% 54.3%; /* #1e66f5 - blue */
+    --info-foreground: 220 22% 92%; /* #e5e8ed */
+    --warning: 34.5 78.7% 49.4%; /* #df8e1d - yellow */
+    --warning-foreground: 234 16% 35%; /* #4c5264 */
+    --destructive: 0 78% 62%; /* #eb3b3b - red */
+    --destructive-foreground: 220 22% 92%; /* #e5e8ed */
+    --ring: 169, 50%, 32%; /* #58B19F */
     --radius: 0.5rem;
   }
 
   .dark {
     /* Catppuccin Macchiato (Dark) */
-    --background: 231 23% 16%; /* base */
-    --foreground: 227 70% 87%; /* text */
-    --muted: 233 20% 27%; /* surface0 */
-    --muted-foreground: 228 15% 63%; /* subtext0 */
-    --popover: 231 23% 16%;
-    --popover-foreground: 227 70% 87%;
-    --card: 231 23% 16%;
-    --card-foreground: 227 70% 87%;
-    --border: 233 20% 27%;
-    --input: 233 20% 27%;
-    --primary: 267 83% 80%; /* mauve */
-    --primary-foreground: 231 23% 16%;
-    --secondary: 232 20% 12%; /* mantle */
-    --secondary-foreground: 227 70% 87%;
-    --accent: 232 20% 12%;
-    --accent-foreground: 227 70% 87%;
-    --destructive: 355 83% 76%; /* red */
-    --destructive-foreground: 231 23% 16%;
-    --ring: 267 83% 80%;
+    --background: 231 23% 16%; /* #282838 - base */
+    --foreground: 227 70% 87%; /* #cbd1e6 - text */
+    --muted: 233 20% 27%; /* #383a4d - surface0 */
+    --muted-foreground: 228 15% 63%; /* #878c9d - subtext0 */
+    --popover: 231 23% 16%; /* #282838 */
+    --popover-foreground: 227 70% 87%; /* #cbd1e6 */
+    --card: 231 23% 16%; /* #282838 */
+    --card-foreground: 227 70% 87%; /* #cbd1e6 */
+    --border: 233 20% 27%; /* #383a4d */
+    --input: 233 20% 27%; /* #383a4d */
+    --primary: 169, 50%, 55%; /* #58B19F - green */
+    --primary-foreground: 231 23% 16%; /* #282838 */
+    --secondary: 232 20% 12%; /* #21212b - mantle */
+    --secondary-foreground: 227 70% 87%; /* #cbd1e6 */
+    --accent: 232 20% 12%; /* #21212b */
+    --accent-foreground: 227 70% 87%; /* #cbd1e6 */
+    --success: 105.2 48.1% 71.9%; /* #a6da95 - green */
+    --success-foreground: 231 23% 16%; /* #282838 */
+    --info: 220.3 83.3% 75%; /* #8aadf4 - blue */
+    --info-foreground: 231 23% 16%; /* #282838 */
+    --warning: 40 70.3% 77.8%; /* #eed49f - yellow */
+    --warning-foreground: 231 23% 16%; /* #282838 */
+    --destructive: 355 83% 76%; /* #ed9396 - red */
+    --destructive-foreground: 231 23% 16%; /* #282838 */
+    --ring: 169, 50%, 55%; /* #58B19F */
   }
 }
