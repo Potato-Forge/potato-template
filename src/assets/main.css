@@ -1,12 +1,6 @@
 @import 'tw-animate-css';
 
 @layer base {
-  /* button active */
-  button:active {
-    transform: scale(0.97);
-    filter: brightness(0.9);
-  }
-
   :root {
     /* Catppuccin Latte (Light) */
     --background: 220 22% 92%; /* #e5e8ed - base */
@@ -64,5 +58,30 @@
     --destructive: 355 83% 76%; /* #ed9396 - red */
     --destructive-foreground: 231 23% 16%; /* #282838 */
     --ring: 169, 50%, 55%; /* #58B19F */
+  }
+}
+
+// sidebar variables
+@layer base {
+  :root {
+    --sidebar-background: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+  }
+
+  .dark {
+    --sidebar-background: var(--background);
+    --sidebar-foreground: var(--foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
   }
 }

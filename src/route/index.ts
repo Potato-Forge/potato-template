@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 // layouts
-import GlobalLayout from '@/layouts/global-layout/index.vue'
+import GlobalLayout from '@/layouts/global-layout/GlobalLayout.vue'
 
 // routes
 import adminRoutes from './routes/adminRoutes'

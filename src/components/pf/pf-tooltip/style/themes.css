@@ -1,0 +1,21 @@
+/* 默认 theme */
+.tippy-box[data-theme~='pf-tooltip'] {
+  @apply bg-gray-900 text-white border border-white/10 shadow-lg;
+}
+
+.tippy-box[data-theme~='pf-tooltip'] > .tippy-content {
+  @apply px-2 py-1 text-xs;
+}
+
+.tippy-box[data-theme~='pf-tooltip'] > .tippy-arrow {
+  @apply fill-gray-900;
+}
+
+/* sidebar 专用 */
+.tippy-box[data-theme~='pf-tooltip-sidebar'] {
+  @apply bg-primary text-primary-foreground border border-primary/10 shadow-lg p-2  font-semibold;
+}
+
+.tippy-box[data-theme~='pf-tooltip-sidebar'] > .tippy-arrow {
+  @apply text-primary;
+}

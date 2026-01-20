@@ -2,13 +2,11 @@
   import PfLogo from '@/layouts/modules/PfLogo.vue'
   import GlobalLayoutSidebarCenter from '../global-layout-sidebar-center/GlobalLayoutSidebarCenter.vue'
   import GlobalLayoutSidebarFooter from '../global-layout-sidebar-footer/GlobalLayoutSidebarFooter.vue'
-
-  const isDark = useDark()
 </script>
 
 <template>
   <div
-    class="w-16 h-full fixed top-0 left-0 bg-background flex flex-col justify-between items-center"
+    class="w-16 h-full fixed top-0 left-0 bg-background flex flex-col justify-between items-center select-none"
   >
     <!-- sidebar top -->
     <div class="w-full aspect-ratio-square flex justify-center items-center px-4">
@@ -25,7 +23,7 @@
       <GlobalLayoutSidebarCenter></GlobalLayoutSidebarCenter>
     </div>
     <!-- sidebar bottom -->
-    <div class="flex-1 w-full">
+    <div class="w-full">
       <GlobalLayoutSidebarFooter></GlobalLayoutSidebarFooter>
     </div>
   </div>

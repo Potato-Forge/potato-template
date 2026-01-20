@@ -26,16 +26,66 @@ export default defineConfig(({ mode }) => {
       UnoCSS(),
 
       AutoImport({
-        imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
+        imports: [
+          'vue',
+          'vue-router',
+          'pinia',
+          '@vueuse/core',
+          {
+            'reka-ui': ['DropdownMenuPortal'], // 自定义导入
+          },
+        ],
         dts: getPath('./src/types/auto-imports.d.ts'),
-        dirs: [getPath('./src/components/pf')],
+        dirs: [getPath('./src/components/pf/*/')],
       }),
       Components({
         dts: getPath('./src/types/components.d.ts'),
+        dirs: [
+          getPath('./src/components/ui'),
+          getPath('./src/components/pf'),
+          getPath('./src/components/common'),
+        ],
         resolvers: [
           IconsResolver({
             prefix: 'i',
           }),
+          {
+            type: 'component',
+            resolve: (name) => {
+              // 1. 匹配 shadcn 组件
+              // 定义组件前缀到目录名的映射
+              const shadcnMap: Record<string, string> = {
+                DropdownMenu: 'dropdown-menu',
+                Avatar: 'avatar',
+                Button: 'button',
+                Input: 'input',
+                Select: 'select',
+                Dialog: 'dialog',
+                AlertDialog: 'alert-dialog',
+                Popover: 'popover',
+                Sheet: 'sheet',
+                Sidebar: 'sidebar',
+                Table: 'table',
+                Tabs: 'tabs',
+                Toast: 'toast',
+                Tooltip: 'tooltip',
+              }
+
+              for (const [prefix, path] of Object.entries(shadcnMap)) {
+                if (name.startsWith(prefix)) {
+                  return { name, from: `@/components/ui/${path}` }
+                }
+              }
+
+              // 2. 匹配 pf 组件，比如 PfButton -> src/components/pf/pf-button/index.ts
+              if (name.match(/^Pf[A-Z]/)) {
+                const kebabCase = name
+                  .replace(/([A-Z])/g, (m) => `-${m.toLowerCase()}`)
+                  .replace(/^-/, '')
+                return { name, from: `@/components/pf/${kebabCase}` }
+              }
+            },
+          },
         ],
       }),
       Icons({

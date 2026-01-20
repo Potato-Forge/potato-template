@@ -6,10 +6,32 @@
 // biome-ignore lint: disable
 export {}
 declare global {
+  const Avatar: typeof import('../components/ui/avatar/index').Avatar
+  const AvatarFallback: typeof import('../components/ui/avatar/index').AvatarFallback
+  const AvatarImage: typeof import('../components/ui/avatar/index').AvatarImage
+  const Button: typeof import('../components/ui/button/index').Button
+  const DropdownMenu: typeof import('../components/ui/dropdown-menu/index').DropdownMenu
+  const DropdownMenuCheckboxItem: typeof import('../components/ui/dropdown-menu/index').DropdownMenuCheckboxItem
+  const DropdownMenuContent: typeof import('../components/ui/dropdown-menu/index').DropdownMenuContent
+  const DropdownMenuGroup: typeof import('../components/ui/dropdown-menu/index').DropdownMenuGroup
+  const DropdownMenuItem: typeof import('../components/ui/dropdown-menu/index').DropdownMenuItem
+  const DropdownMenuLabel: typeof import('../components/ui/dropdown-menu/index').DropdownMenuLabel
+  const DropdownMenuPortal: typeof import('reka-ui').DropdownMenuPortal
+  const DropdownMenuRadioGroup: typeof import('../components/ui/dropdown-menu/index').DropdownMenuRadioGroup
+  const DropdownMenuRadioItem: typeof import('../components/ui/dropdown-menu/index').DropdownMenuRadioItem
+  const DropdownMenuSeparator: typeof import('../components/ui/dropdown-menu/index').DropdownMenuSeparator
+  const DropdownMenuShortcut: typeof import('../components/ui/dropdown-menu/index').DropdownMenuShortcut
+  const DropdownMenuSub: typeof import('../components/ui/dropdown-menu/index').DropdownMenuSub
+  const DropdownMenuSubContent: typeof import('../components/ui/dropdown-menu/index').DropdownMenuSubContent
+  const DropdownMenuSubTrigger: typeof import('../components/ui/dropdown-menu/index').DropdownMenuSubTrigger
+  const DropdownMenuTrigger: typeof import('../components/ui/dropdown-menu/index').DropdownMenuTrigger
   const EffectScope: typeof import('vue').EffectScope
+  const Toaster: typeof import('../components/ui/sonner/index').Toaster
   const acceptHMRUpdate: typeof import('pinia').acceptHMRUpdate
   const asyncComputed: typeof import('@vueuse/core').asyncComputed
   const autoResetRef: typeof import('@vueuse/core').autoResetRef
+  const avatarVariant: typeof import('../components/ui/avatar/index').avatarVariant
+  const buttonVariants: typeof import('../components/ui/button/index').buttonVariants
   const computed: typeof import('vue').computed
   const computedAsync: typeof import('@vueuse/core').computedAsync
   const computedEager: typeof import('@vueuse/core').computedEager

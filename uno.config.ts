@@ -1,10 +1,70 @@
-import { defineConfig, presetIcons, transformerVariantGroup, transformerDirectives } from 'unocss'
+import {
+  defineConfig,
+  presetIcons,
+  presetTypography,
+  presetWebFonts,
+  transformerDirectives,
+  transformerVariantGroup,
+} from 'unocss'
 import presetWind4 from '@unocss/preset-wind4'
 import presetAnimations from 'unocss-preset-animations'
 import fs from 'node:fs'
 import path from 'node:path'
 
+// 定义需要映射的颜色名称列表
+// 这里的名称必须与 main.css 中的 CSS 变量名对应
+// 例如 'background' -> var(--background)
+const colorNames = [
+  'background',
+  'foreground',
+  'muted',
+  'muted-foreground',
+  'popover',
+  'popover-foreground',
+  'card',
+  'card-foreground',
+  'border',
+  'input',
+  'primary',
+  'primary-foreground',
+  'secondary',
+  'secondary-foreground',
+  'accent',
+  'accent-foreground',
+  'destructive',
+  'destructive-foreground',
+  'ring',
+  // 新增状态色
+  'success',
+  'success-foreground',
+  'warning',
+  'warning-foreground',
+  'info',
+  'info-foreground',
+]
+
+// 自动生成 theme.colors 配置
+const colors = colorNames.reduce((acc, name) => {
+  acc[name] = `hsl(var(--${name}))`
+  return acc
+}, {} as Record<string, string>)
+
+// 添加 error 别名
+colors['error'] = colors['destructive']
+colors['error-foreground'] = colors['destructive-foreground']
+
 export default defineConfig({
+  shortcuts: {
+    'flex-center': 'flex justify-center items-center',
+  },
+  theme: {
+    colors,
+    borderRadius: {
+      lg: 'var(--radius)',
+      md: 'calc(var(--radius) - 2px)',
+      sm: 'calc(var(--radius) - 4px)',
+    },
+  },
   presets: [
     presetWind4(),
     presetIcons({
@@ -14,72 +74,22 @@ export default defineConfig({
             fs.readFileSync(path.resolve(__dirname, './src/assets/potato-forge.svg'), 'utf-8'),
         },
       },
-      // 为图标设置默认样式：使用 currentColor 填充、统一尺寸与对齐['display:inline-block;width:1.5em;height:1.5em;vertical-align:middle;fill:currentColor;',]
       extraProperties: {
         display: 'inline-block',
-        width: '1.5em',
-        height: '1.5em',
         'vertical-align': 'middle',
-        fill: 'currentColor',
       },
-      // scale: 1 保持原始视窗尺寸，defaultClass 便于统一覆盖样式
-      scale: 1,
+      scale: 1.2,
+      warn: true,
     }),
-    presetAnimations(), // custom icons
+    presetTypography(),
+    presetWebFonts({
+      fonts: {
+        sans: 'DM Sans',
+        serif: 'DM Serif Display',
+        mono: 'DM Mono',
+      },
+    }),
+    presetAnimations(),
   ],
-  content: {
-    pipeline: {
-      include: [
-        // the default
-        /\.(vue|svelte|[jt]sx|mdx?|astro|elm|php|phtml|html)($|\?)/,
-        // include js/ts files
-        '(components|src)/**/*.{js,ts}',
-      ],
-    },
-  },
-  transformers: [transformerVariantGroup(), transformerDirectives()],
-
-  // theme
-  theme: {
-    colors: {
-      border: 'hsl(var(--border))',
-      input: 'hsl(var(--input))',
-      ring: 'hsl(var(--ring))',
-      background: 'hsl(var(--background))',
-      foreground: 'hsl(var(--foreground))',
-      primary: {
-        DEFAULT: 'hsl(var(--primary))',
-        foreground: 'hsl(var(--primary-foreground))',
-      },
-      secondary: {
-        DEFAULT: 'hsl(var(--secondary))',
-        foreground: 'hsl(var(--secondary-foreground))',
-      },
-      destructive: {
-        DEFAULT: 'hsl(var(--destructive))',
-        foreground: 'hsl(var(--destructive-foreground))',
-      },
-      muted: {
-        DEFAULT: 'hsl(var(--muted))',
-        foreground: 'hsl(var(--muted-foreground))',
-      },
-      accent: {
-        DEFAULT: 'hsl(var(--accent))',
-        foreground: 'hsl(var(--accent-foreground))',
-      },
-      popover: {
-        DEFAULT: 'hsl(var(--popover))',
-        foreground: 'hsl(var(--popover-foreground))',
-      },
-      card: {
-        DEFAULT: 'hsl(var(--card))',
-        foreground: 'hsl(var(--card-foreground))',
-      },
-    },
-    borderRadius: {
-      lg: 'var(--radius)',
-      md: 'calc(var(--radius) - 2px)',
-      sm: 'calc(var(--radius) - 4px)',
-    },
-  },
+  transformers: [transformerDirectives(), transformerVariantGroup()],
 })

@@ -8,9 +8,14 @@ import router from '@/route'
 
 import { createPinia } from 'pinia'
 
+// pf components
+import { pfTooltipPlugin } from '@/components/pf/pf-tooltip'
+
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+
+pfTooltipPlugin(app)
 
 app.mount('#app')
