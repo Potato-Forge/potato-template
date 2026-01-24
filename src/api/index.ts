@@ -1,6 +1,7 @@
 import { createAlova } from 'alova'
 import VueHook from 'alova/vue'
 import { axiosRequestAdapter } from '@alova/adapter-axios'
+import { createClient } from '@supabase/supabase-js'
 
 export const alovaInstance = createAlova({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -8,3 +9,8 @@ export const alovaInstance = createAlova({
   requestAdapter: axiosRequestAdapter(),
   timeout: import.meta.env.VITE_API_TIMEOUT,
 })
+
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_KEY,
+)

@@ -5,7 +5,7 @@
 </script>
 
 <template>
-  <Button class="text-foreground" v-bind="props">
+  <Button v-bind="props">
     <slot name="default"></slot>
   </Button>
 </template>

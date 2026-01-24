@@ -34,6 +34,9 @@ export default defineConfig(({ mode }) => {
           {
             'reka-ui': ['DropdownMenuPortal'], // 自定义导入
           },
+          {
+            'vee-validate': ['useForm', 'useField', 'Field', 'Form', 'ErrorMessage', 'FieldArray'],
+          },
         ],
         dts: getPath('./src/types/auto-imports.d.ts'),
         dirs: [getPath('./src/components/pf/*/')],

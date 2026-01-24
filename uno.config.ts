@@ -11,47 +11,90 @@ import presetAnimations from 'unocss-preset-animations'
 import fs from 'node:fs'
 import path from 'node:path'
 
-// 定义需要映射的颜色名称列表
-// 这里的名称必须与 main.css 中的 CSS 变量名对应
-// 例如 'background' -> var(--background)
-const colorNames = [
+const themeData = {
+  light: {
+    background: '220 22% 92%',
+    foreground: '234 16% 35%',
+    muted: '223 16% 83%',
+    'muted-foreground': '233 13% 53%',
+    popover: '220 22% 92%',
+    'popover-foreground': '234 16% 35%',
+    card: '220 22% 92%',
+    'card-foreground': '234 16% 35%',
+    border: '223 16% 83%',
+    input: '223 16% 83%',
+    primary: '169 50% 32%',
+    'primary-foreground': '220 22% 92%',
+    secondary: '225 15% 88%',
+    'secondary-foreground': '234 16% 35%',
+    accent: '225 15% 88%',
+    'accent-foreground': '234 16% 35%',
+    success: '105.5 59.8% 43.3%',
+    'success-foreground': '220 22% 92%',
+    info: '220.3 91.4% 54.3%',
+    'info-foreground': '220 22% 92%',
+    warning: '34.5 78.7% 49.4%',
+    'warning-foreground': '234 16% 35%',
+    destructive: '0 78% 62%',
+    'destructive-foreground': '220 22% 92%',
+    ring: '169 50% 32%',
+    radius: '0.5rem',
+  },
+  dark: {
+    background: '231 23% 16%',
+    foreground: '227 70% 87%',
+    muted: '233 20% 27%',
+    'muted-foreground': '228 15% 63%',
+    popover: '231 23% 16%',
+    'popover-foreground': '227 70% 87%',
+    card: '231 23% 16%',
+    'card-foreground': '227 70% 87%',
+    border: '233 20% 27%',
+    input: '233 20% 27%',
+    primary: '169 50% 55%',
+    'primary-foreground': '231 23% 16%',
+    secondary: '232 20% 12%',
+    'secondary-foreground': '227 70% 87%',
+    accent: '232 20% 12%',
+    'accent-foreground': '227 70% 87%',
+    success: '105.2 48.1% 71.9%',
+    'success-foreground': '231 23% 16%',
+    info: '220.3 83.3% 75%',
+    'info-foreground': '231 23% 16%',
+    warning: '40 70.3% 77.8%',
+    'warning-foreground': '231 23% 16%',
+    destructive: '355 83% 76%',
+    'destructive-foreground': '231 23% 16%',
+    ring: '169 50% 55%',
+  },
+}
+
+const colorKeys = Object.keys(themeData.light).filter((key) => key !== 'radius')
+const sidebarColors = [
   'background',
   'foreground',
-  'muted',
-  'muted-foreground',
-  'popover',
-  'popover-foreground',
-  'card',
-  'card-foreground',
-  'border',
-  'input',
   'primary',
   'primary-foreground',
-  'secondary',
-  'secondary-foreground',
   'accent',
   'accent-foreground',
-  'destructive',
-  'destructive-foreground',
+  'border',
   'ring',
-  // 新增状态色
-  'success',
-  'success-foreground',
-  'warning',
-  'warning-foreground',
-  'info',
-  'info-foreground',
 ]
 
-// 自动生成 theme.colors 配置
-const colors = colorNames.reduce((acc, name) => {
-  acc[name] = `hsl(var(--${name}))`
-  return acc
-}, {} as Record<string, string>)
+const colors = colorKeys.reduce(
+  (acc, key) => {
+    acc[key] = `hsl(var(--${key}))`
+    return acc
+  },
+  {} as Record<string, string>,
+)
 
-// 添加 error 别名
+// 别名与 Sidebar 映射
 colors['error'] = colors['destructive']
 colors['error-foreground'] = colors['destructive-foreground']
+sidebarColors.forEach((name) => {
+  colors[`sidebar-${name}`] = `hsl(var(--sidebar-${name}))`
+})
 
 export default defineConfig({
   shortcuts: {
@@ -65,6 +108,24 @@ export default defineConfig({
       sm: 'calc(var(--radius) - 4px)',
     },
   },
+  preflights: [
+    {
+      getCSS: () => {
+        const generateVars = (obj: Record<string, string>) =>
+          Object.entries(obj)
+            .map(([k, v]) => `--${k}: ${v};`)
+            .join('\n')
+        const sidebarVars = sidebarColors
+          .map((name) => `--sidebar-${name}: var(--${name});`)
+          .join('\n')
+
+        return `
+          :root { ${generateVars(themeData.light)} ${sidebarVars} }
+          .dark { ${generateVars(themeData.dark)} ${sidebarVars} }
+        `
+      },
+    },
+  ],
   presets: [
     presetWind4(),
     presetIcons({
@@ -74,21 +135,11 @@ export default defineConfig({
             fs.readFileSync(path.resolve(__dirname, './src/assets/potato-forge.svg'), 'utf-8'),
         },
       },
-      extraProperties: {
-        display: 'inline-block',
-        'vertical-align': 'middle',
-      },
+      extraProperties: { display: 'inline-block', 'vertical-align': 'middle' },
       scale: 1.2,
-      warn: true,
     }),
     presetTypography(),
-    presetWebFonts({
-      fonts: {
-        sans: 'DM Sans',
-        serif: 'DM Serif Display',
-        mono: 'DM Mono',
-      },
-    }),
+    presetWebFonts({}),
     presetAnimations(),
   ],
   transformers: [transformerDirectives(), transformerVariantGroup()],

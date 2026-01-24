@@ -9,7 +9,8 @@
 
 <template>
   <div class="p-12 flex justify-center items-center gap-4">
-    <button @click="pushButton">Toast</button>
+    <PfButton @click="pushButton">Toast</PfButton>
+    <Button @click="pushButton">Toast</Button>
   </div>
 </template>
 
