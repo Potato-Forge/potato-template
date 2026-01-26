@@ -1,4 +1,17 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { supabase } from '@/api'
+
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error('Error signing out:', error.message)
+    } else {
+      router.push('/signin')
+    }
+  }
+</script>
 
 <template>
   <DropdownMenu>
@@ -57,7 +70,7 @@
       <DropdownMenuItem>Support</DropdownMenuItem>
       <DropdownMenuItem disabled> API </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem>
+      <DropdownMenuItem @select="handleSignOut">
         Log out
         <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
       </DropdownMenuItem>

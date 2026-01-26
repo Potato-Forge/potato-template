@@ -5,6 +5,10 @@ const adminRoutes: RouteRecordRaw[] = [
   {
     path: 'admin',
     component: AdminLayout,
+    meta: {
+      title: '管理员',
+      icon: 'tabler:dashboard',
+    },
     children: [
       {
         path: 'dashboard',

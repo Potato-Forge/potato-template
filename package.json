@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vue-tsc -b && vite build --mode production",
     "preview": "vite preview",
-    "ui": "shadcn-vue add"
+    "ui": "shadcn-vue add",
+    "gen:types": "tsx ./scripts/gen-types.ts"
   },
   "dependencies": {
     "@alova/adapter-axios": "^2.0.17",
@@ -20,6 +21,7 @@
     "@unocss/reset": "^66.5.10",
     "@unovis/ts": "^1.6.2",
     "@unovis/vue": "^1.6.2",
+    "@vee-validate/zod": "^4.15.1",
     "@vueuse/core": "^14.1.0",
     "alova": "^3.4.1",
     "axios": "^1.13.2",
@@ -51,7 +53,9 @@
     "@unocss/preset-wind4": "^66.5.10",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vue/tsconfig": "^0.8.1",
+    "dotenv": "^17.2.3",
     "shadcn-vue": "^2.4.3",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "unocss": "^66.5.10",
     "unplugin-auto-import": "^20.3.0",
