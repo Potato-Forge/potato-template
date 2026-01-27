@@ -1,9 +1,20 @@
 <script setup lang="ts">
   import { usePfToast } from '@/components/pf/pf-toast'
+  import { supabase } from '@/api'
 
   const { toast } = usePfToast()
-  const pushButton = () => {
-    toast.success('123')
+  const pushButton = async () => {
+    const { data, error } = await supabase.rpc('get_user_permissions')
+    if (error) {
+      toast.error('Error', {
+        description: error.message,
+      })
+    } else {
+      toast.success('Success', {
+        description: 'User permissions retrieved successfully.',
+      })
+      console.log(data)
+    }
   }
 </script>
 

@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      menus: {
+      permissions: {
         Row: {
           code: string | null
           component: string | null
@@ -24,10 +24,11 @@ export type Database = {
           is_external: boolean | null
           is_hidden: boolean | null
           name: string
-          parient_id: number | null
+          parent_id: number | null
           path: string | null
           sort: number | null
           status: boolean | null
+          type: string | null
         }
         Insert: {
           code?: string | null
@@ -38,10 +39,11 @@ export type Database = {
           is_external?: boolean | null
           is_hidden?: boolean | null
           name: string
-          parient_id?: number | null
+          parent_id?: number | null
           path?: string | null
           sort?: number | null
           status?: boolean | null
+          type?: string | null
         }
         Update: {
           code?: string | null
@@ -52,17 +54,18 @@ export type Database = {
           is_external?: boolean | null
           is_hidden?: boolean | null
           name?: string
-          parient_id?: number | null
+          parent_id?: number | null
           path?: string | null
           sort?: number | null
           status?: boolean | null
+          type?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "menus_parient_id_fkey"
-            columns: ["parient_id"]
+            foreignKeyName: "permissions_parent_id_fkey"
+            columns: ["parent_id"]
             isOneToOne: false
-            referencedRelation: "menus"
+            referencedRelation: "permissions"
             referencedColumns: ["id"]
           },
         ]
@@ -74,7 +77,6 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
-          role: string
           status: string
           updated_at: string
           username: string | null
@@ -85,7 +87,6 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
-          role?: string
           status?: string
           updated_at?: string
           username?: string | null
@@ -96,19 +97,104 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
-          role?: string
           status?: string
           updated_at?: string
           username?: string | null
         }
         Relationships: []
       }
+      role_permissions: {
+        Row: {
+          actions: string[] | null
+          permission_id: number
+          role_code: string
+        }
+        Insert: {
+          actions?: string[] | null
+          permission_id: number
+          role_code: string
+        }
+        Update: {
+          actions?: string[] | null
+          permission_id?: number
+          role_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_permission_id_fkey"
+            columns: ["permission_id"]
+            isOneToOne: false
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "role_permissions_role_code_fkey"
+            columns: ["role_code"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      roles: {
+        Row: {
+          code: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          code: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          role_code: string
+          user_id: string
+        }
+        Insert: {
+          role_code: string
+          user_id: string
+        }
+        Update: {
+          role_code?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_role_code_fkey"
+            columns: ["role_code"]
+            isOneToOne: false
+            referencedRelation: "roles"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_permissions: {
+        Args: never
+        Returns: {
+          p_code: string
+          p_id: number
+          p_name: string
+          p_parent_id: number
+          p_type: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
