@@ -8,7 +8,7 @@ import adminRoutes from './routes/adminRoutes'
 import commonRoutes from './routes/commonRoutes'
 
 // guards
-import loginGuard from './guard/LoginGuard'
+import routeGuard from './guard'
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -26,6 +26,6 @@ const router = createRouter({
 })
 
 // 注册路由守卫
-loginGuard(router)
+routeGuard(router)
 
 export default router

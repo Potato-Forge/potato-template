@@ -2,9 +2,7 @@
   import { z } from 'zod'
   import { toTypedSchema } from '@vee-validate/zod'
   import { supabase } from '@/api'
-  import { usePfToast } from '@/components/pf/pf-toast'
-
-  const { toast } = usePfToast()
+  import { pfToast } from '@/components/pf/pf-toast'
 
   const schema = toTypedSchema(
     z.object({
@@ -25,11 +23,11 @@
     })
 
     if (error) {
-      toast.error(error.message)
+      pfToast.error(error.message)
       return
     }
 
-    toast.success('登录成功')
+    pfToast.success('登录成功')
     window.location.reload()
   })
 </script>

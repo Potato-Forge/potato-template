@@ -3,9 +3,11 @@ import type { Database } from '@/types/database.types'
 import { defineStore } from 'pinia'
 import type { RouteRecordRaw } from 'vue-router'
 
-const useMenuStore = defineStore('menu', {
+export type Permission = Database['public']['Functions']['get_user_permissions']['Returns']
+
+const usePermissionStore = defineStore('permission', {
   state: () => ({
-    permissions: [] as Database['public']['Functions']['get_user_permissions']['Returns'],
+    permissions: [] as Permission,
     menus: [] as RouteRecordRaw[],
   }),
   actions: {
@@ -21,4 +23,4 @@ const useMenuStore = defineStore('menu', {
   },
 })
 
-export default useMenuStore
+export default usePermissionStore
