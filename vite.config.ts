@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
           },
         ],
         dts: getPath('./src/types/auto-imports.d.ts'),
-        dirs: [getPath('./src/components/pf/*/')],
+        dirs: [],
       }),
       Components({
         dts: getPath('./src/types/components.d.ts'),
