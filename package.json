@@ -13,6 +13,7 @@
   "dependencies": {
     "@alova/adapter-axios": "^2.0.17",
     "@dnd-kit/abstract": "^0.2.1",
+    "@he-tree/vue": "^2.10.1",
     "@radix-icons/vue": "^1.0.0",
     "@supabase/supabase-js": "^2.91.0",
     "@tabler/icons-vue": "^3.36.0",
@@ -73,5 +74,5 @@
       "vue-demi"
     ]
   },
-  "packageManager": "pnpm@10.29.3"
+  "packageManager": "pnpm@10.32.1"
 }
