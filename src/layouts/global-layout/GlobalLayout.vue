@@ -16,7 +16,7 @@
     <GlobalLayoutSidebar />
 
     <!-- 2. 主体内容区域 -->
-    <div class="h-full pl-16 flex bg-background flex">
+    <div class="h-full min-h-0 pl-16 flex bg-background">
       <!-- Menu sidebar -->
       <div
         :class="isSidebarOpen ? 'w-56 mr-2' : 'w-0 mr-0'"
@@ -28,12 +28,14 @@
       </div>
 
       <!-- main content -->
-      <div class="flex-1 my-3 mr-2 rounded-2xl bg-secondary flex flex-col">
+      <div
+        class="flex-1 min-h-0 min-w-0 my-3 mr-2 rounded-2xl bg-secondary flex flex-col overflow-hidden"
+      >
         <header class="h-12 border-b-1px border-border mx-2">
           <GlobalLayoutHeader></GlobalLayoutHeader>
         </header>
 
-        <main class="flex-1">
+        <main class="flex-1 min-h-0 overflow-hidden">
           <router-view></router-view>
         </main>
       </div>

@@ -9,6 +9,7 @@
     truncate?: boolean | number
     weight?: 'normal' | 'medium' | 'semibold' | 'bold' | 'extrabold'
     dimmed?: boolean
+    prefixLine?: boolean
   }
 
   const props = withDefaults(defineProps<Props>(), {
@@ -20,7 +21,6 @@
   const isExternal = computed(() => props.href?.startsWith('http'))
   const isAnchor = computed(() => props.href?.startsWith('#'))
 
-  // 基于 Stitch 的视觉规范定义的样式映射
   const variantClasses = {
     // Heading 1: Manrope ExtraBold / 3.5rem / Tracking-tight
     h1: 'font-headline text-4xl md:text-[3.5rem] font-extrabold leading-none tracking-tight text-on-surface mb-6',
@@ -103,13 +103,16 @@
       )
     "
   >
+    <!-- prefix line -->
+    <span v-if="props.prefixLine" class="w-2 h-8 bg-primary rounded-full"></span>
+
     <slot name="prefix" />
 
     <slot />
 
     <template v-if="as === 'a' || resolvedVariant === 'link'">
-      <span v-if="isExternal" class="material-symbols-outlined text-[1em]">open_in_new</span>
-      <span v-else-if="isAnchor" class="material-symbols-outlined text-[1em]">link</span>
+      <span v-if="isExternal" class="i-tabler-external-link text-[1em]">open_in_new</span>
+      <span v-else-if="isAnchor" class="i-tabler-link text-[1em]">link</span>
     </template>
   </component>
 </template>

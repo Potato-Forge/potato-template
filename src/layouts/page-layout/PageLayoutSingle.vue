@@ -4,7 +4,10 @@
   const attrs = useAttrs()
 
   const containerClass = computed(() => {
-    return twMerge('w-full hfull flex flex-col p-4 overflow-hidden', (attrs.class as string) || '')
+    return twMerge(
+      'w-full h-full min-h-0 flex flex-col p-4 overflow-hidden',
+      (attrs.class as string) || '',
+    )
   })
 </script>
 
