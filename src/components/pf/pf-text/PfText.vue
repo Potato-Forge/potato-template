@@ -13,7 +13,7 @@
   }
 
   const props = withDefaults(defineProps<Props>(), {
-    as: 'p',
+    as: 'div',
   })
 
   const attrs = useAttrs()
@@ -23,15 +23,15 @@
 
   const variantClasses = {
     // Heading 1: Manrope ExtraBold / 3.5rem / Tracking-tight
-    h1: 'font-headline text-4xl md:text-[3.5rem] font-extrabold leading-none tracking-tight text-on-surface mb-6',
+    h1: 'font-headline text-4xl md:text-[3.5rem] font-extrabold leading-none tracking-tight text-on-surface',
     // Heading 2: Manrope Bold / 2.5rem
-    h2: 'font-headline text-3xl md:text-4xl font-bold leading-tight text-on-surface mb-4',
+    h2: 'font-headline text-3xl md:text-4xl font-bold leading-tight text-on-surface',
     // Heading 3: Manrope Bold / 1.75rem
-    h3: 'font-headline text-2xl md:text-[1.75rem] font-bold leading-tight text-on-surface mb-3',
+    h3: 'font-headline text-2xl md:text-[1.75rem] font-bold leading-tight text-on-surface',
     // Heading 4: Manrope Bold / 1.25rem
-    h4: 'font-headline text-xl md:text-[1.25rem] font-bold leading-tight text-on-surface mb-2',
+    h4: 'font-headline text-xl md:text-[1.25rem] font-bold leading-tight text-on-surface',
     // Body: Inter / 1rem / Leading-relaxed
-    body: 'font-body text-base leading-relaxed text-on-surface mb-4',
+    body: 'font-body text-base leading-relaxed text-on-surface',
     // Caption: Inter / 0.75rem
     caption: 'font-body text-xs text-on-surface-variant italic',
     // Link: Primary Color / Underline Offset
@@ -94,7 +94,7 @@
     :style="truncateStyle"
     :class="
       cn(
-        'pf-text-root antialiased',
+        'pf-text-root antialiased flex items-stretch',
         variantClasses[resolvedVariant],
         props.weight && weightClasses[props.weight],
         props.dimmed && 'text-on-surface-variant',
@@ -104,7 +104,7 @@
     "
   >
     <!-- prefix line -->
-    <span v-if="props.prefixLine" class="w-2 h-8 bg-primary rounded-full"></span>
+    <span v-if="props.prefixLine" class="w-2 bg-primary rounded-full mr-2"></span>
 
     <slot name="prefix" />
 

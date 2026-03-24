@@ -1,52 +1,35 @@
 <script setup lang="ts">
-  import { useQuery } from '@tanstack/vue-query'
-  import { permissionKeys, getAllPermissions } from '@/api/permission/permission'
   import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
-  import { flatToTree, type TreeNode } from '@/utils/tree'
   import PermissionTree from './components/PermissionTree.vue'
   import PermissionForm from './components/PermissionForm.vue'
+  import { usePermissionManager } from './usePermissionManager'
 
-  const {
-    data: allPermissions,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: permissionKeys.all,
-    queryFn: getAllPermissions,
-  })
+  const treeRef = useTemplateRef('tree')
 
-  const allPermissionTree = computed(() => {
-    if (!allPermissions.value) return []
+  const manager = usePermissionManager(treeRef)
+  const { allPermissionTree, choosenId, choosenPath } = manager
 
-    return flatToTree(allPermissions.value)
-  })
-
-  // choosen nodes
-  const choosenNodes = ref<TreeNode | null>(null)
-
-  // inject data
-  provide('allPermissionTree', allPermissionTree.value)
-  provide('allPermissions', allPermissions.value)
+  provide('permissionManager', manager)
 </script>
 <template>
-  <PageLayoutSingle class="flex-row gap-2 min-h-0">
-    <!-- all Menus -->
-    <pf-card class="w-40% h-full min-h-0 flex flex-col p-2 overflow-hidden">
-      <pf-text as="h3">权限列表</pf-text>
+  <PageLayoutSingle class="flex flex-row gap-4">
+    <!-- all Permission tree -->
+    <pf-card class="w-40% h-full min-h-0 flex flex-col overflow-hidden">
+      <template #header>
+        <pf-text :prefix-line="true" as="h3">权限列表</pf-text>
+      </template>
       <div class="flex-1 min-h-0 overflow-y-auto">
         <permission-tree
-          :node="allPermissionTree"
-          v-model:choosenNodes="choosenNodes"
+          ref="tree"
+          :tree-data="allPermissionTree"
+          v-model:choosen="choosenId"
         ></permission-tree>
       </div>
     </pf-card>
     <!-- edit area -->
-    <pf-card class="flex-1 min-w-0 h-full min-h-0 flex flex-col overflow-hidden">
-      <div class="flex-1 min-h-0 overflow-y-auto">
-        <permission-form></permission-form>
-      </div>
-    </pf-card>
+    <div class="flex-1 h-full">
+      <permission-form></permission-form>
+    </div>
   </PageLayoutSingle>
 </template>
 

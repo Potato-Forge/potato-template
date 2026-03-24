@@ -1,11 +1,12 @@
 <script setup lang="ts">
   import { Draggable } from '@he-tree/vue'
   import PfTreeCheckbox from './PfTreeCheckbox.vue'
+  import type { PfTreeNode } from '.'
 
   // props
   const props = withDefaults(
     defineProps<{
-      modelValue: any[]
+      modelValue: PfTreeNode[]
       labelKey?: string
       valueKey?: string
       childrenKey?: string
@@ -13,7 +14,7 @@
       chooseable?: boolean
       checkable?: boolean
       draggable?: boolean
-      choosenNodes?: any
+      choosen?: string | number | null
     }>(),
     {
       labelKey: 'name',
@@ -26,8 +27,18 @@
     },
   )
 
+  // Tree Instance
+  const treeRef = useTemplateRef('tree')
+  // Tree methods
+  const getTreeData = () => {
+    return treeRef.value ? treeRef.value.getData() : []
+  }
+
   // emits
-  const emit = defineEmits(['update:modelValue', 'update:choosenNodes'])
+  const emit = defineEmits<{
+    (event: 'update:modelValue', value: PfTreeNode[]): void
+    (event: 'update:choosen', value: string | number | null): void
+  }>()
 
   // data
   const data = computed({
@@ -42,15 +53,13 @@
   // Node Class
   const nodeClass = (stat: any) => {
     return [
+      // node choose
       props.chooseable ? 'cursor-pointer' : '',
-      isNodeChoosen(stat)
-        ? 'bg-selected text-selected-foreground ring-2 ring-inset ring-primary'
-        : '',
+      isNodeChoosen(stat) ? 'bg-selected text-primary ring-2 ring-inset ring-primary' : '',
     ]
   }
 
   // Check
-  const treeRef = useTemplateRef('tree')
   const checkedNodes = ref<any[]>([])
   const onCheckNode = () => {
     if (treeRef.value) {
@@ -59,39 +68,33 @@
   }
 
   // choose
-  const choosenNodes = computed({
+  const choosen = computed({
     get() {
-      return props.choosenNodes
+      return props.choosen
     },
     set(v) {
-      emit('update:choosenNodes', v)
+      if (v) {
+        emit('update:choosen', v)
+      } else {
+        emit('update:choosen', null)
+      }
     },
   })
-  const onChooseNode = (stats: any) => {
-    if (props.chooseable) {
-      if (getIndex(stats) === getIndex(choosenNodes.value)) {
-        choosenNodes.value = null
-      } else {
-        choosenNodes.value = stats
-      }
-    }
-  }
-  const isNodeChoosen = (stats: any) => {
-    return getIndex(choosenNodes.value) === getIndex(stats)
+
+  const onChooseNode = (stat: any) => {
+    if (!props.chooseable) return
+    const key = stat.data[props.valueKey]
+    choosen.value = choosen.value === key ? null : key
   }
 
-  // node index
-  const getIndex = (node: any) => {
-    if (!node) return Symbol('invalid_node')
-
-    const value = node[props.valueKey]
-
-    if (value === null || value === '') {
-      return Symbol('invalid_node_key')
-    }
-
-    return value
+  const isNodeChoosen = (stat: any) => {
+    return choosen.value != null && choosen.value === stat.data[props.valueKey]
   }
+
+  // expose
+  defineExpose({
+    getTreeData,
+  })
 </script>
 
 <template>
@@ -114,7 +117,7 @@
       >
         <!-- Checkbox  -->
         <div class="flex items-center mx-2">
-          <pf-tree-checkbox v-model="stat.checked" class="mx-1" />
+          <pf-tree-checkbox v-model="stat.checked" class="mx-1" @click.stop />
         </div>
 
         <!-- Toggle Button -->
@@ -134,7 +137,11 @@
         <div class="flex-grow flex items-center whitespace-nowrap">
           <!-- Node Icon -->
           <div :class="node.icon" class="text-primary"></div>
-          <slot name="text">{{ node.name || node.text }}</slot>
+          <slot
+            name="text"
+            :class="isNodeChoosen(stat) ? 'text-selected-foreground' : 'text-on-surface'"
+            >{{ node.name || node.text }}</slot
+          >
         </div>
 
         <!-- Node SubText -->

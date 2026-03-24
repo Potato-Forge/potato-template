@@ -1,3 +1,5 @@
+import type { PfTreeNode } from '@/components/pf/pf-tree'
+
 export type FlatData = {
   [key: string]: any
 }
@@ -8,12 +10,7 @@ export type TreeOptions = {
   childrenKey?: string
 }
 
-export type TreeNode = {
-  [key: string]: any
-  id: string
-  parent_id: string | null
-  children?: TreeNode[]
-}
+export type TreeNode = PfTreeNode
 
 /*
  * @description 将扁平化数据转换为树形结构
