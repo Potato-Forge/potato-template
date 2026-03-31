@@ -8,7 +8,7 @@
     if (error) {
       console.error('Error signing out:', error.message)
     } else {
-      router.push('/signin')
+      router.push('/login')
     }
   }
 </script>

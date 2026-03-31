@@ -3,6 +3,8 @@ import { supabase } from '..'
 
 export type Permission = Database['public']['Tables']['permissions']['Row']
 
+export type AllPermissionItem = Database['public']['Tables']['permissions']['Row']
+
 export const permissionKeys = {
   all: ['permissions'] as const,
 }

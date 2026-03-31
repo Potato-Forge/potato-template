@@ -195,6 +195,7 @@ export type Database = {
           p_type: string
         }[]
       }
+      has_roles: { Args: { role_codes: string[] }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

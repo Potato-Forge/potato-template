@@ -26,18 +26,7 @@ export default defineConfig(({ mode }) => {
       UnoCSS(),
 
       AutoImport({
-        imports: [
-          'vue',
-          'vue-router',
-          'pinia',
-          '@vueuse/core',
-          {
-            'reka-ui': ['DropdownMenuPortal'], // 自定义导入
-          },
-          {
-            'vee-validate': ['useForm', 'useField', 'Field', 'Form', 'ErrorMessage', 'FieldArray'],
-          },
-        ],
+        imports: ['vue', 'vue-router', 'pinia', '@vueuse/core'],
         dts: getPath('./src/types/auto-imports.d.ts'),
         dirs: [],
       }),

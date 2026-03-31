@@ -1,5 +1,7 @@
 <script setup lang="ts">
+  import type { PfFormConfig } from '@/components/pf/pf-form/PfForm.types'
   import type { usePermissionManager } from '../usePermissionManager'
+  import type { AllPermissionItem } from '@/api/permission/permission'
 
   const manager = inject('permissionManager')
   const { choosenId, choosenPath, choosenPermission } = manager as ReturnType<
@@ -14,6 +16,58 @@
 
     return 'edit'
   })
+
+  // form data
+  const formData = ref<AllPermissionItem | null>(null)
+  watchEffect(() => {
+    if (formMode.value === 'edit') {
+      formData.value = choosenPermission.value
+    } else {
+      formData.value = null
+    }
+  })
+  // form config
+  const formConfig = ref<PfFormConfig<AllPermissionItem>>([
+    {
+      name: 'ID',
+      key: 'id',
+      type: 'text',
+      readonly: true,
+    },
+    {
+      name: '创建时间',
+      key: 'created_at',
+      type: 'datetime',
+      readonly: false,
+      create: true,
+      edit: true,
+      config: {
+        format: 'iso',
+      },
+    },
+    {
+      name: '权限名称',
+      key: 'name',
+      type: 'text',
+      create: true,
+      edit: true,
+    },
+
+    {
+      name: '权限编码',
+      key: 'code',
+      type: 'text',
+      create: true,
+      edit: true,
+    },
+    {
+      name: '权限路径',
+      key: 'path',
+      type: 'text',
+      create: true,
+      edit: true,
+    },
+  ])
 </script>
 
 <template>
@@ -52,7 +106,7 @@
 
       <!-- Form Content -->
       <pf-card class="p-4 flex-1">
-        <pf-form></pf-form>
+        <pf-form :form-config="formConfig" :form-data="formData"></pf-form>
       </pf-card>
     </div>
   </div>

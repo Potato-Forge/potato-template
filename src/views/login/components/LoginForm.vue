@@ -3,6 +3,7 @@
   import { toTypedSchema } from '@vee-validate/zod'
   import { supabase } from '@/api'
   import { pfToast } from '@/components/pf/pf-toast'
+  import { useForm } from 'vee-validate'
 
   const schema = toTypedSchema(
     z.object({
