@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { Tippy } from 'vue-tippy'
   import 'tippy.js/dist/tippy.css'
-  import 'tippy.js/animations/shift-away.css' // 推荐一个好看的动画
+  import 'tippy.js/animations/shift-away.css'
 
   interface Props {
     content?: string

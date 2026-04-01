@@ -1,6 +1,6 @@
 /* 默认 theme */
 .tippy-box[data-theme~='pf-tooltip'] {
-  @apply bg-gray-900 text-white border border-white/10 shadow-lg;
+  @apply bg-primary text-primary-foreground border border-border shadow-lg;
 }
 
 .tippy-box[data-theme~='pf-tooltip'] > .tippy-content {
@@ -8,7 +8,7 @@
 }
 
 .tippy-box[data-theme~='pf-tooltip'] > .tippy-arrow {
-  @apply fill-gray-900;
+  @apply text-primary;
 }
 
 /* sidebar 专用 */

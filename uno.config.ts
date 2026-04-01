@@ -134,6 +134,7 @@ export default defineConfig({
     presetWind4(),
     presetIcons({
       collections: {
+        cdn: 'https://esm.sh/',
         pf: {
           logo: () =>
             fs.readFileSync(path.resolve(__dirname, './src/assets/potato-forge.svg'), 'utf-8'),

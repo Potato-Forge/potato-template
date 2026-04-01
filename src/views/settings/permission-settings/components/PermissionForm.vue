@@ -38,9 +38,7 @@
       name: '创建时间',
       key: 'created_at',
       type: 'datetime',
-      readonly: false,
-      create: true,
-      edit: true,
+      readonly: true,
       config: {
         format: 'iso',
       },
@@ -51,6 +49,7 @@
       type: 'text',
       create: true,
       edit: true,
+      help: '权限的展示名称',
     },
 
     {
@@ -59,11 +58,19 @@
       type: 'text',
       create: true,
       edit: true,
+      help: '权限的唯一标识，建议使用英文和下划线',
     },
     {
       name: '权限路径',
       key: 'path',
       type: 'text',
+      create: true,
+      edit: true,
+    },
+    {
+      name: '权限图标',
+      key: 'icon',
+      type: 'icon',
       create: true,
       edit: true,
     },

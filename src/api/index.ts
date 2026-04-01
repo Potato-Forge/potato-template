@@ -11,6 +11,13 @@ export const alovaInstance = createAlova({
   timeout: import.meta.env.VITE_API_TIMEOUT,
 })
 
+// fetch local public data
+export const publicInstance = createAlova({
+  statesHook: VueHook,
+  requestAdapter: axiosRequestAdapter(),
+  timeout: import.meta.env.VITE_API_TIMEOUT,
+})
+
 export const supabase = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_KEY,

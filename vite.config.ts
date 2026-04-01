@@ -9,6 +9,7 @@ import Icons from 'unplugin-icons/vite'
 import IconsResolver from 'unplugin-icons/resolver'
 import UnoCSS from 'unocss/vite'
 import { createHtmlPlugin } from 'vite-plugin-html'
+import { iconListPlugin } from './scripts/gen-icon-list'
 
 const getPath = (path: string) => fileURLToPath(new URL(path, import.meta.url))
 
@@ -92,6 +93,7 @@ export default defineConfig(({ mode }) => {
           },
         },
       }),
+      iconListPlugin(),
     ],
     resolve: {
       alias: {

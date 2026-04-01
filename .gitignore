@@ -31,3 +31,6 @@ env/.env.*.local
 
 # ai
 .ai
+
+# dynamic icon list json
+public/icon-list.json

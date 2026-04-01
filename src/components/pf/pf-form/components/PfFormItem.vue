@@ -39,6 +39,21 @@
       </template>
     </template>
 
+    <!-- type:icon -->
+    <template v-else-if="config.type === 'icon'">
+      <!-- read -->
+      <template v-if="config.readonly">
+        <div class="i-tabler-icons text-lg text-primary"></div>
+      </template>
+      <!-- write -->
+      <template v-else>
+        <pf-icon-picker
+          :model-value="field.state.value"
+          @update:model-value="field.handleChange"
+        ></pf-icon-picker>
+      </template>
+    </template>
+
     <!-- info -->
     <pf-text></pf-text>
   </div>

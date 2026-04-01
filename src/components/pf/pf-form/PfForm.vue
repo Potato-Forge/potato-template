@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import { useForm } from '@tanstack/vue-form'
   import type { PfFormConfigItem } from './PfForm.types'
+  import PfHelp from '../pf-help/PfHelp.vue'
 
   const props = defineProps<{
     formConfig: PfFormConfigItem[]
@@ -41,9 +42,11 @@
     <div class="grid gap-4">
       <form.Field v-for="config in props.formConfig" :key="config.key" :name="String(config.key)">
         <template v-slot="{ field }">
-          <!-- text -->
           <div class="grid w-full items-center gap-2">
-            <Label :for="String(config.key)">{{ config.name }}</Label>
+            <div class="flex items-center gap-1">
+              <Label :for="String(config.key)">{{ config.name }}</Label>
+              <pf-help v-if="config.help" :content="config.help"></pf-help>
+            </div>
             <pf-form-item :config="config" :field="field"></pf-form-item>
           </div>
         </template>

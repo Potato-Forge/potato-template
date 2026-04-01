@@ -1,4 +1,5 @@
 import type { AnyFieldApi } from '@tanstack/vue-form'
+import type { JSX } from 'vue/jsx-runtime'
 
 export type PfFormFieldApi = AnyFieldApi
 
@@ -35,6 +36,11 @@ type PfFormConfigBase<
    * @default false
    */
   readonly?: boolean
+  /**
+   * 表单项的帮助信息，可以是字符串、组件或一个返回 VNode/JSX 的函数，用于在表单项下方显示额外的说明信息
+   *
+   */
+  help?: string | Component | (() => VNode | JSX.Element)
 }
 
 /**
@@ -128,6 +134,14 @@ export type PfFormConfigItemTime<
   }
 }
 
+export type PfFormConfigItemIcon<
+  T = Record<string, unknown>,
+  K extends keyof T & string = keyof T & string,
+> = PfFormConfigBase<T, K> & {
+  type: 'icon'
+  config?: {}
+}
+
 /**
  * 所有表单配置项类型的联合
  */
@@ -136,6 +150,7 @@ export type PfFormConfigItem<T = any> =
   | PfFormConfigItemDatetime<T>
   | PfFormConfigItemDate<T>
   | PfFormConfigItemTime<T>
+  | PfFormConfigItemIcon<T>
 
 /**
  * 表单配置数组
