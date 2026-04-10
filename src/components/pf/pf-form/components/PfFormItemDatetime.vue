@@ -40,19 +40,6 @@
   })
 
   /**
-   * 本地持有 VueDatePicker 状态，避免受控模式下 prop 回流时序问题导致显示回退
-   */
-  const internalValue = ref<string | string[] | null>(props.modelValue)
-
-  // 外部 prop 变化时同步进来（如切换编辑对象）
-  watch(
-    () => props.modelValue,
-    (val) => {
-      internalValue.value = val
-    },
-  )
-
-  /**
    * 显示格式（仅控制输入框展示，不影响 model 输出格式）
    */
   const displayFormat = computed(() => {
@@ -103,7 +90,7 @@
 <template>
   <div class="pf-datepicker">
     <VueDatePicker
-      v-model="internalValue"
+      :model-value="props.modelValue"
       @update:model-value="handleUpdateValue"
       :locale="zhCN"
       :dark="isDark"

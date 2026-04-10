@@ -8,6 +8,12 @@
     typeof usePermissionManager
   >
 
+  // form
+  const formRef = useTemplateRef('form')
+  const handleSubmit = () => {
+    formRef.value?.submit()
+  }
+
   // form mode
   const formMode = computed(() => {
     if (!choosenId.value) {
@@ -75,6 +81,24 @@
       edit: true,
     },
   ])
+
+  // form action
+  const handleReset = () => {
+    formRef.value?.reset()
+  }
+  const handleCancel = () => {
+    // reset form and go back to empty state
+    formRef.value?.reset()
+    choosenId.value = null
+  }
+  const handlePermission = async (data: Record<string, any>) => {
+    if (formMode.value === 'edit') {
+      console.log(data)
+    } else {
+      // create mode, validate first then submit
+      console.log(data)
+    }
+  }
 </script>
 
 <template>
@@ -105,15 +129,21 @@
 
           <!-- actions -->
           <div class="flex items-center gap-2">
-            <pf-button variant="ghost">取消</pf-button>
-            <pf-button type="primary">保存</pf-button>
+            <pf-button variant="ghost" @click="handleCancel">取消</pf-button>
+            <pf-button variant="secondary" @click="handleReset">重置</pf-button>
+            <pf-button type="primary" @click="handleSubmit">保存</pf-button>
           </div>
         </div>
       </pf-card>
 
       <!-- Form Content -->
       <pf-card class="p-4 flex-1">
-        <pf-form :form-config="formConfig" :form-data="formData"></pf-form>
+        <pf-form
+          ref="form"
+          :form-config="formConfig"
+          :form-data="formData"
+          :on-submit="handlePermission"
+        ></pf-form>
       </pf-card>
     </div>
   </div>

@@ -6,6 +6,7 @@
   const props = defineProps<{
     formConfig: PfFormConfigItem[]
     formData?: Record<string, any> | null
+    onSubmit?: (data: Record<string, any>) => Promise<void> | void
   }>()
 
   // initial form data
@@ -31,8 +32,28 @@
   const form = useForm({
     defaultValues: initialFormData(props.formData || {}),
     onSubmit: async ({ value }) => {
-      // Do something with form data
-      console.log(value)
+      if (props.onSubmit) {
+        await props.onSubmit(value)
+      }
+    },
+  })
+
+  // watch for formData changes to reset the form
+  watch(
+    () => props.formData,
+    (newVal) => {
+      form.reset(initialFormData(newVal || {}))
+    },
+    { deep: true },
+  )
+
+  defineExpose({
+    form,
+    reset: () => {
+      form.reset()
+    },
+    submit: () => {
+      form.handleSubmit()
     },
   })
 </script>
@@ -41,17 +62,22 @@
   <form @submit.prevent.stop="form.handleSubmit">
     <div class="grid gap-4">
       <form.Field v-for="config in props.formConfig" :key="config.key" :name="String(config.key)">
-        <template v-slot="{ field }">
+        <template v-slot="{ field, state }">
           <div class="grid w-full items-center gap-2">
             <div class="flex items-center gap-1">
               <Label :for="String(config.key)">{{ config.name }}</Label>
               <pf-help v-if="config.help" :content="config.help"></pf-help>
             </div>
-            <pf-form-item :config="config" :field="field"></pf-form-item>
+            <pf-form-item
+              :config="config"
+              :field="field"
+              :state="state"
+              :model-value="state.value"
+              @update:model-value="field.handleChange"
+            ></pf-form-item>
           </div>
         </template>
       </form.Field>
     </div>
-    <button type="submit">Submit</button>
   </form>
 </template>
