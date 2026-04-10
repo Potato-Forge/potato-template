@@ -6,7 +6,9 @@
   const props = defineProps<{
     formConfig: PfFormConfigItem[]
     formData?: Record<string, any> | null
+    formMode?: string
     onSubmit?: (data: Record<string, any>) => Promise<void> | void
+    onChange?: (data: Record<string, any>) => void
   }>()
 
   // initial form data
@@ -38,6 +40,15 @@
     },
   })
 
+  const handleFieldChange = (field: any, key: string, value: any) => {
+    field.handleChange(value)
+    if (!props.onChange) return
+    props.onChange({
+      ...form.state.values,
+      [key]: value,
+    })
+  }
+
   // watch for formData changes to reset the form
   watch(
     () => props.formData,
@@ -46,6 +57,22 @@
     },
     { deep: true },
   )
+
+  // form mode for create
+  const createForm = computed(() => {
+    return props.formConfig.filter((config) => config.create !== false)
+  })
+
+  // form mode for edit
+  const editForm = computed(() => {
+    return props.formConfig.filter((config) => config.edit !== false)
+  })
+
+  const formModeConfig = computed(() => {
+    if (props.formMode === 'create') return createForm.value
+    if (props.formMode === 'edit') return editForm.value
+    return props.formConfig
+  })
 
   defineExpose({
     form,
@@ -61,7 +88,7 @@
 <template>
   <form @submit.prevent.stop="form.handleSubmit">
     <div class="grid gap-4">
-      <form.Field v-for="config in props.formConfig" :key="config.key" :name="String(config.key)">
+      <form.Field v-for="config in formModeConfig" :key="config.key" :name="String(config.key)">
         <template v-slot="{ field, state }">
           <div class="grid w-full items-center gap-2">
             <div class="flex items-center gap-1">
@@ -73,7 +100,7 @@
               :field="field"
               :state="state"
               :model-value="state.value"
-              @update:model-value="field.handleChange"
+              @update:model-value="handleFieldChange(field, String(config.key), $event)"
             ></pf-form-item>
           </div>
         </template>

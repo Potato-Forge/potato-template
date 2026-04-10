@@ -111,7 +111,7 @@
   >
     <template #default="{ node, stat }">
       <div
-        class="relative w-full h-10 flex items-stretch hover:(bg-secondary) transition-colors ease-in-out duration-200 rounded overflow-hidden"
+        class="relative w-full h-10 flex items-stretch pr-2 hover:(bg-secondary) transition-colors ease-in-out duration-200 rounded overflow-hidden"
         :class="nodeClass(stat)"
         @click="onChooseNode(stat)"
       >
@@ -150,8 +150,8 @@
         </div>
 
         <!-- Node Actions -->
-        <div class="flex items-center">
-          <slot name="actions"></slot>
+        <div class="flex items-center" @click.stop.prevent @mousedown.stop>
+          <slot name="actions" :node="node" :stat="stat"></slot>
         </div>
 
         <!-- Node choosen -->

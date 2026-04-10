@@ -10,6 +10,7 @@ import { createPinia } from 'pinia'
 
 // pf components
 import { pfTooltipPlugin } from '@/components/pf/pf-tooltip'
+import { pfModalPlugin } from '@/components/pf/pf-modal'
 
 // tanstach/vue-query
 import { VueQueryPlugin } from '@tanstack/vue-query'
@@ -21,5 +22,6 @@ app.use(router)
 app.use(VueQueryPlugin)
 
 pfTooltipPlugin(app)
+pfModalPlugin(app)
 
 app.mount('#app')
