@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  const props = withDefaults(
-    defineProps<{
-      vertical?: boolean
-    }>(),
-    {
-      vertical: false,
-    },
-  )
+const props = withDefaults(
+  defineProps<{
+    vertical?: boolean
+  }>(),
+  {
+    vertical: false,
+  },
+)
 </script>
 
 <template>

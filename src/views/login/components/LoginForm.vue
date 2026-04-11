@@ -1,36 +1,36 @@
 <script setup lang="ts">
-  import { z } from 'zod'
-  import { toTypedSchema } from '@vee-validate/zod'
-  import { supabase } from '@/api'
-  import { pfToast } from '@/components/pf/pf-toast'
-  import { useForm } from 'vee-validate'
+import { z } from 'zod'
+import { toTypedSchema } from '@vee-validate/zod'
+import { supabase } from '@/api'
+import { pfToast } from '@/components/pf/pf-toast'
+import { useForm } from 'vee-validate'
 
-  const schema = toTypedSchema(
-    z.object({
-      username: z.string().min(1, '请输入您的账号'),
-      password: z.string().min(1, '请输入您的密码'),
-    }),
-  )
+const schema = toTypedSchema(
+  z.object({
+    username: z.string().min(1, '请输入您的账号'),
+    password: z.string().min(1, '请输入您的密码'),
+  }),
+)
 
-  const { meta, defineField, handleSubmit, errors } = useForm({ validationSchema: schema })
+const { meta, defineField, handleSubmit, errors } = useForm({ validationSchema: schema })
 
-  const [username, usernameProps] = defineField('username')
-  const [password, passwordProps] = defineField('password')
+const [username, usernameProps] = defineField('username')
+const [password, passwordProps] = defineField('password')
 
-  const onSubmit = handleSubmit(async (values) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: values.username,
-      password: values.password,
-    })
-
-    if (error) {
-      pfToast.error(error.message)
-      return
-    }
-
-    pfToast.success('登录成功')
-    window.location.reload()
+const onSubmit = handleSubmit(async (values) => {
+  const { error } = await supabase.auth.signInWithPassword({
+    email: values.username,
+    password: values.password,
   })
+
+  if (error) {
+    pfToast.error(error.message)
+    return
+  }
+
+  pfToast.success('登录成功')
+  window.location.reload()
+})
 </script>
 
 <template>

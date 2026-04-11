@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import type { JSX } from 'vue/jsx-runtime'
-  import { PfTooltip } from '../pf-tooltip'
+import type { JSX } from 'vue/jsx-runtime'
+import { PfTooltip } from '../pf-tooltip'
 
-  const props = defineProps<{
-    content?: string | Component | (() => VNode | JSX.Element)
-    position?: 'top' | 'bottom' | 'left' | 'right'
-  }>()
+const props = defineProps<{
+  content?: string | Component | (() => VNode | JSX.Element)
+  position?: 'top' | 'bottom' | 'left' | 'right'
+}>()
 </script>
 
 <template>

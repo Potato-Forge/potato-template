@@ -134,12 +134,30 @@ export type PfFormConfigItemTime<
   }
 }
 
+/**
+ * 选择图标类型
+ */
 export type PfFormConfigItemIcon<
   T = Record<string, unknown>,
   K extends keyof T & string = keyof T & string,
 > = PfFormConfigBase<T, K> & {
   type: 'icon'
   config?: {}
+}
+
+/**
+ * 开关类型
+ */
+export type PfFormConfigItemToggle<
+  T = Record<string, unknown>,
+  K extends keyof T & string = keyof T & string,
+> = PfFormConfigBase<T, K> & {
+  type: 'toggle'
+  config?: {
+    varient?: 'switch' | 'checkbox'
+    trueValue?: T[K]
+    falseValue?: T[K]
+  }
 }
 
 /**
@@ -151,6 +169,7 @@ export type PfFormConfigItem<T = any> =
   | PfFormConfigItemDate<T>
   | PfFormConfigItemTime<T>
   | PfFormConfigItemIcon<T>
+  | PfFormConfigItemToggle<T>
 
 /**
  * 表单配置数组

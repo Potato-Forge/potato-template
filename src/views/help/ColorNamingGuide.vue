@@ -1,169 +1,169 @@
 <script setup lang="ts">
-  import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
+import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
 
-  const tokenStyle = (token: string) => ({
-    backgroundColor: `hsl(var(--${token}))`,
-  })
+const tokenStyle = (token: string) => ({
+  backgroundColor: `hsl(var(--${token}))`,
+})
 
-  const tokenGroups = [
-    {
-      title: '基础表面',
-      description: '页面骨架、主要容器和浮层使用的长期结构色。',
-      tokens: [
-        {
-          name: 'background',
-          usage: '应用主背景、大页面底色',
-        },
-        {
-          name: 'foreground',
-          usage: '默认正文、主图标、主要信息',
-        },
-        {
-          name: 'card',
-          usage: '卡片、面板、内容容器表面',
-        },
-        {
-          name: 'card-foreground',
-          usage: '卡片内部正文与主信息',
-        },
-        {
-          name: 'popover',
-          usage: '下拉菜单、浮层、弹出内容表面',
-        },
-        {
-          name: 'popover-foreground',
-          usage: '浮层内文字与图标',
-        },
-      ],
-    },
-    {
-      title: '次级表面',
-      description: '弱化区块、次级容器和交互反馈的常用语义色。',
-      tokens: [
-        {
-          name: 'muted',
-          usage: '占位背景、弱化内容区、说明块背景',
-        },
-        {
-          name: 'muted-foreground',
-          usage: '辅助文本、说明文案、placeholder',
-        },
-        {
-          name: 'secondary',
-          usage: '次级容器、辅助按钮背景',
-        },
-        {
-          name: 'secondary-foreground',
-          usage: '次级容器中的主文字',
-        },
-        {
-          name: 'accent',
-          usage: 'hover、focus、激活前的交互高亮',
-        },
-        {
-          name: 'accent-foreground',
-          usage: 'accent 背景上的文字与图标',
-        },
-      ],
-    },
-    {
-      title: '品牌与交互',
-      description: '品牌色、操作焦点和输入控件相关 token。',
-      tokens: [
-        {
-          name: 'primary',
-          usage: '主按钮、关键动作、品牌强调',
-        },
-        {
-          name: 'primary-foreground',
-          usage: 'primary 背景上的主文字',
-        },
-        {
-          name: 'border',
-          usage: '普通边框、分隔线、轮廓边界',
-        },
-        {
-          name: 'input',
-          usage: '输入框边界与表单轮廓',
-        },
-        {
-          name: 'ring',
-          usage: '焦点态、键盘导航和强调轮廓',
-        },
-      ],
-    },
-    {
-      title: '状态反馈',
-      description: '结果反馈、危险提示以及持久选中状态。',
-      tokens: [
-        {
-          name: 'success',
-          usage: '成功反馈、通过状态、正向提示',
-        },
-        {
-          name: 'success-foreground',
-          usage: 'success 背景上的文字',
-        },
-        {
-          name: 'info',
-          usage: '信息提示、普通状态说明',
-        },
-        {
-          name: 'info-foreground',
-          usage: 'info 背景上的文字',
-        },
-        {
-          name: 'warning',
-          usage: '风险提醒、需注意但非危险操作',
-        },
-        {
-          name: 'warning-foreground',
-          usage: 'warning 背景上的文字',
-        },
-        {
-          name: 'destructive',
-          usage: '删除、清除、危险操作',
-        },
-        {
-          name: 'destructive-foreground',
-          usage: 'destructive 背景上的文字',
-        },
-        {
-          name: 'selected',
-          usage: '持久选中项、当前激活内容区',
-        },
-        {
-          name: 'selected-foreground',
-          usage: 'selected 背景上的文字',
-        },
-      ],
-    },
-  ]
+const tokenGroups = [
+  {
+    title: '基础表面',
+    description: '页面骨架、主要容器和浮层使用的长期结构色。',
+    tokens: [
+      {
+        name: 'background',
+        usage: '应用主背景、大页面底色',
+      },
+      {
+        name: 'foreground',
+        usage: '默认正文、主图标、主要信息',
+      },
+      {
+        name: 'card',
+        usage: '卡片、面板、内容容器表面',
+      },
+      {
+        name: 'card-foreground',
+        usage: '卡片内部正文与主信息',
+      },
+      {
+        name: 'popover',
+        usage: '下拉菜单、浮层、弹出内容表面',
+      },
+      {
+        name: 'popover-foreground',
+        usage: '浮层内文字与图标',
+      },
+    ],
+  },
+  {
+    title: '次级表面',
+    description: '弱化区块、次级容器和交互反馈的常用语义色。',
+    tokens: [
+      {
+        name: 'muted',
+        usage: '占位背景、弱化内容区、说明块背景',
+      },
+      {
+        name: 'muted-foreground',
+        usage: '辅助文本、说明文案、placeholder',
+      },
+      {
+        name: 'secondary',
+        usage: '次级容器、辅助按钮背景',
+      },
+      {
+        name: 'secondary-foreground',
+        usage: '次级容器中的主文字',
+      },
+      {
+        name: 'accent',
+        usage: 'hover、focus、激活前的交互高亮',
+      },
+      {
+        name: 'accent-foreground',
+        usage: 'accent 背景上的文字与图标',
+      },
+    ],
+  },
+  {
+    title: '品牌与交互',
+    description: '品牌色、操作焦点和输入控件相关 token。',
+    tokens: [
+      {
+        name: 'primary',
+        usage: '主按钮、关键动作、品牌强调',
+      },
+      {
+        name: 'primary-foreground',
+        usage: 'primary 背景上的主文字',
+      },
+      {
+        name: 'border',
+        usage: '普通边框、分隔线、轮廓边界',
+      },
+      {
+        name: 'input',
+        usage: '输入框边界与表单轮廓',
+      },
+      {
+        name: 'ring',
+        usage: '焦点态、键盘导航和强调轮廓',
+      },
+    ],
+  },
+  {
+    title: '状态反馈',
+    description: '结果反馈、危险提示以及持久选中状态。',
+    tokens: [
+      {
+        name: 'success',
+        usage: '成功反馈、通过状态、正向提示',
+      },
+      {
+        name: 'success-foreground',
+        usage: 'success 背景上的文字',
+      },
+      {
+        name: 'info',
+        usage: '信息提示、普通状态说明',
+      },
+      {
+        name: 'info-foreground',
+        usage: 'info 背景上的文字',
+      },
+      {
+        name: 'warning',
+        usage: '风险提醒、需注意但非危险操作',
+      },
+      {
+        name: 'warning-foreground',
+        usage: 'warning 背景上的文字',
+      },
+      {
+        name: 'destructive',
+        usage: '删除、清除、危险操作',
+      },
+      {
+        name: 'destructive-foreground',
+        usage: 'destructive 背景上的文字',
+      },
+      {
+        name: 'selected',
+        usage: '持久选中项、当前激活内容区',
+      },
+      {
+        name: 'selected-foreground',
+        usage: 'selected 背景上的文字',
+      },
+    ],
+  },
+]
 
-  const usageRules = [
-    {
-      title: '结构色',
-      body: '先决定这是不是页面结构本身。结构优先用 background、card、popover、secondary、muted。',
-    },
-    {
-      title: '信息层级',
-      body: '主信息用 foreground，辅助说明和次要信息用 muted-foreground。',
-    },
-    {
-      title: '交互色',
-      body: '主动作和品牌强调用 primary，hover 和 focus 用 accent、ring。',
-    },
-    {
-      title: '状态色',
-      body: '成功、信息、警告、危险和持久选中分别使用 success、info、warning、destructive、selected。',
-    },
-  ]
+const usageRules = [
+  {
+    title: '结构色',
+    body: '先决定这是不是页面结构本身。结构优先用 background、card、popover、secondary、muted。',
+  },
+  {
+    title: '信息层级',
+    body: '主信息用 foreground，辅助说明和次要信息用 muted-foreground。',
+  },
+  {
+    title: '交互色',
+    body: '主动作和品牌强调用 primary，hover 和 focus 用 accent、ring。',
+  },
+  {
+    title: '状态色',
+    body: '成功、信息、警告、危险和持久选中分别使用 success、info、warning、destructive、selected。',
+  },
+]
 
-  const heroBadgeStyle = {
-    backgroundColor: 'hsl(var(--secondary))',
-    color: 'hsl(var(--primary))',
-    borderColor: 'hsl(var(--primary))',
-  }
+const heroBadgeStyle = {
+  backgroundColor: 'hsl(var(--secondary))',
+  color: 'hsl(var(--primary))',
+  borderColor: 'hsl(var(--primary))',
+}
 </script>
 
 <template>

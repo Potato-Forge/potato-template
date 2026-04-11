@@ -1,78 +1,78 @@
 <script setup lang="ts">
-  import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-  import {
-    SidebarGroup,
-    SidebarGroupLabel,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-  } from '@/components/ui/sidebar'
-  import type { SidebarItem } from '.'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from '@/components/ui/sidebar'
+import type { SidebarItem } from '.'
 
-  const items: SidebarItem[] = [
-    {
-      title: 'Home',
-      url: '#',
-      icon: 'i-tabler-home',
-    },
-    {
-      title: 'Inbox',
-      url: '#',
-      icon: 'i-tabler-inbox',
-    },
-    {
-      title: 'Calendar',
-      url: '#',
-      icon: 'i-tabler-calendar',
-      isActive: true,
-      items: [
-        {
-          title: 'Sub Calendar 1',
-          url: '#',
-          isActive: true,
-          items: [
-            {
-              title: 'third Calendar 1',
-              url: '#',
-            },
-            {
-              title: 'third Calendar 2',
-              url: '#',
-              isActive: true,
-            },
-          ],
-        },
-        {
-          title: 'Sub Calendar 2',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Search',
-      url: '#',
-      icon: 'i-tabler-search',
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: 'i-tabler-settings',
-    },
-  ]
+const items: SidebarItem[] = [
+  {
+    title: 'Home',
+    url: '#',
+    icon: 'i-tabler-home',
+  },
+  {
+    title: 'Inbox',
+    url: '#',
+    icon: 'i-tabler-inbox',
+  },
+  {
+    title: 'Calendar',
+    url: '#',
+    icon: 'i-tabler-calendar',
+    isActive: true,
+    items: [
+      {
+        title: 'Sub Calendar 1',
+        url: '#',
+        isActive: true,
+        items: [
+          {
+            title: 'third Calendar 1',
+            url: '#',
+          },
+          {
+            title: 'third Calendar 2',
+            url: '#',
+            isActive: true,
+          },
+        ],
+      },
+      {
+        title: 'Sub Calendar 2',
+        url: '#',
+      },
+    ],
+  },
+  {
+    title: 'Search',
+    url: '#',
+    icon: 'i-tabler-search',
+  },
+  {
+    title: 'Settings',
+    url: '#',
+    icon: 'i-tabler-settings',
+  },
+]
 
-  const isHightlight = (item: SidebarItem) => {
-    const isEndLeaf = !item.items || item.items.length === 0
-    if (item.isActive) {
-      const defaultActiveClass = 'text-primary font-semibold'
-      const endLeafActiveClass = 'text-primary-foreground font-semibold bg-primary/80'
-      return isEndLeaf ? endLeafActiveClass : defaultActiveClass
-    } else {
-      return ''
-    }
+const isHightlight = (item: SidebarItem) => {
+  const isEndLeaf = !item.items || item.items.length === 0
+  if (item.isActive) {
+    const defaultActiveClass = 'text-primary font-semibold'
+    const endLeafActiveClass = 'text-primary-foreground font-semibold bg-primary/80'
+    return isEndLeaf ? endLeafActiveClass : defaultActiveClass
+  } else {
+    return ''
   }
+}
 </script>
 
 <template>

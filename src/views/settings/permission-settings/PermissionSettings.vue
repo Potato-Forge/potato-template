@@ -1,17 +1,17 @@
 <script setup lang="ts">
-  import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
-  import PermissionTree from './components/PermissionTree.vue'
-  import PermissionForm from './components/PermissionForm.vue'
-  import { usePermissionManager } from './usePermissionManager'
+import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
+import PermissionTree from './components/PermissionTree.vue'
+import PermissionForm from './components/PermissionForm.vue'
+import { usePermissionManager } from './usePermissionManager'
 
-  const manager = usePermissionManager()
-  const { allPermissionTree, choosenId } = manager
+const manager = usePermissionManager()
+const { allPermissionTree, choosenId } = manager
 
-  const handleChoose = async (nextId: string | number | null) => {
-    await manager.selectNode(nextId)
-  }
+const handleChoose = async (nextId: string | number | null) => {
+  await manager.selectNode(nextId)
+}
 
-  provide('permissionManager', manager)
+provide('permissionManager', manager)
 </script>
 <template>
   <PageLayoutSingle class="flex flex-row gap-4">

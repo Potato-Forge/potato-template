@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import PfAvatar from '@/layouts/modules/PfAvatar.vue'
-  import { useRouter } from 'vue-router'
+import PfAvatar from '@/layouts/modules/PfAvatar.vue'
+import { useRouter } from 'vue-router'
 
-  const isDark = useDark()
-  const router = useRouter()
+const isDark = useDark()
+const router = useRouter()
 </script>
 
 <template>

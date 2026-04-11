@@ -1,107 +1,107 @@
 <script setup lang="ts">
-  import {
-    DropdownMenu,
-    DropdownMenuPortal,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-  } from '@/components/ui/dropdown-menu'
-  import { Input } from '@/components/ui/input'
-  import { Icon } from '@iconify/vue'
+import {
+  DropdownMenu,
+  DropdownMenuPortal,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Icon } from '@iconify/vue'
 
-  // ── Props & Emits ──────────────────────────────────────────────
-  const props = withDefaults(
-    defineProps<{
-      modelValue?: string | null
-    }>(),
-    { modelValue: null },
-  )
+// ── Props & Emits ──────────────────────────────────────────────
+const props = withDefaults(
+  defineProps<{
+    modelValue?: string | null
+  }>(),
+  { modelValue: null },
+)
 
-  const emit = defineEmits<{
-    (event: 'update:modelValue', value: string): void
-  }>()
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: string): void
+}>()
 
-  /**
-   * 本地持有选中值，避免受控模式下 prop 回流时序导致选中态/预览回退
-   */
-  const internalValue = ref<string | null>(props.modelValue ?? null)
+/**
+ * 本地持有选中值，避免受控模式下 prop 回流时序导致选中态/预览回退
+ */
+const internalValue = ref<string | null>(props.modelValue ?? null)
 
-  watch(
-    () => props.modelValue,
-    (val) => {
-      internalValue.value = val ?? null
-    },
-  )
+watch(
+  () => props.modelValue,
+  (val) => {
+    internalValue.value = val ?? null
+  },
+)
 
-  // ── Search state ───────────────────────────────────────────────
-  type SearchMode = 'contains' | 'startsWith'
-  const searchText = ref('')
-  const searchMode = ref<SearchMode>('contains')
+// ── Search state ───────────────────────────────────────────────
+type SearchMode = 'contains' | 'startsWith'
+const searchText = ref('')
+const searchMode = ref<SearchMode>('contains')
 
-  // ── Icon list loading ──────────────────────────────────────────
-  const iconList = ref<string[]>([])
-  const iconListLoading = ref(false)
-  const iconListError = ref(false)
+// ── Icon list loading ──────────────────────────────────────────
+const iconList = ref<string[]>([])
+const iconListLoading = ref(false)
+const iconListError = ref(false)
 
-  const fetchIcons = async (): Promise<string[]> => {
-    const response = await fetch('/tabler-index.json', { cache: 'force-cache' })
-    if (!response.ok) throw new Error(`HTTP ${response.status}`)
-    return response.json()
+const fetchIcons = async (): Promise<string[]> => {
+  const response = await fetch('/tabler-index.json', { cache: 'force-cache' })
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  return response.json()
+}
+
+onMounted(async () => {
+  iconListLoading.value = true
+  iconListError.value = false
+  try {
+    iconList.value = await fetchIcons()
+  } catch {
+    iconListError.value = true
+  } finally {
+    iconListLoading.value = false
   }
+})
 
-  onMounted(async () => {
-    iconListLoading.value = true
-    iconListError.value = false
-    try {
-      iconList.value = await fetchIcons()
-    } catch {
-      iconListError.value = true
-    } finally {
-      iconListLoading.value = false
-    }
-  })
-
-  // ── Filtered list (search + mode) ─────────────────────────────
-  const filteredList = computed(() => {
-    const q = searchText.value.trim().toLowerCase()
-    if (!q) return iconList.value
-    return iconList.value.filter((name) =>
-      searchMode.value === 'startsWith'
-        ? name.toLowerCase().startsWith(q)
-        : name.toLowerCase().includes(q),
-    )
-  })
-
-  // ── Pagination ─────────────────────────────────────────────────
-  const PAGE_SIZE = 12
-  const currentPage = ref(1)
-  const totalPages = computed(() => Math.max(1, Math.ceil(filteredList.value.length / PAGE_SIZE)))
-
-  // 搜索变化时回到第 1 页
-  watch([searchText, searchMode], () => {
-    currentPage.value = 1
-  })
-
-  // 越界保护
-  watch(totalPages, (pages) => {
-    if (currentPage.value > pages) currentPage.value = pages
-  })
-
-  const currentPageItems = computed(() => {
-    const start = (currentPage.value - 1) * PAGE_SIZE
-    return filteredList.value.slice(start, start + PAGE_SIZE)
-  })
-
-  // ── Selection ──────────────────────────────────────────────────
-  const selectIcon = (name: string) => {
-    internalValue.value = name
-    emit('update:modelValue', name)
-    // 不关闭面板，方便连续浏览
-  }
-
-  // ── Preview icon name (with tabler: prefix for Iconify) ────────
-  const previewIcon = computed(() =>
-    internalValue.value ? `tabler:${internalValue.value}` : 'tabler:icons',
+// ── Filtered list (search + mode) ─────────────────────────────
+const filteredList = computed(() => {
+  const q = searchText.value.trim().toLowerCase()
+  if (!q) return iconList.value
+  return iconList.value.filter((name) =>
+    searchMode.value === 'startsWith'
+      ? name.toLowerCase().startsWith(q)
+      : name.toLowerCase().includes(q),
   )
+})
+
+// ── Pagination ─────────────────────────────────────────────────
+const PAGE_SIZE = 12
+const currentPage = ref(1)
+const totalPages = computed(() => Math.max(1, Math.ceil(filteredList.value.length / PAGE_SIZE)))
+
+// 搜索变化时回到第 1 页
+watch([searchText, searchMode], () => {
+  currentPage.value = 1
+})
+
+// 越界保护
+watch(totalPages, (pages) => {
+  if (currentPage.value > pages) currentPage.value = pages
+})
+
+const currentPageItems = computed(() => {
+  const start = (currentPage.value - 1) * PAGE_SIZE
+  return filteredList.value.slice(start, start + PAGE_SIZE)
+})
+
+// ── Selection ──────────────────────────────────────────────────
+const selectIcon = (name: string) => {
+  internalValue.value = name
+  emit('update:modelValue', name)
+  // 不关闭面板，方便连续浏览
+}
+
+// ── Preview icon name (with tabler: prefix for Iconify) ────────
+const previewIcon = computed(() =>
+  internalValue.value ? `tabler:${internalValue.value}` : 'tabler:icons',
+)
 </script>
 
 <template>

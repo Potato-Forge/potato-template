@@ -1,22 +1,21 @@
 <script setup lang="ts">
-  import { format } from 'date-fns'
-  import type { PfFormConfigItem, PfFormFieldApi } from '../PfForm.types'
-  import PfFormItemDatetime from './PfFormItemDatetime.vue'
-  import PfFormItemText from './PfFormItemText.vue'
+import { format } from 'date-fns'
+import type { PfFormConfigItem } from '../PfForm.types'
+import PfFormItemDatetime from './PfFormItemDatetime.vue'
+import PfFormItemText from './PfFormItemText.vue'
 
-  const props = defineProps<{
-    config: PfFormConfigItem
-    field: PfFormFieldApi // tanstack field api
-    modelValue?: any
-  }>()
+const props = defineProps<{
+  config: PfFormConfigItem
+  modelValue?: any
+}>()
 
-  const emits = defineEmits<{
-    (e: 'update:modelValue', payload: any): void
-  }>()
+const emits = defineEmits<{
+  (e: 'update:modelValue', payload: any): void
+}>()
 
-  const handleChange = (value: any) => {
-    emits('update:modelValue', value)
-  }
+const handleChange = (value: any) => {
+  emits('update:modelValue', value)
+}
 </script>
 
 <template>
@@ -70,8 +69,24 @@
       </template>
     </template>
 
-    <!-- info -->
-    <pf-text></pf-text>
+    <!-- type:toggle -->
+    <template v-else-if="config.type === 'toggle'">
+      <!-- read is disabled write -->
+      <!-- write -->
+      <div class="flex items-center gap-2">
+        <pf-form-item-toggle
+          class="h-10"
+          :label="config.name"
+          :model-value="props.modelValue"
+          :type="config.config?.varient"
+          :true-value="config.config?.trueValue"
+          :false-value="config.config?.falseValue"
+          @update:model-value="handleChange"
+          :disabled="config.readonly"
+        />
+        <pf-text as="span">{{ config.name }}</pf-text>
+      </div>
+    </template>
   </div>
 </template>
 

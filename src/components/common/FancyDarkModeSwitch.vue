@@ -49,105 +49,105 @@
 </template>
 
 <script setup lang="ts">
-  import { useAttrs, computed } from 'vue'
+import { useAttrs, computed } from 'vue'
 
-  const props = defineProps({
-    modelValue: Boolean,
-  })
-  const emit = defineEmits(['update:modelValue'])
-  defineOptions({
-    inheritAttrs: false,
-  })
+const props = defineProps({
+  modelValue: Boolean,
+})
+const emit = defineEmits(['update:modelValue'])
+defineOptions({
+  inheritAttrs: false,
+})
 
-  const attrs = useAttrs()
+const attrs = useAttrs()
 
-  // mergedStyle: prefer external inline style.width -> prefer Tailwind w-* classes (detected in class string) -> fallback to default width
-  const mergedStyle = computed(() => {
-    // external style may be an object or string; normalize
-    const externalStyle: any = attrs.style || {}
+// mergedStyle: prefer external inline style.width -> prefer Tailwind w-* classes (detected in class string) -> fallback to default width
+const mergedStyle = computed(() => {
+  // external style may be an object or string; normalize
+  const externalStyle: any = attrs.style || {}
 
-    // if external style explicitly has width, keep it
-    if (externalStyle && (externalStyle.width || externalStyle['--fancy-switch-width'])) {
-      return externalStyle
-    }
-
-    // if external classes include a Tailwind width class like 'w-12' or 'w-1/2', don't set default width
-    const cls = attrs.class || ''
-    if (typeof cls === 'string' && /(^|\s)w-/.test(cls)) {
-      // keep other external style props (if any)
-      return externalStyle
-    }
-
-    // otherwise, merge default width into any external style
-    return Object.assign({}, externalStyle || {}, { width: 'var(--fancy-switch-width, 4.5em)' })
-  })
-
-  const handleChange = (event: Event) => {
-    emit('update:modelValue', (event.target as HTMLInputElement).checked)
+  // if external style explicitly has width, keep it
+  if (externalStyle && (externalStyle.width || externalStyle['--fancy-switch-width'])) {
+    return externalStyle
   }
+
+  // if external classes include a Tailwind width class like 'w-12' or 'w-1/2', don't set default width
+  const cls = attrs.class || ''
+  if (typeof cls === 'string' && /(^|\s)w-/.test(cls)) {
+    // keep other external style props (if any)
+    return externalStyle
+  }
+
+  // otherwise, merge default width into any external style
+  return Object.assign({}, externalStyle || {}, { width: 'var(--fancy-switch-width, 4.5em)' })
+})
+
+const handleChange = (event: Event) => {
+  emit('update:modelValue', (event.target as HTMLInputElement).checked)
+}
 </script>
 
 <style scoped>
-  :where(.theme-toggle-vertical) {
-    font-size: 17px;
-    position: relative;
-    display: inline-block;
-    /* 默认为宽度驱动，外部可以通过 class (w-*) 或 style 覆盖 */
-    width: var(--fancy-switch-width, 2.5em);
-    /* 使用 aspect-ratio 保持原始 SVG 比例（viewBox: 44 / 69.667） */
-    aspect-ratio: 44 / 69.667;
-    cursor: pointer;
-    transform-origin: center;
-  }
+:where(.theme-toggle-vertical) {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+  /* 默认为宽度驱动，外部可以通过 class (w-*) 或 style 覆盖 */
+  width: var(--fancy-switch-width, 2.5em);
+  /* 使用 aspect-ratio 保持原始 SVG 比例（viewBox: 44 / 69.667） */
+  aspect-ratio: 44 / 69.667;
+  cursor: pointer;
+  transform-origin: center;
+}
 
-  #toggle {
-    opacity: 0;
-    width: 0;
-    height: 0;
-    position: absolute;
-  }
+#toggle {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
 
-  svg {
-    width: 100%;
-    height: 100%;
-  }
+svg {
+  width: 100%;
+  height: 100%;
+}
 
-  #container,
-  #button,
-  #sun,
-  #moon,
-  #cloud,
-  #stars {
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
+#container,
+#button,
+#sun,
+#moon,
+#cloud,
+#stars {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
 
-  /* 状态切换逻辑 */
+/* 状态切换逻辑 */
 
-  /* 1. 背景颜色 */
-  svg.is-checked #container {
-    fill: #2b4360;
-  }
+/* 1. 背景颜色 */
+svg.is-checked #container {
+  fill: #2b4360;
+}
 
-  /* 2. 核心移动：从 X 轴移动改为 Y 轴移动 */
-  svg.is-checked #button {
-    /* 60.667(总高) - 35(按钮高) = 25.667 左右的位移 */
-    transform: translate(2.333px, 28px);
-  }
+/* 2. 核心移动：从 X 轴移动改为 Y 轴移动 */
+svg.is-checked #button {
+  /* 60.667(总高) - 35(按钮高) = 25.667 左右的位移 */
+  transform: translate(2.333px, 28px);
+}
 
-  /* 3. 太阳/月亮 显隐 */
-  svg.is-checked #sun {
-    opacity: 0;
-  }
-  svg.is-checked #moon {
-    opacity: 1;
-  }
+/* 3. 太阳/月亮 显隐 */
+svg.is-checked #sun {
+  opacity: 0;
+}
+svg.is-checked #moon {
+  opacity: 1;
+}
 
-  /* 4. 云朵/星星 显隐与微调 */
-  svg.is-checked #cloud {
-    opacity: 0;
-    transform: translate(2px, 50px) scale(0.5); /* 消失时向下沉 */
-  }
-  svg.is-checked #stars {
-    opacity: 1;
-  }
+/* 4. 云朵/星星 显隐与微调 */
+svg.is-checked #cloud {
+  opacity: 0;
+  transform: translate(2px, 50px) scale(0.5); /* 消失时向下沉 */
+}
+svg.is-checked #stars {
+  opacity: 1;
+}
 </style>

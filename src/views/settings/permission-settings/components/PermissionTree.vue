@@ -1,38 +1,38 @@
 <script setup lang="ts">
-  import PfTree from '@/components/pf/pf-tree/PfTree.vue'
-  import type { PfTreeNode } from '@/components/pf/pf-tree'
+import PfTree from '@/components/pf/pf-tree/PfTree.vue'
+import type { PfTreeNode } from '@/components/pf/pf-tree'
 
-  // props
-  const props = defineProps<{
-    treeData: PfTreeNode[]
-    choosen: number | string | null
-    onCreateDraftNode?: (parentId?: string | number) => Promise<boolean> | boolean
-  }>()
+// props
+const props = defineProps<{
+  treeData: PfTreeNode[]
+  choosen: number | string | null
+  onCreateDraftNode?: (parentId?: string | number) => Promise<boolean> | boolean
+}>()
 
-  const emits = defineEmits(['update:choosen'])
+const emits = defineEmits(['update:choosen'])
 
-  const choosenNodes = computed({
-    get() {
-      return props.choosen || null
-    },
-    set(v) {
-      emits('update:choosen', v)
-    },
-  })
+const choosenNodes = computed({
+  get() {
+    return props.choosen || null
+  },
+  set(v) {
+    emits('update:choosen', v)
+  },
+})
 
-  const handleCreateChild = async (nodeId: string | number) => {
-    if (!props.onCreateDraftNode) return
-    await props.onCreateDraftNode(nodeId)
-  }
+const handleCreateChild = async (nodeId: string | number) => {
+  if (!props.onCreateDraftNode) return
+  await props.onCreateDraftNode(nodeId)
+}
 
-  // tree methods
-  const treeRef = useTemplateRef('tree')
+// tree methods
+const treeRef = useTemplateRef('tree')
 
-  defineExpose({
-    getTreeData: () => {
-      return treeRef.value ? treeRef.value.getTreeData() : []
-    },
-  })
+defineExpose({
+  getTreeData: () => {
+    return treeRef.value ? treeRef.value.getTreeData() : []
+  },
+})
 </script>
 
 <template>

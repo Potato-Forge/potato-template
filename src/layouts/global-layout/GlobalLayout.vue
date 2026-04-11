@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import GlobalLayoutSidebar from './components/global-layout-sidebar/GlobalLayoutSidebar.vue'
-  import GlobalLayoutHeader from './components/global-layout-header/GlobalLayoutHeader.vue'
-  import { useSystemStore } from '@/store/systemStore'
+import GlobalLayoutSidebar from './components/global-layout-sidebar/GlobalLayoutSidebar.vue'
+import GlobalLayoutHeader from './components/global-layout-header/GlobalLayoutHeader.vue'
+import { useSystemStore } from '@/store/systemStore'
 
-  // menu sidebar state
-  const systemStore = useSystemStore()
+// menu sidebar state
+const systemStore = useSystemStore()
 
-  const { isSidebarOpen } = storeToRefs(systemStore)
+const { isSidebarOpen } = storeToRefs(systemStore)
 </script>
 
 <template>

@@ -1,22 +1,22 @@
 <script setup lang="ts">
-  import PfModal from './PfModal.vue'
-  import {
-    runModalNegative,
-    runModalPositive,
-    setModalOpen,
-    resolveModal,
-    useModalState,
-  } from './modal.store'
+import PfModal from './PfModal.vue'
+import {
+  runModalNegative,
+  runModalPositive,
+  setModalOpen,
+  resolveModal,
+  useModalState,
+} from './modal.store'
 
-  const modalState = useModalState()
+const modalState = useModalState()
 
-  const handleOpenChange = (id: number, open: boolean) => {
-    if (open) {
-      setModalOpen(id, true)
-      return
-    }
-    resolveModal(id, false)
+const handleOpenChange = (id: number, open: boolean) => {
+  if (open) {
+    setModalOpen(id, true)
+    return
   }
+  resolveModal(id, false)
+}
 </script>
 
 <template>

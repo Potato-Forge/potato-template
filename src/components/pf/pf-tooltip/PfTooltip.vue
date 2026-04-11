@@ -1,20 +1,20 @@
 <script setup lang="ts">
-  import { Tippy } from 'vue-tippy'
-  import 'tippy.js/dist/tippy.css'
-  import 'tippy.js/animations/shift-away.css'
+import { Tippy } from 'vue-tippy'
+import 'tippy.js/dist/tippy.css'
+import 'tippy.js/animations/shift-away.css'
 
-  interface Props {
-    content?: string
-    placement?: 'top' | 'bottom' | 'left' | 'right'
-    delay?: [number, number]
-    interactive?: boolean
-  }
+interface Props {
+  content?: string
+  placement?: 'top' | 'bottom' | 'left' | 'right'
+  delay?: [number, number]
+  interactive?: boolean
+}
 
-  const props = withDefaults(defineProps<Props>(), {
-    placement: 'top',
-    delay: () => [200, 0],
-    interactive: false,
-  })
+const props = withDefaults(defineProps<Props>(), {
+  placement: 'top',
+  delay: () => [200, 0],
+  interactive: false,
+})
 </script>
 
 <template>
@@ -36,11 +36,11 @@
 </template>
 
 <style>
-  /* @unocss-include */
-  .tippy-box[data-theme~='pf-tooltip'] {
-    @apply bg-gray-900 text-white border border-white/10 shadow-lg;
-  }
-  .tippy-box[data-theme~='pf-tooltip'] > .tippy-content {
-    @apply px-2 py-1 text-xs;
-  }
+/* @unocss-include */
+.tippy-box[data-theme~='pf-tooltip'] {
+  @apply bg-gray-900 text-white border border-white/10 shadow-lg;
+}
+.tippy-box[data-theme~='pf-tooltip'] > .tippy-content {
+  @apply px-2 py-1 text-xs;
+}
 </style>

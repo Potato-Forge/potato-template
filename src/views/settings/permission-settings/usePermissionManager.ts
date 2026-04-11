@@ -71,6 +71,11 @@ export function usePermissionManager() {
     return ensurePermissions().find((p) => String(p.id) === String(id)) || null
   }
 
+  const getCurrentDraftPermission = () => {
+    if (currentDraftId.value === null) return null
+    return ensurePermissions().find((item) => item.id === currentDraftId.value) || null
+  }
+
   const editingSnapshot = ref<Record<string, any> | null>(null)
 
   const setEditingSnapshot = (permission: Permission | null) => {
@@ -248,9 +253,10 @@ export function usePermissionManager() {
   }
 
   const sanitizeCreatePayload = (values: Record<string, any>): PermissionInsert => {
+    const draft = getCurrentDraftPermission()
     return {
       name: values.name || '',
-      parent_id: values.parent_id ?? null,
+      parent_id: values.parent_id ?? draft?.parent_id ?? null,
       code: values.code || null,
       path: values.path || null,
       icon: values.icon || null,

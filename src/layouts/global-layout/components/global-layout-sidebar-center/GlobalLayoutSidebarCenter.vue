@@ -1,20 +1,20 @@
 <script setup lang="ts">
-  const menuItems = ref([
-    { icon: 'i-tabler-home', label: 'Home', active: true },
-    { icon: 'i-tabler-dashboard', label: 'Dashboard', active: false },
-    { icon: 'i-tabler-layers-intersect', label: 'Components', active: false },
-    { icon: 'i-tabler-settings', label: 'Settings', active: false },
-  ])
+const menuItems = ref([
+  { icon: 'i-tabler-home', label: 'Home', active: true },
+  { icon: 'i-tabler-dashboard', label: 'Dashboard', active: false },
+  { icon: 'i-tabler-layers-intersect', label: 'Components', active: false },
+  { icon: 'i-tabler-settings', label: 'Settings', active: false },
+])
 
-  const isMobile = () => window.innerWidth < 768
+const isMobile = () => window.innerWidth < 768
 
-  const tooltipOptions = (content: string) => ({
-    content: content,
-    placement: 'right',
-    theme: 'pf-tooltip-sidebar',
-    touch: isMobile() ? ['hold', 300] : true,
-    hideOnClick: isMobile() ? 'toggle' : true,
-  })
+const tooltipOptions = (content: string) => ({
+  content: content,
+  placement: 'right',
+  theme: 'pf-tooltip-sidebar',
+  touch: isMobile() ? ['hold', 300] : true,
+  hideOnClick: isMobile() ? 'toggle' : true,
+})
 </script>
 
 <template>

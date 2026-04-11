@@ -1,16 +1,16 @@
 <script setup lang="ts">
-  import { supabase } from '@/api'
+import { supabase } from '@/api'
 
-  const router = useRouter()
+const router = useRouter()
 
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) {
-      console.error('Error signing out:', error.message)
-    } else {
-      router.push('/login')
-    }
+const handleSignOut = async () => {
+  const { error } = await supabase.auth.signOut()
+  if (error) {
+    console.error('Error signing out:', error.message)
+  } else {
+    router.push('/login')
   }
+}
 </script>
 
 <template>

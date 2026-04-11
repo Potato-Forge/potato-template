@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import PfToastProvider from '@/components/pf/pf-toast/PfToastProvider.vue'
+import PfToastProvider from '@/components/pf/pf-toast/PfToastProvider.vue'
 </script>
 <template>
   <PfToastProvider>

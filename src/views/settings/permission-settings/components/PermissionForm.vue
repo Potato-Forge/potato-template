@@ -1,99 +1,115 @@
 <script setup lang="ts">
-  import type { PfFormConfig } from '@/components/pf/pf-form/PfForm.types'
-  import type { usePermissionManager } from '../usePermissionManager'
-  import type { AllPermissionItem } from '@/api/permission/permission'
+import type { PfFormConfig } from '@/components/pf/pf-form/PfForm.types'
+import type { usePermissionManager } from '../usePermissionManager'
+import type { AllPermissionItem } from '@/api/permission/permission'
 
-  const manager = inject<ReturnType<typeof usePermissionManager>>('permissionManager')
-  if (!manager) {
-    throw new Error('permissionManager is not provided')
+const manager = inject<ReturnType<typeof usePermissionManager>>('permissionManager')
+if (!manager) {
+  throw new Error('permissionManager is not provided')
+}
+
+const { choosenPath, choosenPermission, formMode } = manager
+
+// form
+const formRef = useTemplateRef('form')
+const handleSubmit = () => {
+  formRef.value?.submit()
+}
+
+// form data
+const formData = ref<AllPermissionItem | null>(null)
+watchEffect(() => {
+  if (formMode.value === 'empty') {
+    formData.value = null
+    return
   }
 
-  const { choosenPath, choosenPermission, formMode } = manager
-
-  // form
-  const formRef = useTemplateRef('form')
-  const handleSubmit = () => {
-    formRef.value?.submit()
+  if (formMode.value === 'create') {
+    formData.value = null
+    return
   }
 
-  // form data
-  const formData = ref<AllPermissionItem | null>(null)
-  watchEffect(() => {
-    if (formMode.value === 'empty') {
-      formData.value = null
-      return
-    }
+  if (choosenPermission.value) {
+    formData.value = choosenPermission.value
+  } else {
+    formData.value = null
+  }
+})
+// form config
+const formConfig = ref<PfFormConfig<AllPermissionItem>>([
+  {
+    name: 'ID',
+    key: 'id',
+    type: 'text',
+    readonly: true,
+    create: false,
+  },
+  {
+    name: '创建时间',
+    key: 'created_at',
+    type: 'datetime',
+    readonly: true,
+    create: false,
+    config: {
+      format: 'iso',
+    },
+  },
+  {
+    name: '权限名称',
+    key: 'name',
+    type: 'text',
+    help: '权限的展示名称',
+  },
 
-    if (choosenPermission.value) {
-      formData.value = choosenPermission.value
-    } else {
-      formData.value = null
-    }
-  })
-  // form config
-  const formConfig = ref<PfFormConfig<AllPermissionItem>>([
-    {
-      name: 'ID',
-      key: 'id',
-      type: 'text',
-      readonly: true,
-      create: false,
+  {
+    name: '权限编码',
+    key: 'code',
+    type: 'text',
+    help: '权限的唯一标识，建议使用英文和下划线',
+  },
+  {
+    name: '权限路由',
+    key: 'path',
+    type: 'text',
+    help: '前端权限对应的路由路径，自动衔接父级路径',
+  },
+  {
+    name: '权限图标',
+    key: 'icon',
+    type: 'icon',
+  },
+  {
+    name: 'view 组件',
+    key: 'component',
+    type: 'text',
+    help: '前端权限对应的 view 组件路径，建议使用 kebab-case，默认从 views/ 下寻找',
+  },
+  {
+    name: '是否显示',
+    key: 'is_hidden',
+    type: 'toggle',
+    default: true,
+    config: {
+      varient: 'switch',
+      trueValue: true,
+      falseValue: false,
     },
-    {
-      name: '创建时间',
-      key: 'created_at',
-      type: 'datetime',
-      readonly: true,
-      create: false,
-      config: {
-        format: 'iso',
-      },
-    },
-    {
-      name: '权限名称',
-      key: 'name',
-      type: 'text',
-      help: '权限的展示名称',
-    },
+  },
+])
 
-    {
-      name: '权限编码',
-      key: 'code',
-      type: 'text',
-      help: '权限的唯一标识，建议使用英文和下划线',
-    },
-    {
-      name: '权限路由',
-      key: 'path',
-      type: 'text',
-      help: '前端权限对应的路由路径，自动衔接父级路径',
-    },
-    {
-      name: '权限图标',
-      key: 'icon',
-      type: 'icon',
-    },
-    {
-      name: 'view 组件',
-      key: 'component',
-      type: 'text',
-      help: '前端权限对应的 view 组件路径，建议使用 kebab-case，默认从 views/ 下寻找',
-    },
-  ])
-
-  // form action
-  const handleReset = () => {
-    formRef.value?.reset()
-  }
-  const handleCancel = async () => {
-    await manager.cancelEditing()
-  }
-  const handleFormChange = (values: Record<string, any>) => {
-    manager.markFormChanged(values)
-  }
-  const handlePermission = async (data: Record<string, any>) => {
-    await manager.saveCurrent(data)
-  }
+// form action
+const handleReset = () => {
+  formRef.value?.reset()
+}
+const handleCancel = async () => {
+  await manager.cancelEditing()
+}
+const handleFormChange = (values: Record<string, any>) => {
+  manager.markFormChanged(values)
+}
+const handlePermission = async (data: Record<string, any>) => {
+  await manager.saveCurrent(data)
+}
 </script>
 
 <template>

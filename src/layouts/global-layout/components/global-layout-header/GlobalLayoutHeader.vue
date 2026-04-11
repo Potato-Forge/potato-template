@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import { useSystemStore } from '@/store/systemStore'
-  import SidebarHambergurButton from './components/SidebarHambergurButton.vue'
-  const isLargeScreen = useMediaQuery('(min-width:1024px)')
+import { useSystemStore } from '@/store/systemStore'
+import SidebarHambergurButton from './components/SidebarHambergurButton.vue'
+const isLargeScreen = useMediaQuery('(min-width:1024px)')
 
-  // menu sidebar state
-  const systemStore = useSystemStore()
-  const { isSidebarOpen } = storeToRefs(systemStore)
+// menu sidebar state
+const systemStore = useSystemStore()
+const { isSidebarOpen } = storeToRefs(systemStore)
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-  import PfLogo from '@/layouts/modules/PfLogo.vue'
-  import GlobalLayoutSidebarCenter from '../global-layout-sidebar-center/GlobalLayoutSidebarCenter.vue'
-  import GlobalLayoutSidebarFooter from '../global-layout-sidebar-footer/GlobalLayoutSidebarFooter.vue'
+import PfLogo from '@/layouts/modules/PfLogo.vue'
+import GlobalLayoutSidebarCenter from '../global-layout-sidebar-center/GlobalLayoutSidebarCenter.vue'
+import GlobalLayoutSidebarFooter from '../global-layout-sidebar-footer/GlobalLayoutSidebarFooter.vue'
 </script>
 
 <template>

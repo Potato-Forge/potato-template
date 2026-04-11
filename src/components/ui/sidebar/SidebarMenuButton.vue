@@ -1,39 +1,39 @@
 <script setup lang="ts">
-  import type { Component, Ref } from 'vue'
-  import type { SidebarMenuButtonProps } from './SidebarMenuButtonChild.vue'
-  import { reactiveOmit } from '@vueuse/core'
-  import SidebarMenuButtonChild from './SidebarMenuButtonChild.vue'
-  import { useSidebar } from './utils'
-  import { ref } from 'vue'
+import type { Component, Ref } from 'vue'
+import type { SidebarMenuButtonProps } from './SidebarMenuButtonChild.vue'
+import { reactiveOmit } from '@vueuse/core'
+import SidebarMenuButtonChild from './SidebarMenuButtonChild.vue'
+import { useSidebar } from './utils'
+import { ref } from 'vue'
 
-  defineOptions({
-    inheritAttrs: false,
-  })
+defineOptions({
+  inheritAttrs: false,
+})
 
-  const props = withDefaults(
-    defineProps<
-      SidebarMenuButtonProps & {
-        tooltip?: string | Component
-      }
-    >(),
-    {
-      as: 'button',
-      variant: 'default',
-      size: 'default',
-    },
-  )
+const props = withDefaults(
+  defineProps<
+    SidebarMenuButtonProps & {
+      tooltip?: string | Component
+    }
+  >(),
+  {
+    as: 'button',
+    variant: 'default',
+    size: 'default',
+  },
+)
 
-  let isMobile: Ref<boolean>, state: Ref<string>
-  try {
-    const sidebar = useSidebar()
-    isMobile = sidebar.isMobile
-    state = sidebar.state
-  } catch {
-    isMobile = ref(false)
-    state = ref('collapsed')
-  }
+let isMobile: Ref<boolean>, state: Ref<string>
+try {
+  const sidebar = useSidebar()
+  isMobile = sidebar.isMobile
+  state = sidebar.state
+} catch {
+  isMobile = ref(false)
+  state = ref('collapsed')
+}
 
-  const delegatedProps = reactiveOmit(props, 'tooltip')
+const delegatedProps = reactiveOmit(props, 'tooltip')
 </script>
 
 <template>

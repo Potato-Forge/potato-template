@@ -1,10 +1,10 @@
 <script lang="ts">
-  export const description = 'Potato Forge Login'
+export const description = 'Potato Forge Login'
 </script>
 
 <script setup lang="ts">
-  import LoginForm from './components/LoginForm.vue'
-  import GlobalLayoutBg from '@/layouts/global-layout/components/global-layout-bg/GlobalLayoutBg.vue'
+import LoginForm from './components/LoginForm.vue'
+import GlobalLayoutBg from '@/layouts/global-layout/components/global-layout-bg/GlobalLayoutBg.vue'
 </script>
 
 <template>

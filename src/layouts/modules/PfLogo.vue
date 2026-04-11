@@ -46,64 +46,64 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref } from 'vue'
+import { computed, ref } from 'vue'
 
-  const props = defineProps<{
-    gradientFrom?: string
-    gradientTo?: string
-    isHover?: boolean
-    animate?: boolean
-  }>()
+const props = defineProps<{
+  gradientFrom?: string
+  gradientTo?: string
+  isHover?: boolean
+  animate?: boolean
+}>()
 
-  const hovered = ref(false)
+const hovered = ref(false)
 
-  const onEnter = () => {
-    if (props.isHover) hovered.value = true
-  }
-  const onLeave = () => {
-    if (props.isHover) hovered.value = false
-  }
+const onEnter = () => {
+  if (props.isHover) hovered.value = true
+}
+const onLeave = () => {
+  if (props.isHover) hovered.value = false
+}
 
-  const hasGradient = computed(() => !!(props.gradientFrom && props.gradientTo))
-  const showGradient = computed(() => (props.isHover ? hovered.value : hasGradient.value))
+const hasGradient = computed(() => !!(props.gradientFrom && props.gradientTo))
+const showGradient = computed(() => (props.isHover ? hovered.value : hasGradient.value))
 
-  const gradFrom = computed(() => props.gradientFrom || 'var(--pf-g1,#58B19F)')
-  const gradTo = computed(() => props.gradientTo || 'var(--pf-g2,#205072)')
+const gradFrom = computed(() => props.gradientFrom || 'var(--pf-g1,#58B19F)')
+const gradTo = computed(() => props.gradientTo || 'var(--pf-g2,#205072)')
 </script>
 
 <style scoped>
-  .fry-logo {
-    width: 2.5rem; /* 你可以在外部用 w-10 覆盖 */
-    height: 2.5rem;
-    fill: currentColor; /* 支持 text-primary 控制颜色 */
-    cursor: pointer;
-  }
+.fry-logo {
+  width: 2.5rem; /* 你可以在外部用 w-10 覆盖 */
+  height: 2.5rem;
+  fill: currentColor; /* 支持 text-primary 控制颜色 */
+  cursor: pointer;
+}
 
-  /* 增加透明度过渡，使颜色切换平滑 */
-  .mono,
-  .grad {
-    transition: opacity 0.3s ease;
-  }
+/* 增加透明度过渡，使颜色切换平滑 */
+.mono,
+.grad {
+  transition: opacity 0.3s ease;
+}
 
-  /* 所有 path 的基础动画属性 */
-  .fry-logo path {
-    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    transform-origin: bottom center;
-  }
+/* 所有 path 的基础动画属性 */
+.fry-logo path {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-origin: bottom center;
+}
 
-  /* hover 时依次浮起 */
-  .fry-logo.is-animated:hover path:nth-child(1) {
-    transform: translateY(-4px);
-    transition-delay: 0s;
-  }
+/* hover 时依次浮起 */
+.fry-logo.is-animated:hover path:nth-child(1) {
+  transform: translateY(-4px);
+  transition-delay: 0s;
+}
 
-  .fry-logo.is-animated:hover path:nth-child(2) {
-    transform: translateY(-4px);
-    transition-delay: 0.1s;
-  }
+.fry-logo.is-animated:hover path:nth-child(2) {
+  transform: translateY(-4px);
+  transition-delay: 0.1s;
+}
 
-  .fry-logo.is-animated:hover path:nth-child(3) {
-    transform: translateY(-4px);
-    transition-delay: 0.2s;
-  }
+.fry-logo.is-animated:hover path:nth-child(3) {
+  transform: translateY(-4px);
+  transition-delay: 0.2s;
+}
 </style>

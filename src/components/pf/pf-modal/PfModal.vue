@@ -1,59 +1,59 @@
 <script setup lang="ts">
-  import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-  } from '@/components/ui/dialog'
-  import { useSlots } from 'vue'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { useSlots } from 'vue'
 
-  const props = withDefaults(
-    defineProps<{
-      open?: boolean
-      title?: string
-      description?: string
-      positiveText?: string
-      negativeText?: string
-      positiveLoading?: boolean
-    }>(),
-    {
-      title: '',
-      description: '',
-      positiveText: '确认',
-      negativeText: '取消',
-      positiveLoading: false,
-    },
-  )
+const props = withDefaults(
+  defineProps<{
+    open?: boolean
+    title?: string
+    description?: string
+    positiveText?: string
+    negativeText?: string
+    positiveLoading?: boolean
+  }>(),
+  {
+    title: '',
+    description: '',
+    positiveText: '确认',
+    negativeText: '取消',
+    positiveLoading: false,
+  },
+)
 
-  const emits = defineEmits<{
-    (event: 'positive-click'): void
-    (event: 'negative-click'): void
-    (event: 'update:open', value: boolean): void
-  }>()
+const emits = defineEmits<{
+  (event: 'positive-click'): void
+  (event: 'negative-click'): void
+  (event: 'update:open', value: boolean): void
+}>()
 
-  const slots = useSlots()
+const slots = useSlots()
 
-  const hasTriggerSlot = computed(() => Boolean(slots.trigger))
+const hasTriggerSlot = computed(() => Boolean(slots.trigger))
 
-  const handlePositiveClick = () => {
-    emits('positive-click')
-  }
+const handlePositiveClick = () => {
+  emits('positive-click')
+}
 
-  const handleNegativeClick = () => {
-    emits('negative-click')
-  }
+const handleNegativeClick = () => {
+  emits('negative-click')
+}
 
-  const modalOpen = computed({
-    get() {
-      return props.open || false
-    },
-    set(v) {
-      emits('update:open', v)
-    },
-  })
+const modalOpen = computed({
+  get() {
+    return props.open || false
+  },
+  set(v) {
+    emits('update:open', v)
+  },
+})
 </script>
 
 <template>

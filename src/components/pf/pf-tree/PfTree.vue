@@ -1,100 +1,100 @@
 <script setup lang="ts">
-  import { Draggable } from '@he-tree/vue'
-  import PfTreeCheckbox from './PfTreeCheckbox.vue'
-  import type { PfTreeNode } from '.'
+import { Draggable } from '@he-tree/vue'
+import PfTreeCheckbox from './PfTreeCheckbox.vue'
+import type { PfTreeNode } from '.'
 
-  // props
-  const props = withDefaults(
-    defineProps<{
-      modelValue: PfTreeNode[]
-      labelKey?: string
-      valueKey?: string
-      childrenKey?: string
-      disabledKey?: string
-      chooseable?: boolean
-      checkable?: boolean
-      draggable?: boolean
-      choosen?: string | number | null
-    }>(),
-    {
-      labelKey: 'name',
-      valueKey: 'id',
-      childrenKey: 'children',
-      disabledKey: 'disabled',
-      chooseable: true,
-      checkable: true,
-      draggable: false,
-    },
-  )
+// props
+const props = withDefaults(
+  defineProps<{
+    modelValue: PfTreeNode[]
+    labelKey?: string
+    valueKey?: string
+    childrenKey?: string
+    disabledKey?: string
+    chooseable?: boolean
+    checkable?: boolean
+    draggable?: boolean
+    choosen?: string | number | null
+  }>(),
+  {
+    labelKey: 'name',
+    valueKey: 'id',
+    childrenKey: 'children',
+    disabledKey: 'disabled',
+    chooseable: true,
+    checkable: true,
+    draggable: false,
+  },
+)
 
-  // Tree Instance
-  const treeRef = useTemplateRef('tree')
-  // Tree methods
-  const getTreeData = () => {
-    return treeRef.value ? treeRef.value.getData() : []
+// Tree Instance
+const treeRef = useTemplateRef('tree')
+// Tree methods
+const getTreeData = () => {
+  return treeRef.value ? treeRef.value.getData() : []
+}
+
+// emits
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: PfTreeNode[]): void
+  (event: 'update:choosen', value: string | number | null): void
+}>()
+
+// data
+const data = computed({
+  get() {
+    return props.modelValue
+  },
+  set(v) {
+    emit('update:modelValue', v)
+  },
+})
+
+// Node Class
+const nodeClass = (stat: any) => {
+  return [
+    // node choose
+    props.chooseable ? 'cursor-pointer' : '',
+    isNodeChoosen(stat) ? 'bg-selected text-primary ring-2 ring-inset ring-primary' : '',
+  ]
+}
+
+// Check
+const checkedNodes = ref<any[]>([])
+const onCheckNode = () => {
+  if (treeRef.value) {
+    checkedNodes.value = treeRef.value.getChecked()
   }
+}
 
-  // emits
-  const emit = defineEmits<{
-    (event: 'update:modelValue', value: PfTreeNode[]): void
-    (event: 'update:choosen', value: string | number | null): void
-  }>()
-
-  // data
-  const data = computed({
-    get() {
-      return props.modelValue
-    },
-    set(v) {
-      emit('update:modelValue', v)
-    },
-  })
-
-  // Node Class
-  const nodeClass = (stat: any) => {
-    return [
-      // node choose
-      props.chooseable ? 'cursor-pointer' : '',
-      isNodeChoosen(stat) ? 'bg-selected text-primary ring-2 ring-inset ring-primary' : '',
-    ]
-  }
-
-  // Check
-  const checkedNodes = ref<any[]>([])
-  const onCheckNode = () => {
-    if (treeRef.value) {
-      checkedNodes.value = treeRef.value.getChecked()
+// choose
+const choosen = computed({
+  get() {
+    return props.choosen
+  },
+  set(v) {
+    if (v) {
+      emit('update:choosen', v)
+    } else {
+      emit('update:choosen', null)
     }
-  }
+  },
+})
 
-  // choose
-  const choosen = computed({
-    get() {
-      return props.choosen
-    },
-    set(v) {
-      if (v) {
-        emit('update:choosen', v)
-      } else {
-        emit('update:choosen', null)
-      }
-    },
-  })
+const onChooseNode = (stat: any) => {
+  if (!props.chooseable) return
+  const key = stat.data[props.valueKey]
+  choosen.value = choosen.value === key ? null : key
+}
 
-  const onChooseNode = (stat: any) => {
-    if (!props.chooseable) return
-    const key = stat.data[props.valueKey]
-    choosen.value = choosen.value === key ? null : key
-  }
+const isNodeChoosen = (stat: any) => {
+  return choosen.value != null && choosen.value === stat.data[props.valueKey]
+}
 
-  const isNodeChoosen = (stat: any) => {
-    return choosen.value != null && choosen.value === stat.data[props.valueKey]
-  }
-
-  // expose
-  defineExpose({
-    getTreeData,
-  })
+// expose
+defineExpose({
+  getTreeData,
+})
 </script>
 
 <template>
@@ -165,60 +165,60 @@
 </template>
 
 <style>
-  .pf-tree .tree-node {
-    position: relative;
-  }
+.pf-tree .tree-node {
+  position: relative;
+}
 
-  /* he-tree 的线条基础样式 */
-  .pf-tree .tree-line {
-    position: absolute;
-    background-color: hsl(var(--border));
-  }
+/* he-tree 的线条基础样式 */
+.pf-tree .tree-line {
+  position: absolute;
+  background-color: hsl(var(--border));
+}
 
-  /* 竖线 */
-  .pf-tree .tree-vline {
-    inline-size: 1px;
-    inset-block-start: 0;
-    inset-block-end: 0;
-  }
+/* 竖线 */
+.pf-tree .tree-vline {
+  inline-size: 1px;
+  inset-block-start: 0;
+  inset-block-end: 0;
+}
 
-  /* 横线 */
-  .tree-hline {
-    block-size: 2px;
-    inset-inline-start: 0;
-    inset-inline-end: 0;
-    inset-block-start: 50%;
-  }
+/* 横线 */
+.tree-hline {
+  block-size: 2px;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  inset-block-start: 50%;
+}
 
-  .pf-tree .tree-line {
-    background: hsl(var(--border));
-  }
+.pf-tree .tree-line {
+  background: hsl(var(--border));
+}
 
-  .pf-tree .tree-vline {
-    background: hsl(var(--border));
-    inline-size: 1px;
-  }
+.pf-tree .tree-vline {
+  background: hsl(var(--border));
+  inline-size: 1px;
+}
 
-  .pf-tree .tree-hline {
-    background: hsl(var(--border));
-    block-size: 1px;
-    inline-size: 10px;
-  }
+.pf-tree .tree-hline {
+  background: hsl(var(--border));
+  block-size: 1px;
+  inline-size: 10px;
+}
 
-  .pf-tree .tree-node-inner {
-    animation: tree-row-in 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  }
+.pf-tree .tree-node-inner {
+  animation: tree-row-in 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
 
-  @keyframes tree-row-in {
-    from {
-      opacity: 0;
-      transform: translateY(-10px) scale(0.98);
-      filter: blur(2px); /* 增加一点模糊感，更显高级 */
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      filter: blur(0);
-    }
+@keyframes tree-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.98);
+    filter: blur(2px); /* 增加一点模糊感，更显高级 */
   }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
 </style>
