@@ -7,15 +7,53 @@ import PfFormItemText from './PfFormItemText.vue'
 const props = defineProps<{
   config: PfFormConfigItem
   modelValue?: any
+  error?: string
+  touched?: boolean
+  dirty?: boolean
+  submitted?: boolean
 }>()
 
 const emits = defineEmits<{
   (e: 'update:modelValue', payload: any): void
+  (e: 'blur'): void
 }>()
 
 const handleChange = (value: any) => {
   emits('update:modelValue', value)
 }
+
+const handleBlur = () => {
+  emits('blur')
+}
+
+const handleChangeAndBlur = (value: any) => {
+  handleChange(value)
+  handleBlur()
+}
+
+const displayError = computed(() => {
+  if (!props.error) return undefined
+  if (props.touched || props.submitted) return props.error
+  return undefined
+})
+
+const maxLength = computed(() => {
+  if (props.config.type !== 'text') return undefined
+  const maxRule = props.config.rules?.max
+  if (!maxRule) return undefined
+  if (typeof maxRule === 'number') return maxRule
+  if (typeof maxRule === 'object') return maxRule.value
+  return undefined
+})
+
+const currentLength = computed(() => {
+  if (typeof props.modelValue === 'string') return props.modelValue.length
+  return 0
+})
+
+const showCount = computed(() => {
+  return props.config.type === 'text' && !props.config.readonly && !!maxLength.value
+})
 </script>
 
 <template>
@@ -31,6 +69,7 @@ const handleChange = (value: any) => {
         <Input
           :passive="false"
           :model-value="props.modelValue"
+          @blur="handleBlur"
           @update:model-value="handleChange"
         ></Input>
       </template>
@@ -49,7 +88,7 @@ const handleChange = (value: any) => {
         <pf-form-item-datetime
           :format="config.config?.format"
           :model-value="props.modelValue"
-          @update:model-value="handleChange"
+          @update:model-value="handleChangeAndBlur"
         ></pf-form-item-datetime>
       </template>
     </template>
@@ -64,7 +103,7 @@ const handleChange = (value: any) => {
       <template v-else>
         <pf-icon-picker
           :model-value="props.modelValue"
-          @update:model-value="handleChange"
+          @update:model-value="handleChangeAndBlur"
         ></pf-icon-picker>
       </template>
     </template>
@@ -81,12 +120,22 @@ const handleChange = (value: any) => {
           :type="config.config?.varient"
           :true-value="config.config?.trueValue"
           :false-value="config.config?.falseValue"
-          @update:model-value="handleChange"
+          @update:model-value="handleChangeAndBlur"
           :disabled="config.readonly"
         />
         <pf-text as="span">{{ config.name }}</pf-text>
       </div>
     </template>
+
+    <div
+      v-if="showCount"
+      class="self-end text-xs"
+      :class="currentLength > Number(maxLength) ? 'text-destructive' : 'text-muted-foreground'"
+    >
+      {{ currentLength }} / {{ maxLength }}
+    </div>
+
+    <FieldError v-if="displayError">{{ displayError }}</FieldError>
   </div>
 </template>
 

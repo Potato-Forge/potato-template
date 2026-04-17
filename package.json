@@ -22,6 +22,7 @@
     "@tabler/icons-vue": "^3.36.0",
     "@tanstack/vue-form": "^1.28.5",
     "@tanstack/vue-query": "^5.92.8",
+    "@tanstack/zod-form-adapter": "^0.42.1",
     "@types/three": "^0.182.0",
     "@unocss/reset": "^66.5.10",
     "@unovis/ts": "^1.6.2",

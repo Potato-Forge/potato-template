@@ -39,7 +39,7 @@ provide('permissionManager', manager)
       </div>
     </pf-card>
     <!-- edit area -->
-    <div class="flex-1 h-full">
+    <div class="flex-1 h-full min-h-0">
       <permission-form></permission-form>
     </div>
   </PageLayoutSingle>

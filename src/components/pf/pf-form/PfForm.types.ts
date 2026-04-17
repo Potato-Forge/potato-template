@@ -1,7 +1,55 @@
 import type { AnyFieldApi } from '@tanstack/vue-form'
 import type { JSX } from 'vue/jsx-runtime'
+import type { ZodType } from 'zod'
 
 export type PfFormFieldApi = AnyFieldApi
+
+export type PfFormValidationErrors<T = Record<string, any>> = Partial<
+  Record<keyof T & string, string | string[]>
+>
+
+export type PfFormValidationResult<T = Record<string, any>> =
+  | void
+  | null
+  | undefined
+  | string
+  | PfFormValidationErrors<T>
+  | {
+      form?: string
+      fields?: PfFormValidationErrors<T>
+    }
+
+export type PfFormRuleHandler<T = Record<string, any>> = (payload: {
+  value: T
+  stage: 'change' | 'blur' | 'submit'
+  signal?: AbortSignal
+}) => PfFormValidationResult<T> | Promise<PfFormValidationResult<T>>
+
+type PfFormFieldRuleNumber = number | { value: number; message?: string }
+type PfFormFieldRulePattern = RegExp | { value: RegExp; message?: string }
+
+export type PfFormFieldRules = {
+  required?: boolean | string
+  min?: PfFormFieldRuleNumber
+  max?: PfFormFieldRuleNumber
+  pattern?: PfFormFieldRulePattern
+  validateOn?: 'change' | 'blur' | 'both'
+}
+
+export type PfFormRules<T = Record<string, any>> = {
+  /**
+   * zod schema validation, usually used for submit-time strict checks.
+   */
+  schema?: ZodType<T>
+  /**
+   * Form-level custom validation triggered on blur.
+   */
+  onBlur?: PfFormRuleHandler<T>
+  /**
+   * Form-level custom validation triggered on submit.
+   */
+  onSubmit?: PfFormRuleHandler<T>
+}
 
 /**
  * 表单配置项的公共基础字段
@@ -41,6 +89,10 @@ type PfFormConfigBase<
    *
    */
   help?: string | Component | (() => VNode | JSX.Element)
+  /**
+   * 字段级原子校验规则，仅处理当前字段值，不涉及跨字段逻辑
+   */
+  rules?: PfFormFieldRules
 }
 
 /**
