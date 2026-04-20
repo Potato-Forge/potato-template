@@ -26,8 +26,9 @@ const permissionSchema = z.object({
   path: z.string().min(1, '权限路由不能为空').regex(/^\//, '权限路由必须以 / 开头'),
   component: z
     .string()
-    .regex(/^[a-z0-9-]+(?:\/[a-z0-9-]+)*(?:\.vue)?$/i, 'view 组件路径格式不正确')
+    .regex(/^[a-z0-9-]+(?:\/[a-z0-9-]+)*(?:\.vue)?$/i, 'view 组件路径格式不正确，')
     .or(z.literal('')),
+  sort: z.coerce.number().int('排序必须为整数').min(1, '排序不能小于 1'),
 })
 
 const formRules: PfFormRules<Record<string, any>> = {
@@ -54,7 +55,7 @@ watchEffect(() => {
   }
 
   if (formMode.value === 'create') {
-    formData.value = null
+    formData.value = choosenPermission.value
     return
   }
 
@@ -139,6 +140,20 @@ const formConfig = ref<PfFormConfig<AllPermissionItem>>([
     },
   },
   {
+    name: '排序',
+    key: 'sort',
+    type: 'text',
+    default: 1,
+    help: '同级节点排序值，从 1 开始，值越小越靠前',
+    rules: {
+      required: true,
+      pattern: {
+        value: /^[1-9]\d*$/,
+        message: '排序必须是大于等于 1 的整数',
+      },
+    },
+  },
+  {
     name: '是否显示',
     key: 'is_hidden',
     type: 'toggle',
@@ -194,11 +209,26 @@ const handlePermission = async (data: Record<string, any>) => {
 
           <!-- actions -->
           <div class="flex items-center gap-2">
-            <pf-button variant="ghost" @click="handleCancel">取消</pf-button>
-            <pf-button variant="secondary" @click="handleReset">重置</pf-button>
-            <pf-button type="primary" :loading="manager.isSaving.value" @click="handleSubmit"
-              >保存</pf-button
+            <pf-button variant="ghost" :disabled="manager.isSaving.value" @click="handleCancel"
+              >取消</pf-button
             >
+            <pf-button variant="secondary" :disabled="manager.isSaving.value" @click="handleReset"
+              >重置</pf-button
+            >
+            <pf-button
+              type="primary"
+              :disabled="manager.isSaving.value"
+              :aria-busy="manager.isSaving.value"
+              @click="handleSubmit"
+            >
+              <template #prefix>
+                <div
+                  v-if="manager.isSaving.value"
+                  class="i-tabler-loader-2 h-4 w-4 animate-spin"
+                ></div>
+              </template>
+              {{ manager.isSaving.value ? '保存中...' : '保存' }}
+            </pf-button>
           </div>
         </div>
       </pf-card>

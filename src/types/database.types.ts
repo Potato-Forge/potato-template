@@ -190,6 +190,7 @@ export type Database = {
         }[]
       }
       has_roles: { Args: { role_codes: string[] }; Returns: boolean }
+      reorder_permissions: { Args: { updates: Json }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

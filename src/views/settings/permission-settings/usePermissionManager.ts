@@ -2,14 +2,18 @@ import {
   createPermission,
   getAllPermissions,
   permissionKeys,
+  reorderPermissions,
   updatePermission,
   type Permission,
   type PermissionInsert,
+  type PermissionSortUpdate,
   type PermissionUpdate,
 } from '@/api/permission/permission'
 import { flatToTree } from '@/utils/tree'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { usePfModal } from '@/components/pf/pf-modal'
+import { pfToast } from '@/components/pf/pf-toast'
+import type { PfTreeNode } from '@/components/pf/pf-tree'
 
 export function usePermissionManager() {
   const queryClient = useQueryClient()
@@ -66,6 +70,83 @@ export function usePermissionManager() {
   const ensurePermissions = () => queryClient.getQueryData<Permission[]>(permissionKeys.all) || []
   const compareValue = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
+  const parsePermissionId = (id: unknown): number | null => {
+    const parsed = Number.parseInt(String(id), 10)
+    if (Number.isNaN(parsed) || parsed <= 0) return null
+    return parsed
+  }
+
+  const normalizeSortValue = (value: unknown, fallback: number | null): number | null => {
+    if (value === null || value === undefined || value === '') {
+      return fallback
+    }
+
+    const parsed = Number.parseInt(String(value), 10)
+    if (Number.isNaN(parsed) || parsed < 1) {
+      return fallback
+    }
+
+    return parsed
+  }
+
+  const collectTreeSortUpdates = (
+    nodes: PfTreeNode[],
+    parentId: number | null,
+    updates: PermissionSortUpdate[],
+  ) => {
+    let nextSort = 1
+
+    nodes.forEach((node) => {
+      const id = parsePermissionId(node.id)
+      if (id !== null) {
+        updates.push({
+          id,
+          parent_id: parentId,
+          sort: nextSort,
+        })
+        nextSort += 1
+      }
+
+      const nextParentId = id === null ? parentId : id
+      const children = Array.isArray(node.children) ? (node.children as PfTreeNode[]) : []
+      if (children.length > 0) {
+        collectTreeSortUpdates(children, nextParentId, updates)
+      }
+    })
+  }
+
+  const hasSortChanges = (updates: PermissionSortUpdate[]) => {
+    if (updates.length === 0) return false
+
+    const currentMap = new Map(
+      ensurePermissions().map((item) => [item.id, { sort: item.sort, parent_id: item.parent_id }]),
+    )
+
+    return updates.some((item) => {
+      const current = currentMap.get(item.id)
+      if (!current) return false
+      return current.sort !== item.sort || current.parent_id !== item.parent_id
+    })
+  }
+
+  const applySortUpdatesToCache = (updates: PermissionSortUpdate[]) => {
+    if (updates.length === 0) return
+
+    const updatesMap = new Map(updates.map((item) => [item.id, item]))
+    queryClient.setQueryData<Permission[]>(permissionKeys.all, (old = []) =>
+      old.map((item) => {
+        const next = updatesMap.get(item.id)
+        if (!next) return item
+
+        return {
+          ...item,
+          parent_id: next.parent_id,
+          sort: next.sort,
+        }
+      }),
+    )
+  }
+
   const getPermissionById = (id: string | number | null) => {
     if (id === null) return null
     return ensurePermissions().find((p) => String(p.id) === String(id)) || null
@@ -93,6 +174,12 @@ export function usePermissionManager() {
     const draftId = -Date.now()
     currentDraftId.value = draftId
 
+    const siblings = ensurePermissions().filter((item) => item.parent_id === parentId)
+    const maxSort = siblings.reduce((max, item) => {
+      if (typeof item.sort !== 'number') return max
+      return Math.max(max, item.sort)
+    }, 0)
+
     return {
       id: draftId,
       name: '',
@@ -104,7 +191,7 @@ export function usePermissionManager() {
       is_hidden: null,
       parent_id: parentId,
       path: null,
-      sort: null,
+      sort: maxSort + 1,
       status: null,
       type: null,
     }
@@ -254,6 +341,7 @@ export function usePermissionManager() {
 
   const sanitizeCreatePayload = (values: Record<string, any>): PermissionInsert => {
     const draft = getCurrentDraftPermission()
+    const defaultSort = typeof draft?.sort === 'number' ? draft.sort : 1
     return {
       name: values.name || '',
       parent_id: values.parent_id ?? draft?.parent_id ?? null,
@@ -263,7 +351,7 @@ export function usePermissionManager() {
       component: values.component || null,
       is_external: values.is_external ?? null,
       is_hidden: values.is_hidden ?? null,
-      sort: values.sort ?? null,
+      sort: normalizeSortValue(values.sort, defaultSort),
       status: values.status ?? null,
       type: values.type || null,
     }
@@ -279,10 +367,18 @@ export function usePermissionManager() {
       component: values.component,
       is_external: values.is_external,
       is_hidden: values.is_hidden,
-      sort: values.sort,
+      sort: normalizeSortValue(values.sort, null),
       status: values.status,
       type: values.type,
     }
+  }
+
+  const getErrorMessage = (error: unknown) => {
+    if (error instanceof Error) {
+      return error.message
+    }
+
+    return '请稍后重试'
   }
 
   const createMutation = useMutation({
@@ -300,10 +396,12 @@ export function usePermissionManager() {
 
       return { previous }
     },
-    onError: (_error, _variables, context) => {
+    onError: (error, _variables, context) => {
       if (context?.previous) {
         queryClient.setQueryData(permissionKeys.all, context.previous)
       }
+
+      pfToast.error('新建权限失败', getErrorMessage(error))
     },
     onSuccess: (saved) => {
       const draftId = currentDraftId.value
@@ -318,6 +416,7 @@ export function usePermissionManager() {
       currentDraftId.value = null
       isDirty.value = false
       setEditingSnapshot(saved)
+      pfToast.success('新建权限成功')
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: permissionKeys.all })
@@ -337,10 +436,12 @@ export function usePermissionManager() {
 
       return { previous }
     },
-    onError: (_error, _variables, context) => {
+    onError: (error, _variables, context) => {
       if (context?.previous) {
         queryClient.setQueryData(permissionKeys.all, context.previous)
       }
+
+      pfToast.error('更新权限失败', getErrorMessage(error))
     },
     onSuccess: (saved) => {
       queryClient.setQueryData<Permission[]>(permissionKeys.all, (old = []) =>
@@ -351,11 +452,85 @@ export function usePermissionManager() {
       isCreating.value = false
       isDirty.value = false
       setEditingSnapshot(saved)
+      pfToast.success('更新权限成功')
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: permissionKeys.all })
     },
   })
+
+  const pendingReorderUpdates = ref<PermissionSortUpdate[]>([])
+  const isReorderQueued = ref(false)
+  const reorderSnapshot = ref<Permission[] | null>(null)
+
+  const reorderMutation = useMutation({
+    mutationFn: reorderPermissions,
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: permissionKeys.all })
+    },
+    onError: (error) => {
+      if (reorderSnapshot.value) {
+        queryClient.setQueryData(permissionKeys.all, reorderSnapshot.value)
+      }
+
+      pendingReorderUpdates.value = []
+      isReorderQueued.value = false
+      reorderSnapshot.value = null
+      pfToast.error('权限排序更新失败', getErrorMessage(error))
+    },
+    onSuccess: () => {
+      if (pendingReorderUpdates.value.length === 0) {
+        reorderSnapshot.value = null
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: permissionKeys.all })
+    },
+  })
+
+  const commitPendingReorder = async () => {
+    if (reorderMutation.isPending.value) return
+    if (pendingReorderUpdates.value.length === 0) {
+      isReorderQueued.value = false
+      return
+    }
+
+    const updates = [...pendingReorderUpdates.value]
+    pendingReorderUpdates.value = []
+    isReorderQueued.value = false
+
+    await reorderMutation.mutateAsync(updates)
+
+    if (pendingReorderUpdates.value.length > 0) {
+      await commitPendingReorder()
+    }
+  }
+
+  const scheduleReorderCommit = useDebounceFn(() => {
+    void commitPendingReorder()
+  }, 600)
+
+  const reorderTree = (treeData: PfTreeNode[]) => {
+    if (isCreating.value) {
+      queryClient.invalidateQueries({ queryKey: permissionKeys.all })
+      pfToast.warning('请先保存或取消当前新建节点，再进行拖拽排序')
+      return
+    }
+
+    const updates: PermissionSortUpdate[] = []
+    collectTreeSortUpdates(treeData, null, updates)
+
+    if (!hasSortChanges(updates)) return
+
+    if (!reorderSnapshot.value) {
+      reorderSnapshot.value = ensurePermissions().map((item) => ({ ...item }))
+    }
+
+    applySortUpdatesToCache(updates)
+    pendingReorderUpdates.value = updates
+    isReorderQueued.value = true
+    scheduleReorderCommit()
+  }
 
   const saveCurrent = async (values: Record<string, any>) => {
     if (formMode.value === 'create') {
@@ -397,7 +572,10 @@ export function usePermissionManager() {
     selectNode,
     cancelEditing,
     markFormChanged,
+    reorderTree,
     saveCurrent,
+    canDragTree: computed(() => !isCreating.value && !createMutation.isPending.value),
+    isReordering: computed(() => reorderMutation.isPending.value || isReorderQueued.value),
     isSaving: computed(() => createMutation.isPending.value || updateMutation.isPending.value),
   }
 }

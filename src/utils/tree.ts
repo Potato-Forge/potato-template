@@ -12,6 +12,35 @@ export type TreeOptions = {
 
 export type TreeNode = PfTreeNode
 
+const sortTreeSiblings = (nodes: TreeNode[]) => {
+  nodes.sort((a, b) => {
+    const sortA = typeof a.sort === 'number' ? a.sort : Number.MAX_SAFE_INTEGER
+    const sortB = typeof b.sort === 'number' ? b.sort : Number.MAX_SAFE_INTEGER
+
+    if (sortA !== sortB) return sortA - sortB
+
+    const createdAtA = typeof a.created_at === 'string' ? Date.parse(a.created_at) : Number.NaN
+    const createdAtB = typeof b.created_at === 'string' ? Date.parse(b.created_at) : Number.NaN
+    if (!Number.isNaN(createdAtA) && !Number.isNaN(createdAtB) && createdAtA !== createdAtB) {
+      return createdAtA - createdAtB
+    }
+
+    const idA = Number(a.id)
+    const idB = Number(b.id)
+    if (!Number.isNaN(idA) && !Number.isNaN(idB) && idA !== idB) {
+      return idA - idB
+    }
+
+    return 0
+  })
+
+  nodes.forEach((node) => {
+    if (Array.isArray(node.children) && node.children.length > 0) {
+      sortTreeSiblings(node.children as TreeNode[])
+    }
+  })
+}
+
 /*
  * @description 将扁平化数据转换为树形结构
  * @param flatData 扁平化数据数组
@@ -47,6 +76,8 @@ export const flatToTree = (flatData: FlatData[], options?: TreeOptions): TreeNod
       map[parentId][childrenKey].push(currentNode)
     }
   })
+
+  sortTreeSiblings(tree)
 
   return tree
 }

@@ -3,12 +3,17 @@ import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
 import PermissionTree from './components/PermissionTree.vue'
 import PermissionForm from './components/PermissionForm.vue'
 import { usePermissionManager } from './usePermissionManager'
+import type { PfTreeNode } from '@/components/pf/pf-tree'
 
 const manager = usePermissionManager()
 const { allPermissionTree, choosenId } = manager
 
 const handleChoose = async (nextId: string | number | null) => {
   await manager.selectNode(nextId)
+}
+
+const handleTreeDataChange = (treeData: PfTreeNode[]) => {
+  manager.reorderTree(treeData)
 }
 
 provide('permissionManager', manager)
@@ -33,8 +38,11 @@ provide('permissionManager', manager)
         <permission-tree
           :tree-data="allPermissionTree"
           :choosen="choosenId"
+          :draggable="manager.canDragTree.value"
+          :reordering="manager.isReordering.value"
           :on-create-draft-node="manager.createDraftNode"
           @update:choosen="handleChoose"
+          @update:treeData="handleTreeDataChange"
         ></permission-tree>
       </div>
     </pf-card>

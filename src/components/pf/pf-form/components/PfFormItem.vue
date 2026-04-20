@@ -18,6 +18,9 @@ const emits = defineEmits<{
   (e: 'blur'): void
 }>()
 
+const isErrorShaking = ref(false)
+let shakeTimer: ReturnType<typeof setTimeout> | null = null
+
 const handleChange = (value: any) => {
   emits('update:modelValue', value)
 }
@@ -35,6 +38,30 @@ const displayError = computed(() => {
   if (!props.error) return undefined
   if (props.touched || props.submitted) return props.error
   return undefined
+})
+
+watch(displayError, (next, prev) => {
+  if (!next || next === prev) return
+
+  if (shakeTimer) {
+    clearTimeout(shakeTimer)
+  }
+
+  isErrorShaking.value = false
+  requestAnimationFrame(() => {
+    isErrorShaking.value = true
+    shakeTimer = setTimeout(() => {
+      isErrorShaking.value = false
+      shakeTimer = null
+    }, 420)
+  })
+})
+
+onBeforeUnmount(() => {
+  if (shakeTimer) {
+    clearTimeout(shakeTimer)
+    shakeTimer = null
+  }
 })
 
 const maxLength = computed(() => {
@@ -57,7 +84,7 @@ const showCount = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col">
     <!-- type:text -->
     <template v-if="config.type === 'text'">
       <!-- read -->
@@ -135,8 +162,53 @@ const showCount = computed(() => {
       {{ currentLength }} / {{ maxLength }}
     </div>
 
-    <FieldError v-if="displayError">{{ displayError }}</FieldError>
+    <div class="field-error-placeholder min-h-5 overflow-hidden">
+      <Transition name="field-error">
+        <FieldError v-if="displayError" :class="{ 'field-error-shake': isErrorShaking }">
+          {{ displayError }}
+        </FieldError>
+      </Transition>
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.field-error-enter-active,
+.field-error-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.field-error-enter-from,
+.field-error-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.field-error-shake {
+  animation: field-error-shake 0.38s ease-in-out;
+}
+
+@keyframes field-error-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-4px);
+  }
+  30% {
+    transform: translateX(4px);
+  }
+  45% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+</style>

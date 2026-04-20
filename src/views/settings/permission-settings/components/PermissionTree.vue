@@ -6,10 +6,21 @@ import type { PfTreeNode } from '@/components/pf/pf-tree'
 const props = defineProps<{
   treeData: PfTreeNode[]
   choosen: number | string | null
+  draggable?: boolean
+  reordering?: boolean
   onCreateDraftNode?: (parentId?: string | number) => Promise<boolean> | boolean
 }>()
 
-const emits = defineEmits(['update:choosen'])
+const emits = defineEmits(['update:choosen', 'update:treeData'])
+
+const treeDataModel = computed({
+  get() {
+    return props.treeData
+  },
+  set(v: PfTreeNode[]) {
+    emits('update:treeData', v)
+  },
+})
 
 const choosenNodes = computed({
   get() {
@@ -36,7 +47,17 @@ defineExpose({
 </script>
 
 <template>
-  <PfTree ref="tree" :modelValue="props.treeData" :chooseable="true" v-model:choosen="choosenNodes">
+  <div
+    class="transition-all duration-200"
+    :class="props.reordering ? 'opacity-75 saturate-60 pointer-events-none' : ''"
+  >
+    <PfTree
+      ref="tree"
+      v-model="treeDataModel"
+      :chooseable="true"
+      :draggable="props.draggable"
+      v-model:choosen="choosenNodes"
+    >
     <template #actions="{ node }">
       <div class="flex items-center">
         <pf-button
@@ -54,5 +75,6 @@ defineExpose({
         ></pf-button>
       </div>
     </template>
-  </PfTree>
+    </PfTree>
+  </div>
 </template>

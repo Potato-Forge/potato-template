@@ -2,6 +2,7 @@
 import { Draggable } from '@he-tree/vue'
 import PfTreeCheckbox from './PfTreeCheckbox.vue'
 import type { PfTreeNode } from '.'
+import { Icon } from '@iconify/vue'
 
 // props
 const props = withDefaults(
@@ -104,8 +105,8 @@ defineExpose({
     :indent="16"
     :treeLine="true"
     class="pf-tree"
-    :key-field="'text'"
-    :nodeKey="(stat) => stat.data.text"
+    :key-field="props.valueKey"
+    :nodeKey="(stat) => stat.data[props.valueKey]"
     :disable-drag="!props.draggable"
     @check:node="onCheckNode"
   >
@@ -136,7 +137,9 @@ defineExpose({
         <!-- Node Text -->
         <div class="flex-grow flex items-center whitespace-nowrap">
           <!-- Node Icon -->
-          <div :class="node.icon" class="text-primary"></div>
+          <slot name="icon" :node="node" :stat="stat">
+            <Icon v-if="node.icon" :icon="`tabler:${node.icon}`" class="text-lg mr-1" />
+          </slot>
           <slot
             name="text"
             :class="isNodeChoosen(stat) ? 'text-selected-foreground' : 'text-on-surface'"

@@ -205,12 +205,28 @@ const runFieldRules = (stage: 'change' | 'blur' | 'submit', value: Record<string
 const schemaAdapter = zodValidator()
 const schemaValidator = schemaAdapter()
 
+const coerceValue = (val: unknown): unknown => {
+  // Convert null/undefined to empty string for string schema validation
+  if (val === null || val === undefined) return ''
+  if (Array.isArray(val)) return val.map((item) => coerceValue(item))
+  if (val && typeof val === 'object') {
+    return Object.fromEntries(
+      Object.entries(val as Record<string, unknown>).map(([key, item]) => [key, coerceValue(item)]),
+    )
+  }
+  return val
+}
+
 const runSchemaRules = async (value: Record<string, any>) => {
   if (!resolvedFormRules.value?.schema) return undefined
 
+  // Coerce null/undefined values to empty strings before schema validation
+  // This prevents "expected string, received null" errors when fields haven't been touched
+  const coercedValue = coerceValue(value) as Record<string, any>
+
   const schemaResult = await schemaValidator.validateAsync(
     {
-      value,
+      value: coercedValue,
       validationSource: 'form',
     },
     resolvedFormRules.value.schema,

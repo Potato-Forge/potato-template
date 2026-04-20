@@ -14,6 +14,12 @@ const createToastHandler = (type: ToastTypes) => {
     if (typeof arg1 === 'object' && arg1 !== null) {
       // 如果第一个参数是对象，直接传递给toast
       toast[type](arg1)
+    } else if (typeof arg1 === 'string' && arg2 === undefined) {
+      // 只有一个字符串参数
+      toast[type](arg1)
+    } else if (typeof arg1 === 'string' && typeof arg2 === 'string' && arg3 === undefined) {
+      // 两个字符串：标题 + 描述
+      toast[type](arg1, { description: arg2 })
     } else if (typeof arg1 === 'string' && typeof arg2 === 'object' && arg2 !== null) {
       // 如果第一个参数是字符串，第二个参数是对象，合并后传递给toast
       toast[type](arg1, arg2)
@@ -23,7 +29,7 @@ const createToastHandler = (type: ToastTypes) => {
       typeof arg3 === 'object' &&
       arg3 !== null
     ) {
-      // 如果第一个和第二个参数是字符串，第三个参数是对象，合并后传递给toast
+      // 两个字符串 + 额外选项：标题 + 描述 + 选项
       toast[type](arg1, { description: arg2, ...arg3 })
     } else {
       // 否则，打印警告
