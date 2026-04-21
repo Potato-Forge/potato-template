@@ -60,12 +60,7 @@ const initialFormData = (val: Record<string, any> | null | undefined) => {
   return formData
 }
 
-const normalizeErrorValue = (error: unknown): string | undefined => {
-  if (typeof error === 'string') return error
-  if (!error || typeof error !== 'object') return undefined
-  if ('message' in error && typeof error.message === 'string') return error.message
-  return undefined
-}
+const currentFormValues = ref<Record<string, any>>(initialFormData(props.formData || {}))
 
 const normalizeValue = (value: unknown): unknown => {
   if (typeof value === 'string') return value.trim()
@@ -145,10 +140,21 @@ const shouldRunFieldRules = (
   return rules.validateOn === stage
 }
 
+const isFieldVisible = (config: PfFormConfigItem, formValues: Record<string, any>) => {
+  if (!config.visibleIf) return true
+
+  try {
+    return config.visibleIf(formValues)
+  } catch {
+    return true
+  }
+}
+
 const runFieldRules = (stage: 'change' | 'blur' | 'submit', value: Record<string, any>) => {
   const fields: Record<string, string> = {}
 
   formModeConfig.value.forEach((config) => {
+    if (!isFieldVisible(config, value)) return
     if (!config.rules || config.readonly || !shouldRunFieldRules(config.rules, stage)) return
 
     const fieldKey = String(config.key)
@@ -285,26 +291,25 @@ const runRules = async (
   }
 
   // Schema is merged last so it has the highest priority.
-  if (stage !== 'change') {
-    const schemaResult = await runSchemaRules(normalizedValue)
-    if (schemaResult?.form) {
-      formError = schemaResult.form
-    }
-    if (schemaResult?.fields) {
-      Object.entries(schemaResult.fields).forEach(([key, message]) => {
-        if (Array.isArray(message)) {
-          const firstMessage = message.find((item) => typeof item === 'string')
-          if (firstMessage) {
-            mergedFields[key] = firstMessage
-          }
-          return
+  // Run on every stage to ensure blur-originated schema errors can be cleared while typing.
+  const schemaResult = await runSchemaRules(normalizedValue)
+  if (schemaResult?.form) {
+    formError = schemaResult.form
+  }
+  if (schemaResult?.fields) {
+    Object.entries(schemaResult.fields).forEach(([key, message]) => {
+      if (Array.isArray(message)) {
+        const firstMessage = message.find((item) => typeof item === 'string')
+        if (firstMessage) {
+          mergedFields[key] = firstMessage
         }
+        return
+      }
 
-        if (typeof message === 'string') {
-          mergedFields[key] = message
-        }
-      })
-    }
+      if (typeof message === 'string') {
+        mergedFields[key] = message
+      }
+    })
   }
 
   if (!formError && Object.keys(mergedFields).length === 0) {
@@ -317,28 +322,63 @@ const runRules = async (
   }
 }
 
-const getFieldError = (errors: unknown[] | undefined) => {
-  if (!errors || errors.length === 0) return undefined
+// ---------------------------------------------------------------------------
+// Own error state — managed independently from TanStack to avoid the
+// cross-source error-map merging issue: TanStack keeps onBlur errors alive
+// even after onChange clears them, because each source's errorMap slot is
+// only overwritten by a validator of the same source (onChange / onBlur).
+// ---------------------------------------------------------------------------
+const fieldErrors = ref<Record<string, string | undefined>>({})
+const touchedFields = ref<Set<string>>(new Set())
 
-  for (const error of errors) {
-    const message = normalizeErrorValue(error)
-    if (message) return message
+const resetValidationState = () => {
+  fieldErrors.value = {}
+  touchedFields.value = new Set()
+}
+
+/**
+ * Run validation and sync results into fieldErrors.
+ * - 'change': only update fields already touched or already carrying an error
+ *   (fresh, un-touched fields never receive premature errors).
+ * - 'blur'  : always update the blurred field + other touched/errored fields.
+ * - 'submit': update every visible field regardless of touch state.
+ */
+const syncErrors = async (
+  stage: 'change' | 'blur' | 'submit',
+  triggerKey?: string,
+  signal?: AbortSignal,
+) => {
+  const result = await runRules(stage, currentFormValues.value, signal)
+  const allErrors = result?.fields || {}
+
+  if (stage === 'submit') {
+    visibleFormModeConfig.value.forEach((config) => {
+      const key = String(config.key)
+      fieldErrors.value[key] = allErrors[key]
+      if (allErrors[key]) touchedFields.value.add(key)
+    })
+    return result
   }
 
-  return undefined
+  visibleFormModeConfig.value.forEach((config) => {
+    const key = String(config.key)
+    const isBlurTarget = stage === 'blur' && key === triggerKey
+    const isTouched = touchedFields.value.has(key)
+    const hasCurrentError = fieldErrors.value[key] !== undefined
+
+    if (isBlurTarget || isTouched || hasCurrentError) {
+      fieldErrors.value[key] = allErrors[key]
+    }
+  })
+
+  return result
 }
 
 const form = useForm({
   defaultValues: initialFormData(props.formData || {}),
   validators: {
-    onChangeAsync: async ({ value, signal }) => {
-      return await runRules('change', value, signal)
-    },
-    onBlurAsync: async ({ value, signal }) => {
-      return await runRules('blur', value, signal)
-    },
-    onSubmitAsync: async ({ value, signal }) => {
-      return await runRules('submit', value, signal)
+    onSubmitAsync: async ({ signal }) => {
+      return await syncErrors('submit', undefined, signal)
     },
   },
   onSubmit: async ({ value }) => {
@@ -352,19 +392,44 @@ const form = useForm({
 const isFormSubmitted = computed(() => form.state.isSubmitted)
 
 const handleFieldChange = (field: any, key: string, value: any) => {
-  field.handleChange(value)
-  if (!props.onChange) return
-  props.onChange({
-    ...form.state.values,
+  // Update currentFormValues BEFORE calling field.handleChange so that any
+  // synchronous or microtask-scheduled validator sees the latest value.
+  currentFormValues.value = {
+    ...currentFormValues.value,
     [key]: value,
-  })
+  }
+  field.handleChange(value)
+
+  // Only run real-time validation for fields the user has already interacted
+  // with (touched via blur) or that already carry an error.
+  const isTouched = touchedFields.value.has(key)
+  const hasError = fieldErrors.value[key] !== undefined
+  if (isTouched || hasError) {
+    syncErrors('change', key)
+  }
+
+  if (!props.onChange) return
+  props.onChange({ ...currentFormValues.value })
 }
+
+const handleFieldBlur = async (field: any, key: string) => {
+  touchedFields.value.add(key)
+  field.handleBlur()
+  await syncErrors('blur', key)
+}
+
+const visibleFormModeConfig = computed(() => {
+  return formModeConfig.value.filter((config) => isFieldVisible(config, currentFormValues.value))
+})
 
 // watch for formData changes to reset the form
 watch(
   () => props.formData,
   (newVal) => {
-    form.reset(initialFormData(newVal || {}))
+    const nextValues = initialFormData(newVal || {})
+    currentFormValues.value = nextValues
+    resetValidationState()
+    form.reset(nextValues)
   },
   { deep: true },
 )
@@ -372,7 +437,10 @@ watch(
 watch(
   formModeConfig,
   () => {
-    form.reset(initialFormData(props.formData || {}))
+    const nextValues = initialFormData(props.formData || {})
+    currentFormValues.value = nextValues
+    resetValidationState()
+    form.reset(nextValues)
   },
   { deep: true },
 )
@@ -391,7 +459,11 @@ defineExpose({
 <template>
   <form @submit.prevent.stop="form.handleSubmit">
     <div class="grid gap-4">
-      <form.Field v-for="config in formModeConfig" :key="config.key" :name="String(config.key)">
+      <form.Field
+        v-for="config in visibleFormModeConfig"
+        :key="config.key"
+        :name="String(config.key)"
+      >
         <template v-slot="{ field, state }">
           <div class="grid w-full items-center gap-2">
             <div class="flex items-center gap-1">
@@ -407,8 +479,8 @@ defineExpose({
               :touched="state.meta.isTouched"
               :dirty="state.meta.isDirty"
               :submitted="isFormSubmitted"
-              :error="getFieldError(state.meta.errors)"
-              @blur="field.handleBlur"
+              :error="fieldErrors[String(config.key)]"
+              @blur="handleFieldBlur(field, String(config.key))"
               @update:model-value="handleFieldChange(field, String(config.key), $event)"
             ></pf-form-item>
           </div>

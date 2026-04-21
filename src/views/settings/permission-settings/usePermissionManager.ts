@@ -193,7 +193,7 @@ export function usePermissionManager() {
       path: null,
       sort: maxSort + 1,
       status: null,
-      type: null,
+      type: 'menu',
     }
   }
 
@@ -342,34 +342,43 @@ export function usePermissionManager() {
   const sanitizeCreatePayload = (values: Record<string, any>): PermissionInsert => {
     const draft = getCurrentDraftPermission()
     const defaultSort = typeof draft?.sort === 'number' ? draft.sort : 1
+    const defaultType = draft?.type || 'menu'
+    const type = (values.type || defaultType) as 'menu' | 'button' | 'api'
+    const isMenu = type === 'menu'
+    const isApi = type === 'api'
+
     return {
       name: values.name || '',
       parent_id: values.parent_id ?? draft?.parent_id ?? null,
       code: values.code || null,
-      path: values.path || null,
-      icon: values.icon || null,
-      component: values.component || null,
-      is_external: values.is_external ?? null,
+      path: isMenu ? values.path || null : null,
+      icon: isApi ? null : values.icon || null,
+      component: isMenu ? values.component || null : null,
+      is_external: isMenu ? values.is_external || null : null,
       is_hidden: values.is_hidden ?? null,
       sort: normalizeSortValue(values.sort, defaultSort),
       status: values.status ?? null,
-      type: values.type || null,
+      type,
     }
   }
 
   const sanitizeUpdatePayload = (values: Record<string, any>): PermissionUpdate => {
+    const type = (values.type || 'menu') as 'menu' | 'button' | 'api'
+    const isMenu = type === 'menu'
+    const isApi = type === 'api'
+
     return {
       name: values.name,
       parent_id: values.parent_id,
       code: values.code,
-      path: values.path,
-      icon: values.icon,
-      component: values.component,
-      is_external: values.is_external,
+      path: isMenu ? values.path || null : null,
+      icon: isApi ? null : values.icon || null,
+      component: isMenu ? values.component || null : null,
+      is_external: isMenu ? values.is_external || null : null,
       is_hidden: values.is_hidden,
       sort: normalizeSortValue(values.sort, null),
       status: values.status,
-      type: values.type,
+      type,
     }
   }
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
 import PfTree from '@/components/pf/pf-tree/PfTree.vue'
 import type { PfTreeNode } from '@/components/pf/pf-tree'
 
@@ -58,6 +59,24 @@ defineExpose({
       :draggable="props.draggable"
       v-model:choosen="choosenNodes"
     >
+      <template #icon="{ node }">
+        <!-- 显示节点类型图标 -->
+        <Icon
+          v-if="node.type === 'button'"
+          icon="tabler:square"
+          class="text-lg mr-1 text-warning"
+          title="按钮类型"
+        />
+        <Icon
+          v-else-if="node.type === 'api'"
+          icon="tabler:api"
+          class="text-lg mr-1 text-info"
+          title="接口类型"
+        />
+        <!-- 菜单类型或无类型时显示节点自己的图标（如果有的话） -->
+        <Icon v-else-if="node.icon" :icon="`tabler:${node.icon}`" class="text-lg mr-1" />
+      </template>
+
       <template #actions="{ node }">
         <div class="flex items-center">
           <pf-button

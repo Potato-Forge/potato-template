@@ -93,6 +93,7 @@ declare module 'vue' {
     PfFormInput: typeof import('./../components/pf/pf-form/components/PfFormInput.vue')['default']
     PfFormItem: typeof import('./../components/pf/pf-form/components/PfFormItem.vue')['default']
     PfFormItemDatetime: typeof import('./../components/pf/pf-form/components/PfFormItemDatetime.vue')['default']
+    PfFormItemOptions: typeof import('./../components/pf/pf-form/components/PfFormItemOptions.vue')['default']
     PfFormItemText: typeof import('./../components/pf/pf-form/components/PfFormItemText.vue')['default']
     PfFormItemToggle: typeof import('./../components/pf/pf-form/components/PfFormItemToggle.vue')['default']
     PfFrom: typeof import('./../components/pf/pf-form/PfFrom.vue')['default']

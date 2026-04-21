@@ -3,6 +3,7 @@ import { format } from 'date-fns'
 import type { PfFormConfigItem } from '../PfForm.types'
 import PfFormItemDatetime from './PfFormItemDatetime.vue'
 import PfFormItemText from './PfFormItemText.vue'
+import PfFormItemOptions from './PfFormItemOptions.vue'
 
 const props = defineProps<{
   config: PfFormConfigItem
@@ -34,11 +35,7 @@ const handleChangeAndBlur = (value: any) => {
   handleBlur()
 }
 
-const displayError = computed(() => {
-  if (!props.error) return undefined
-  if (props.touched || props.submitted) return props.error
-  return undefined
-})
+const displayError = computed(() => props.error)
 
 watch(displayError, (next, prev) => {
   if (!next || next === prev) return
@@ -152,6 +149,22 @@ const showCount = computed(() => {
         />
         <pf-text as="span">{{ config.name }}</pf-text>
       </div>
+    </template>
+
+    <!-- type:options -->
+    <template v-else-if="config.type === 'options'">
+      <PfFormItemOptions
+        :model-value="props.modelValue"
+        :multiple="config.config?.multiple"
+        :variant="config.config?.variant"
+        :options="config.config?.options"
+        :options-fn="config.config?.optionsFn"
+        :placeholder="config.config?.placeholder"
+        :searchable="config.config?.searchable"
+        :disabled="config.readonly || config.disabled"
+        @update:model-value="handleChange"
+        @blur="handleBlur"
+      />
     </template>
 
     <div

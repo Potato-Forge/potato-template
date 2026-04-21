@@ -93,6 +93,10 @@ type PfFormConfigBase<
    * 字段级原子校验规则，仅处理当前字段值，不涉及跨字段逻辑
    */
   rules?: PfFormFieldRules
+  /**
+   * 条件可见性函数，当返回 false 时隐藏该表单项，该字段不会被验证和提交
+   */
+  visibleIf?: (formValues: Record<string, any>) => boolean
 }
 
 /**
@@ -213,6 +217,51 @@ export type PfFormConfigItemToggle<
 }
 
 /**
+ * 选项类型（下拉/复选框单选多选）
+ */
+export type PfFormSelectOption = {
+  label: string
+  value: any
+  disabled?: boolean
+}
+
+export type PfFormConfigItemOptions<
+  T = Record<string, unknown>,
+  K extends keyof T & string = keyof T & string,
+> = PfFormConfigBase<T, K> & {
+  type: 'options'
+  config: {
+    /**
+     * 是否允许多选
+     * @default false
+     */
+    multiple?: boolean
+    /**
+     * UI 变体：combobox（下拉）或 checkbox（复选框组）
+     * @default 'combobox'
+     */
+    variant?: 'combobox' | 'checkbox'
+    /**
+     * 静态选项列表
+     */
+    options?: PfFormSelectOption[]
+    /**
+     * 异步加载选项的函数，与 options 互斥，优先使用 optionsFn
+     */
+    optionsFn?: () => Promise<PfFormSelectOption[]>
+    /**
+     * Combobox 输入占位符
+     */
+    placeholder?: string
+    /**
+     * 是否支持搜索过滤（仅 combobox 变体有效）
+     * @default false
+     */
+    searchable?: boolean
+  }
+}
+
+/**
  * 所有表单配置项类型的联合
  */
 export type PfFormConfigItem<T = any> =
@@ -222,6 +271,7 @@ export type PfFormConfigItem<T = any> =
   | PfFormConfigItemTime<T>
   | PfFormConfigItemIcon<T>
   | PfFormConfigItemToggle<T>
+  | PfFormConfigItemOptions<T>
 
 /**
  * 表单配置数组

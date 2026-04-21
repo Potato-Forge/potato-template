@@ -15,7 +15,7 @@ export type Database = {
           created_at: string
           icon: string | null
           id: number
-          is_external: boolean | null
+          is_external: string | null
           is_hidden: boolean | null
           name: string
           parent_id: number | null
@@ -30,7 +30,7 @@ export type Database = {
           created_at?: string
           icon?: string | null
           id?: number
-          is_external?: boolean | null
+          is_external?: string | null
           is_hidden?: boolean | null
           name: string
           parent_id?: number | null
@@ -45,7 +45,7 @@ export type Database = {
           created_at?: string
           icon?: string | null
           id?: number
-          is_external?: boolean | null
+          is_external?: string | null
           is_hidden?: boolean | null
           name?: string
           parent_id?: number | null
