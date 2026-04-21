@@ -20,15 +20,6 @@ const adminRoutes: RouteRecordRaw[] = [
         component: () => import('@/views/dashboard/Dashboard.vue'),
       },
       {
-        path: 'settings',
-        name: 'settings',
-        meta: {
-          title: '设置',
-          icon: 'tabler:settings',
-        },
-        component: () => import('@/views/settings/permission-settings/PermissionSettings.vue'),
-      },
-      {
         path: 'help',
         name: 'help',
         meta: {

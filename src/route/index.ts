@@ -9,13 +9,14 @@ import commonRoutes from './routes/commonRoutes'
 
 // guards
 import routeGuard from './guard'
+import manageRoutes from './routes/manageRoutes'
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: GlobalLayout,
     redirect: '/admin/dashboard',
-    children: [...adminRoutes],
+    children: [...adminRoutes, ...manageRoutes],
   },
   ...commonRoutes,
 ]
