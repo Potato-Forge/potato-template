@@ -80,6 +80,21 @@ type PfFormConfigBase<
   create?: boolean
   edit?: boolean
   /**
+   * 是否参与查询表单渲染。
+   * 该字段由 PfDataTable 等上层组件消费，PfForm 本身不直接处理。
+   */
+  query?:
+    | boolean
+    | {
+        enable?: boolean
+        name?: string
+        type?: PfFormConfigItem<T>['type']
+        default?: unknown
+        help?: string | Component | (() => VNode | JSX.Element)
+        rules?: PfFormFieldRules
+        config?: Record<string, any>
+      }
+  /**
    * 表单项是否为只读状态，为 true 时会直接渲染 type 对应的渲染逻辑
    * @default false
    */

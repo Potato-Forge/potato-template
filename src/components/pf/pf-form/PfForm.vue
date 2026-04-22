@@ -14,6 +14,7 @@ const props = defineProps<{
   formConfig: PfFormConfigItem[]
   formData?: Record<string, any> | null
   formMode?: 'create' | 'edit'
+  columnsPerRow?: number
   formRules?: PfFormRules<Record<string, any>>
   /**
    * @deprecated Use formRules instead.
@@ -22,6 +23,12 @@ const props = defineProps<{
   onSubmit?: (data: Record<string, any>) => Promise<void> | void
   onChange?: (data: Record<string, any>) => void
 }>()
+
+const resolvedColumnsPerRow = computed(() => {
+  const count = Number(props.columnsPerRow || 1)
+  if (Number.isNaN(count) || count < 1) return 1
+  return Math.floor(count)
+})
 
 const resolvedFormRules = computed(() => props.formRules || props.rules)
 
@@ -458,7 +465,12 @@ defineExpose({
 
 <template>
   <form @submit.prevent.stop="form.handleSubmit">
-    <div class="grid gap-4">
+    <div
+      class="grid gap-4"
+      :style="{
+        gridTemplateColumns: `repeat(${resolvedColumnsPerRow}, minmax(0, 1fr))`,
+      }"
+    >
       <form.Field
         v-for="config in visibleFormModeConfig"
         :key="config.key"

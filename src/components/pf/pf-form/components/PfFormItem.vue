@@ -168,19 +168,25 @@ const showCount = computed(() => {
     </template>
 
     <div
-      v-if="showCount"
-      class="self-end text-xs"
-      :class="currentLength > Number(maxLength) ? 'text-destructive' : 'text-muted-foreground'"
+      class="field-feedback-row mt-1 h-5 flex items-center justify-between gap-2 overflow-hidden"
     >
-      {{ currentLength }} / {{ maxLength }}
-    </div>
+      <div class="min-w-0 flex-1 overflow-hidden">
+        <Transition name="field-error">
+          <pf-tooltip v-if="displayError" :content="displayError" placement="top">
+            <FieldError :class="['block truncate', { 'field-error-shake': isErrorShaking }]">
+              {{ displayError }}
+            </FieldError>
+          </pf-tooltip>
+        </Transition>
+      </div>
 
-    <div class="field-error-placeholder min-h-5 overflow-hidden">
-      <Transition name="field-error">
-        <FieldError v-if="displayError" :class="{ 'field-error-shake': isErrorShaking }">
-          {{ displayError }}
-        </FieldError>
-      </Transition>
+      <div
+        v-if="showCount"
+        class="shrink-0 text-xs"
+        :class="currentLength > Number(maxLength) ? 'text-destructive' : 'text-muted-foreground'"
+      >
+        {{ currentLength }} / {{ maxLength }}
+      </div>
     </div>
   </div>
 </template>
