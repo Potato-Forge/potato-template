@@ -41,7 +41,8 @@ const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
     edit: false,
     query: false,
     table: {
-      width: 240,
+      width: 80,
+      textDisplay: 'ellipsis',
     },
   },
   {
@@ -55,7 +56,7 @@ const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
       max: 32,
     },
     table: {
-      minWidth: 160,
+      minWidth: 120,
     },
   },
   {
@@ -88,7 +89,16 @@ const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
     edit: true,
     query: false,
     table: {
-      minWidth: 240,
+      minWidth: 120,
+      align: 'center',
+      render: (value) => {
+        if (!value) return '-'
+        return h('img', {
+          src: String(value),
+          alt: 'avatar',
+          class: 'h-8 w-8 rounded-full object-cover',
+        })
+      },
     },
     detail: {
       show: true,
@@ -221,7 +231,7 @@ const handleDelete = async (id: string | number) => {
     :update="handleUpdate"
     :delete="handleDelete"
     :form-rules="formRules"
-    container-mode="drawer"
+    container-mode="modal"
     row-key="id"
   />
 </template>

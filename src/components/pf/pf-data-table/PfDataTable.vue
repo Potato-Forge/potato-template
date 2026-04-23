@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import 'vxe-table/lib/style.css'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { VxeColumn, VxeTable } from 'vxe-table'
+import { VxeColumn, VxeTable, VxeUI } from 'vxe-table'
 import type { PfFormConfigItem, PfFormRules } from '@/components/pf/pf-form/PfForm.types'
 import { pfToast } from '@/components/pf/pf-toast'
 import { usePfModal } from '@/components/pf/pf-modal/usePfModal'
@@ -407,6 +407,17 @@ const isFormSaving = computed(
 const showQuery = computed(() => queryFormItems.value.length > 0)
 const queryButtonText = computed(() => (isQueryBusy.value ? '查询中...' : '查询'))
 const resetButtonText = computed(() => (isResettingQuery.value ? '重置中...' : '重置'))
+
+// light/dark switch
+const isDark = useDark()
+watch(
+  isDark,
+  (val) => {
+    if (val) VxeUI.setTheme('dark')
+    else VxeUI.setTheme('light')
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
@@ -578,15 +589,15 @@ const resetButtonText = computed(() => (isResettingQuery.value ? '重置中...' 
 
 <style>
 .pf-data-table-vxe {
+  --vxe-ui-layout-background-color: hsl(var(--background));
+  --vxe-ui-table-header-background-color: hsl(var(--accent));
+  --vxe-ui-table-border-color: hsl(var(--border));
+  --vxe-ui-table-row-hover-background-color: hsl(var(--muted));
+  --vxe-ui-table-row-striped-background-color: hsl(var(--secondary));
+  --vxe-ui-table-row-hover-striped-background-color: hsl(var(--muted));
+  --vxe-ui-table-row-current-background-color: hsl(var(--selected));
+  --vxe-ui-table-row-hover-current-background-color: hsl(var(--selected));
   --vxe-ui-font-color: hsl(var(--foreground));
-  --vxe-ui-body-background-color: hsl(var(--background));
-  --vxe-ui-header-background-color: hsl(var(--muted));
-  --vxe-ui-border-color: hsl(var(--border));
-  --vxe-ui-primary-color: hsl(var(--primary));
-  --vxe-ui-row-hover-background-color: hsl(var(--muted));
-}
-
-.pf-data-table-vxe .vxe-body--row.row--current {
-  background-color: hsl(var(--selected));
+  --vxe-ui-font-primary-color: hsl(var(--primary));
 }
 </style>

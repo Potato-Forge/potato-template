@@ -37,6 +37,7 @@ const emits = defineEmits<{
 const slots = useSlots()
 
 const hasTriggerSlot = computed(() => Boolean(slots.trigger))
+const hasDescription = computed(() => Boolean(slots.description) || Boolean(props.description))
 
 const handlePositiveClick = () => {
   emits('positive-click')
@@ -62,14 +63,14 @@ const modalOpen = computed({
       <slot name="trigger"></slot>
     </DialogTrigger>
 
-    <DialogContent>
+    <DialogContent :aria-describedby="hasDescription ? undefined : 'undefined'">
       <DialogHeader>
         <DialogTitle>
           <slot name="title">
             <pf-text class="text-foreground">{{ props.title }}</pf-text>
           </slot>
         </DialogTitle>
-        <DialogDescription>
+        <DialogDescription v-if="hasDescription">
           <slot name="description"
             ><pf-text class="text-foreground">{{ props.description }}</pf-text></slot
           >

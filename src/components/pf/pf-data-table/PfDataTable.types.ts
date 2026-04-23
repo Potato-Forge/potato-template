@@ -50,6 +50,10 @@ export type PfDataTableColumnConfig = {
    * 当 textDisplay 为 ellipsis 时，是否显示 tooltip。
    */
   tooltip?: boolean
+  /**
+   * 自定义表格单元格渲染，仅在 table 场景生效，优先级高于顶层 render。
+   */
+  render?: (value: unknown, rowData: Record<string, any>) => VNodeChild
 }
 
 export type PfDataTableDetailConfig = {

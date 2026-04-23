@@ -2,6 +2,8 @@
 import { format } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import type { PfDataTableItem } from './PfDataTable.types'
+import { pfToast } from '../pf-toast'
+import { p } from 'vue-router/dist/router-CWoNjPRp.mjs'
 
 const props = withDefaults(
   defineProps<{
@@ -17,6 +19,10 @@ const props = withDefaults(
 const value = computed(() => props.rowData?.[String(props.item.key)])
 
 const customRenderNode = computed(() => {
+  if (props.scene === 'table' && props.item.table?.render) {
+    return props.item.table.render(value.value, props.rowData)
+  }
+
   if (!props.item.render) return null
 
   return props.item.render(value.value, props.rowData, {
@@ -76,7 +82,7 @@ const iconValue = computed(() => {
 
 const tableTextDisplay = computed(() => {
   if (props.scene !== 'table') return 'wrap' as const
-  return props.item.table?.textDisplay || 'ellipsis'
+  return props.item.table?.textDisplay || 'wrap'
 })
 
 const tableTextClass = computed(() => {
@@ -96,16 +102,55 @@ const showTableTooltip = computed(() => {
   if (tableTextDisplay.value !== 'ellipsis') return false
   return props.item.table?.tooltip !== false
 })
+
+const customRenderAlignClass = computed(() => {
+  if (props.scene !== 'table') return ''
+  const align = props.item.table?.align
+  if (align === 'center') return 'justify-center'
+  if (align === 'right') return 'justify-end'
+  return 'justify-start'
+})
+
+// clipboard
+const { copy, isSupported } = useClipboard({
+  source: normalizedText.value,
+})
+const handleTextCopy = () => {
+  if (!isSupported.value) {
+    pfToast.error('当前环境不支持复制功能')
+    return
+  }
+  copy()
+  pfToast.success('复制成功', { position: 'top-right' })
+}
 </script>
 
 <template>
-  <component :is="customRenderNode" v-if="customRenderNode" />
+  <div v-if="customRenderNode" class="flex w-full items-center" :class="customRenderAlignClass">
+    <component :is="customRenderNode" />
+  </div>
   <div v-else-if="item.type === 'icon'" class="inline-flex items-center gap-2">
     <Icon v-if="iconValue" :icon="iconValue" class="text-lg" />
     <span>{{ iconValue || '-' }}</span>
   </div>
-  <pf-tooltip v-else-if="showTableTooltip" :content="normalizedText" placement="top">
+  <pf-tooltip
+    v-else-if="showTableTooltip"
+    :content="normalizedText"
+    placement="top"
+    :interactive="true"
+  >
     <span :class="tableTextClass">{{ normalizedText }}</span>
+    <template #content>
+      <div>
+        <div class="max-w-xs break-words text-left text-sm text-gray-200">{{ normalizedText }}</div>
+        <pf-button
+          size="tiny"
+          @click="handleTextCopy"
+          class="mt-2 inline"
+          icon="i-tabler-copy"
+        ></pf-button>
+      </div>
+    </template>
   </pf-tooltip>
   <span v-else :class="tableTextClass">{{ normalizedText }}</span>
 </template>
