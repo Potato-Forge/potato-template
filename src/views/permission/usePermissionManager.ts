@@ -522,7 +522,7 @@ export function usePermissionManager() {
   const reorderTree = (treeData: PfTreeNode[]) => {
     if (isCreating.value) {
       queryClient.invalidateQueries({ queryKey: permissionKeys.all })
-      pfToast.warning('请先保存或取消当前新建节点，再进行拖拽排序')
+      pfToast.risk('请先保存或取消当前新建节点，再进行拖拽排序')
       return
     }
 

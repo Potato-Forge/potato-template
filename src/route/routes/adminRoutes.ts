@@ -19,15 +19,6 @@ const adminRoutes: RouteRecordRaw[] = [
         },
         component: () => import('@/views/dashboard/Dashboard.vue'),
       },
-      {
-        path: 'help',
-        name: 'help',
-        meta: {
-          title: '帮助',
-          icon: 'tabler:help',
-        },
-        component: () => import('@/views/help/ColorNamingGuide.vue'),
-      },
     ],
   },
 ]

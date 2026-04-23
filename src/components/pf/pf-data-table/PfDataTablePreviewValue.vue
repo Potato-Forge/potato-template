@@ -16,16 +16,13 @@ const props = withDefaults(
 
 const value = computed(() => props.rowData?.[String(props.item.key)])
 
-const customRenderComponent = computed(() => {
+const customRenderNode = computed(() => {
   if (!props.item.render) return null
 
-  return {
-    render: () =>
-      props.item.render?.(value.value, props.rowData, {
-        scene: props.scene,
-        column: props.item,
-      }),
-  }
+  return props.item.render(value.value, props.rowData, {
+    scene: props.scene,
+    column: props.item,
+  })
 })
 
 const optionsMap = computed(() => {
@@ -76,13 +73,39 @@ const iconValue = computed(() => {
   if (!value.value) return null
   return String(value.value)
 })
+
+const tableTextDisplay = computed(() => {
+  if (props.scene !== 'table') return 'wrap' as const
+  return props.item.table?.textDisplay || 'ellipsis'
+})
+
+const tableTextClass = computed(() => {
+  if (tableTextDisplay.value === 'single-line') {
+    return 'block max-w-full whitespace-nowrap'
+  }
+
+  if (tableTextDisplay.value === 'wrap') {
+    return 'block max-w-full whitespace-normal break-words'
+  }
+
+  return 'block max-w-full overflow-hidden text-ellipsis whitespace-nowrap'
+})
+
+const showTableTooltip = computed(() => {
+  if (props.scene !== 'table') return false
+  if (tableTextDisplay.value !== 'ellipsis') return false
+  return props.item.table?.tooltip !== false
+})
 </script>
 
 <template>
-  <component :is="customRenderComponent" v-if="customRenderComponent" />
+  <component :is="customRenderNode" v-if="customRenderNode" />
   <div v-else-if="item.type === 'icon'" class="inline-flex items-center gap-2">
     <Icon v-if="iconValue" :icon="iconValue" class="text-lg" />
     <span>{{ iconValue || '-' }}</span>
   </div>
-  <span v-else class="line-clamp-2 break-all">{{ normalizedText }}</span>
+  <pf-tooltip v-else-if="showTableTooltip" :content="normalizedText" placement="top">
+    <span :class="tableTextClass">{{ normalizedText }}</span>
+  </pf-tooltip>
+  <span v-else :class="tableTextClass">{{ normalizedText }}</span>
 </template>

@@ -106,15 +106,31 @@ const tokenGroups = [
       },
       {
         name: 'info',
-        usage: '信息提示、普通状态说明',
+        usage: '标准信息提示、普通状态说明',
       },
       {
         name: 'info-foreground',
         usage: 'info 背景上的文字',
       },
       {
+        name: 'tip',
+        usage: '非阻断提醒、轻提示（比 info 更浅更柔和）',
+      },
+      {
+        name: 'tip-foreground',
+        usage: 'tip 背景上的文字',
+      },
+      {
+        name: 'risk',
+        usage: '低级风险提醒（低于 warning）',
+      },
+      {
+        name: 'risk-foreground',
+        usage: 'risk 背景上的文字',
+      },
+      {
         name: 'warning',
-        usage: '风险提醒、需注意但非危险操作',
+        usage: '中高级风险提醒、需要用户关注',
       },
       {
         name: 'warning-foreground',
@@ -154,8 +170,47 @@ const usageRules = [
     body: '主动作和品牌强调用 primary，hover 和 focus 用 accent、ring。',
   },
   {
-    title: '状态色',
-    body: '成功、信息、警告、危险和持久选中分别使用 success、info、warning、destructive、selected。',
+    title: '状态色分层',
+    body: '推荐按层级使用：tip < info < risk < warning < destructive；成功态使用 success，持久选中使用 selected。',
+  },
+]
+
+const statusRecipes = [
+  {
+    state: 'tip',
+    level: '轻提示 / 非阻断',
+    combo: 'bg-tip text-tip-foreground border-tip',
+    note: '用于补充说明、引导文案、可忽略提醒。',
+  },
+  {
+    state: 'info',
+    level: '信息提示',
+    combo: 'bg-info text-info-foreground border-info',
+    note: '用于普通信息反馈与系统状态说明。',
+  },
+  {
+    state: 'risk',
+    level: '低风险提示',
+    combo: 'bg-risk text-risk-foreground border-risk',
+    note: '用于轻度风险、建议用户确认。',
+  },
+  {
+    state: 'warning',
+    level: '中高风险警告',
+    combo: 'bg-warning text-warning-foreground border-warning',
+    note: '用于可能导致问题的操作提醒。',
+  },
+  {
+    state: 'destructive',
+    level: '危险 / 失败',
+    combo: 'bg-destructive text-destructive-foreground border-destructive',
+    note: '用于删除、失败、不可逆操作。',
+  },
+  {
+    state: 'success',
+    level: '成功反馈',
+    combo: 'bg-success text-success-foreground border-success',
+    note: '用于保存成功、完成态与正反馈。',
   },
 ]
 
@@ -195,6 +250,28 @@ const heroBadgeStyle = {
         </div>
         <div class="grid grid-cols-1 gap-3">
           <div
+
+    <section>
+      <pf-card class="p-5 gap-4">
+        <pf-text as="h3" class="mb-0">状态色配方</pf-text>
+        <div class="grid grid-cols-1 gap-3 xl:grid-cols-2">
+          <div
+            v-for="recipe in statusRecipes"
+            :key="recipe.state"
+            class="rounded-xl border border-border bg-background px-4 py-4"
+          >
+            <div class="mb-2 flex items-center justify-between gap-3">
+              <div class="font-mono text-sm text-foreground">{{ recipe.state }}</div>
+              <div class="text-xs text-muted-foreground">{{ recipe.level }}</div>
+            </div>
+            <div class="mb-2 rounded-md border border-border px-2 py-1 font-mono text-xs text-foreground">
+              {{ recipe.combo }}
+            </div>
+            <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ recipe.note }}</pf-text>
+          </div>
+        </div>
+      </pf-card>
+    </section>
             v-for="token in group.tokens"
             :key="token.name"
             class="flex items-center gap-4 rounded-xl border border-border bg-background px-4 py-4"

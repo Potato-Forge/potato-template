@@ -36,8 +36,20 @@ export type PfDataTableColumnConfig = {
   show?: boolean
   width?: number | string
   minWidth?: number | string
+  maxWidth?: number | string
   align?: 'left' | 'center' | 'right'
   sortable?: boolean
+  /**
+   * 文本展示策略：
+   * - single-line: 强制单行（不截断）
+   * - wrap: 自动换行
+   * - ellipsis: 超长截断并可通过 tooltip 查看完整值
+   */
+  textDisplay?: 'single-line' | 'wrap' | 'ellipsis'
+  /**
+   * 当 textDisplay 为 ellipsis 时，是否显示 tooltip。
+   */
+  tooltip?: boolean
 }
 
 export type PfDataTableDetailConfig = {

@@ -45,10 +45,18 @@ export const getUsers = async (query: UserListQuery = {}) => {
 }
 
 export const getUserDetail = async (id: string | number) => {
-  const { data, error } = await supabase.from('profiles').select('*').eq('id', String(id)).single()
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', String(id))
+    .maybeSingle()
 
   if (error) {
     throw new Error(error.message)
+  }
+
+  if (!data) {
+    throw new Error('未找到该用户或暂无权限查看')
   }
 
   return data
@@ -88,10 +96,14 @@ export const updateUser = async (id: string | number, payload: UserProfileUpdate
     })
     .eq('id', String(id))
     .select('*')
-    .single()
+    .maybeSingle()
 
   if (error) {
     throw new Error(error.message)
+  }
+
+  if (!data) {
+    throw new Error('更新失败：未找到该用户或暂无权限修改')
   }
 
   return data

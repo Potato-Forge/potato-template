@@ -9,7 +9,7 @@ import 'vue-sonner/style.css'
     position="top-center"
     :close-button="false"
     close-button-position="top-left"
-    rich-colors
+    :rich-colors="false"
     theme="system"
     ref="toaster"
   />

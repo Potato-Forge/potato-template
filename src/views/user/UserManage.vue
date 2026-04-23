@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { h } from 'vue'
 import type { PfDataTableItem } from '@/components/pf/pf-data-table'
 import type { PfFormRules } from '@/components/pf/pf-form/PfForm.types'
-import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
 import {
   createUser,
   deleteUser,
@@ -121,6 +120,7 @@ const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
         { label: '禁用', value: 'inactive' },
       ],
     },
+    default: 'active',
     rules: {
       required: true,
     },
@@ -191,7 +191,7 @@ const handleCreate = async (payload: Record<string, any>) => {
     email: payload.email || null,
     full_name: payload.full_name || null,
     avatar_url: payload.avatar_url || null,
-    status: payload.status || 'active',
+    status: payload.status,
   })
 }
 
@@ -201,7 +201,7 @@ const handleUpdate = async (id: string | number, payload: Record<string, any>) =
     email: payload.email || null,
     full_name: payload.full_name || null,
     avatar_url: payload.avatar_url || null,
-    status: payload.status || 'active',
+    status: payload.status,
   })
 }
 
@@ -211,22 +211,19 @@ const handleDelete = async (id: string | number) => {
 </script>
 
 <template>
-  <PageLayoutSingle class="h-full min-h-0">
-    <pf-data-table
-      title="用户管理"
-      :columns="columns"
-      :query-key-base="userKeys.all"
-      :default-query="defaultQuery"
-      :list-query="handleListQuery"
-      :detail-query="handleDetailQuery"
-      :create-request="handleCreate"
-      :update-request="handleUpdate"
-      :delete-request="handleDelete"
-      :form-rules="formRules"
-      container-mode="drawer"
-      row-key="id"
-    />
-  </PageLayoutSingle>
+  <pf-data-table
+    :columns="columns"
+    :query-key-base="userKeys.all"
+    :default-query="defaultQuery"
+    :list-query="handleListQuery"
+    :detail="handleDetailQuery"
+    :create="handleCreate"
+    :update="handleUpdate"
+    :delete="handleDelete"
+    :form-rules="formRules"
+    container-mode="drawer"
+    row-key="id"
+  />
 </template>
 
 <style scoped></style>

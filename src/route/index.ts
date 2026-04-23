@@ -9,6 +9,7 @@ import commonRoutes from './routes/commonRoutes'
 
 // guards
 import routeGuard from './guard'
+import helpRoutes from './routes/helpRoutes'
 import manageRoutes from './routes/manageRoutes'
 
 export const routes: RouteRecordRaw[] = [
@@ -16,7 +17,7 @@ export const routes: RouteRecordRaw[] = [
     path: '/',
     component: GlobalLayout,
     redirect: '/admin/dashboard',
-    children: [...adminRoutes, ...manageRoutes],
+    children: [...adminRoutes, ...manageRoutes, ...helpRoutes],
   },
   ...commonRoutes,
 ]
