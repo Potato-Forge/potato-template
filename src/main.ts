@@ -4,7 +4,9 @@ import App from './App.vue'
 import '@unocss/reset/tailwind-v4.css'
 import 'virtual:uno.css'
 import './assets/main.css'
+import 'viewerjs/dist/viewer.css'
 import router from '@/route'
+import VueViewer from 'v-viewer'
 
 import { createPinia } from 'pinia'
 
@@ -44,6 +46,7 @@ const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
+app.use(VueViewer)
 app.use(VueQueryPlugin, {
   queryClient,
 })

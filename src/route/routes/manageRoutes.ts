@@ -27,6 +27,15 @@ const manageRoutes: RouteRecordRaw[] = [
         },
         component: () => import('@/views/user/UserManage.vue'),
       },
+      {
+        path: 'components',
+        name: 'componentsDemo',
+        meta: {
+          title: '组件演示',
+          icon: 'tabler:components',
+        },
+        component: () => import('@/views/settings/ImgUploadComponentsDemo.vue'),
+      },
     ],
   },
 ]
