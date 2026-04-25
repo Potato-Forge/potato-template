@@ -12,6 +12,7 @@ import {
   userKeys,
   type UserProfile,
 } from '@/api/user/user'
+import PfImg from '@/components/pf/pf-img/PfImg.vue'
 
 const defaultQuery = {
   username: '',
@@ -102,6 +103,14 @@ const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
     },
     detail: {
       show: true,
+      render: (value: unknown) => {
+        if (!value) return '-'
+        return h(PfImg, {
+          src: String(value),
+          alt: 'avatar',
+          class: 'size-8',
+        })
+      },
     },
   },
   {

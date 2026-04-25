@@ -2,13 +2,24 @@
 import PfLogo from '@/layouts/modules/PfLogo.vue'
 import GlobalLayoutSidebarCenter from '../global-layout-sidebar-center/GlobalLayoutSidebarCenter.vue'
 import GlobalLayoutSidebarFooter from '../global-layout-sidebar-footer/GlobalLayoutSidebarFooter.vue'
+
+interface AppMenuItem {
+  path: string
+  title: string
+  icon: string
+  firstChildPath: string
+}
+
+defineProps<{
+  items: AppMenuItem[]
+  activePath: string
+}>()
 </script>
 
 <template>
   <div
     class="w-16 h-full fixed top-0 left-0 bg-background flex flex-col justify-between items-center select-none"
   >
-    <!-- sidebar top -->
     <div class="w-full aspect-ratio-square flex justify-center items-center px-4">
       <PfLogo
         animate
@@ -18,11 +29,9 @@ import GlobalLayoutSidebarFooter from '../global-layout-sidebar-footer/GlobalLay
         class="text-primary"
       ></PfLogo>
     </div>
-    <!-- sidebar center-->
     <div class="flex-1 w-full">
-      <GlobalLayoutSidebarCenter></GlobalLayoutSidebarCenter>
+      <GlobalLayoutSidebarCenter :items="items" :active-path="activePath"></GlobalLayoutSidebarCenter>
     </div>
-    <!-- sidebar bottom -->
     <div class="w-full">
       <GlobalLayoutSidebarFooter></GlobalLayoutSidebarFooter>
     </div>

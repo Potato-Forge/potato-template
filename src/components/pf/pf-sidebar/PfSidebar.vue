@@ -12,56 +12,11 @@ import {
 } from '@/components/ui/sidebar'
 import type { SidebarItem } from '.'
 
-const items: SidebarItem[] = [
-  {
-    title: 'Home',
-    url: '#',
-    icon: 'i-tabler-home',
-  },
-  {
-    title: 'Inbox',
-    url: '#',
-    icon: 'i-tabler-inbox',
-  },
-  {
-    title: 'Calendar',
-    url: '#',
-    icon: 'i-tabler-calendar',
-    isActive: true,
-    items: [
-      {
-        title: 'Sub Calendar 1',
-        url: '#',
-        isActive: true,
-        items: [
-          {
-            title: 'third Calendar 1',
-            url: '#',
-          },
-          {
-            title: 'third Calendar 2',
-            url: '#',
-            isActive: true,
-          },
-        ],
-      },
-      {
-        title: 'Sub Calendar 2',
-        url: '#',
-      },
-    ],
-  },
-  {
-    title: 'Search',
-    url: '#',
-    icon: 'i-tabler-search',
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: 'i-tabler-settings',
-  },
-]
+const props = withDefaults(defineProps<{
+  items?: SidebarItem[]
+}>(), {
+  items: () => [],
+})
 
 const isHightlight = (item: SidebarItem) => {
   const isEndLeaf = !item.items || item.items.length === 0
@@ -69,9 +24,8 @@ const isHightlight = (item: SidebarItem) => {
     const defaultActiveClass = 'text-primary font-semibold'
     const endLeafActiveClass = 'text-primary-foreground font-semibold bg-primary/80'
     return isEndLeaf ? endLeafActiveClass : defaultActiveClass
-  } else {
-    return ''
   }
+  return ''
 }
 </script>
 
@@ -82,7 +36,6 @@ const isHightlight = (item: SidebarItem) => {
     >
     <SidebarMenu class="text-secondary-foreground">
       <template v-for="item in items" :key="item.title">
-        <!-- First layer -->
         <Collapsible
           v-if="item.items?.length"
           as-child
@@ -90,7 +43,6 @@ const isHightlight = (item: SidebarItem) => {
           class="group/collapsible"
         >
           <SidebarMenuItem>
-            <!-- First layer Button -->
             <CollapsibleTrigger as-child>
               <SidebarMenuButton :class="isHightlight(item)" :tooltip="item.title">
                 <div v-if="item.icon" :class="item.icon" class="shrink-0" />
@@ -101,11 +53,9 @@ const isHightlight = (item: SidebarItem) => {
               </SidebarMenuButton>
             </CollapsibleTrigger>
 
-            <!-- Secondd layer -->
             <CollapsibleContent>
               <SidebarMenuSub>
                 <SidebarMenuSubItem v-for="subItem in item.items" :key="subItem.title">
-                  <!-- Third layer -->
                   <Collapsible
                     v-if="subItem.items?.length"
                     as-child
@@ -114,7 +64,6 @@ const isHightlight = (item: SidebarItem) => {
                   >
                     <SidebarMenuSubItem>
                       <CollapsibleTrigger as-child>
-                        <!-- Second layer Button -->
                         <SidebarMenuSubButton
                           :class="isHightlight(subItem)"
                           :tooltip="subItem.title"
@@ -133,20 +82,18 @@ const isHightlight = (item: SidebarItem) => {
                             v-for="thirdItem in subItem.items"
                             :key="thirdItem.title"
                           >
-                            <!-- Third layer Button -->
                             <SidebarMenuSubButton
                               :class="isHightlight(thirdItem)"
                               as-child
-                              :is-active="thirdItem.isActive"
                             >
-                              <a :href="thirdItem.url">
+                              <router-link :to="thirdItem.url || '/'">
                                 <span
                                   v-if="thirdItem.icon"
                                   :class="thirdItem.icon"
                                   class="shrink-0"
                                 />
                                 <span>{{ thirdItem.title }}</span>
-                              </a>
+                              </router-link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         </SidebarMenuSub>
@@ -158,13 +105,12 @@ const isHightlight = (item: SidebarItem) => {
                     <SidebarMenuButton
                       :class="isHightlight(subItem)"
                       as-child
-                      :is-active="subItem.isActive"
                       :tooltip="subItem.title"
                     >
-                      <a :href="subItem.url">
+                      <router-link :to="subItem.url || '/'">
                         <div v-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
                         <span>{{ subItem.title }}</span>
-                      </a>
+                      </router-link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenuSubItem>
@@ -177,13 +123,12 @@ const isHightlight = (item: SidebarItem) => {
           <SidebarMenuButton
             :class="isHightlight(item)"
             as-child
-            :is-active="item.isActive"
             :tooltip="item.title"
           >
-            <a :href="item.url">
+            <router-link :to="item.url || '/'">
               <div v-if="item.icon" :class="item.icon" class="shrink-0" />
               <span>{{ item.title }}</span>
-            </a>
+            </router-link>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </template>

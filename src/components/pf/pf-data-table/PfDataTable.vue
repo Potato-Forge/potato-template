@@ -257,6 +257,29 @@ const closePanel = () => {
   opened.value = false
 }
 
+const hasActiveImageViewer = () => {
+  if (typeof document === 'undefined') {
+    return false
+  }
+
+  if (document.body.classList.contains('viewer-open')) {
+    return true
+  }
+
+  const viewer = document.querySelector('.viewer-container')
+  if (!viewer) {
+    return false
+  }
+
+  return !viewer.classList.contains('viewer-hide') && viewer.getAttribute('aria-hidden') !== 'true'
+}
+
+const preventPanelCloseWhenViewerOpen = (event: { preventDefault: () => void }) => {
+  if (hasActiveImageViewer()) {
+    event.preventDefault()
+  }
+}
+
 watch(opened, (val) => {
   if (!val) {
     panelMode.value = null
@@ -555,7 +578,12 @@ watch(
   </Sheet>
 
   <Dialog v-else v-model:open="opened">
-    <DialogContent class="max-h-[90vh] max-w-4xl flex flex-col overflow-hidden">
+    <DialogContent
+      class="max-h-[90vh] max-w-4xl flex flex-col overflow-hidden"
+      @escape-key-down="preventPanelCloseWhenViewerOpen"
+      @pointer-down-outside="preventPanelCloseWhenViewerOpen"
+      @interact-outside="preventPanelCloseWhenViewerOpen"
+    >
       <DialogHeader class="shrink-0">
         <DialogTitle>{{ panelTitle }}</DialogTitle>
         <DialogDescription class="sr-only">

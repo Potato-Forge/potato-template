@@ -3,7 +3,6 @@ import { format } from 'date-fns'
 import { Icon } from '@iconify/vue'
 import type { PfDataTableItem } from './PfDataTable.types'
 import { pfToast } from '../pf-toast'
-import { p } from 'vue-router/dist/router-CWoNjPRp.mjs'
 
 const props = withDefaults(
   defineProps<{
@@ -21,6 +20,10 @@ const value = computed(() => props.rowData?.[String(props.item.key)])
 const customRenderNode = computed(() => {
   if (props.scene === 'table' && props.item.table?.render) {
     return props.item.table.render(value.value, props.rowData)
+  }
+
+  if (props.scene === 'detail' && props.item.detail?.render) {
+    return props.item.detail.render(value.value, props.rowData)
   }
 
   if (!props.item.render) return null

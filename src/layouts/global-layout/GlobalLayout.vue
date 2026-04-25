@@ -1,33 +1,99 @@
 <script setup lang="ts">
+import type { RouteRecordRaw } from 'vue-router'
+import { routes, resolveRouteChildren } from '@/route'
+import type { SidebarItem } from '@/components/pf/pf-sidebar'
 import GlobalLayoutSidebar from './components/global-layout-sidebar/GlobalLayoutSidebar.vue'
 import GlobalLayoutHeader from './components/global-layout-header/GlobalLayoutHeader.vue'
 import { useSystemStore } from '@/store/systemStore'
 
-// menu sidebar state
 const systemStore = useSystemStore()
-
 const { isSidebarOpen } = storeToRefs(systemStore)
+
+const route = useRoute()
+
+const iconClass = (icon: string) => {
+  if (!icon) return ''
+  const idx = icon.indexOf(':')
+  return idx === -1 ? icon : `i-${icon.slice(0, idx)}-${icon.slice(idx + 1)}`
+}
+
+interface AppMenuItem {
+  path: string
+  title: string
+  icon: string
+  firstChildPath: string
+}
+
+const appMenuItems = computed<AppMenuItem[]>(() => {
+  const rootRoute = routes[0]
+  if (!rootRoute || !rootRoute.children) return []
+  return rootRoute.children.map((child: RouteRecordRaw) => {
+    const parentPath = child.path.startsWith('/') ? child.path : `/${child.path}`
+    const firstChild = child.children?.[0]
+    const firstChildPath = firstChild
+      ? `${parentPath}/${firstChild.path}`
+      : parentPath
+    return {
+      path: parentPath,
+      title: (child.meta?.title as string) || child.path,
+      icon: iconClass((child.meta?.icon as string) || ''),
+      firstChildPath,
+    }
+  })
+})
+
+const activeAppPath = computed(() => {
+  const path = route.path
+  for (const item of appMenuItems.value) {
+    if (path === item.path || path.startsWith(`${item.path}/`)) {
+      return item.path
+    }
+  }
+  return ''
+})
+
+const sidebarItems = computed<SidebarItem[]>(() => {
+  if (!activeAppPath.value) return []
+  const children = resolveRouteChildren(route.path)
+  const currentPath = route.path
+  return children.map((child: RouteRecordRaw) => {
+    const childPath = `${activeAppPath.value}/${child.path}`
+    const grandChildren = child.children
+    return {
+      title: (child.meta?.title as string) || child.path,
+      url: childPath,
+      icon: iconClass((child.meta?.icon as string) || ''),
+      isActive: currentPath === childPath || currentPath.startsWith(`${childPath}/`),
+      items: grandChildren
+        ? grandChildren.map((gc: RouteRecordRaw) => {
+            const gcPath = `${childPath}/${gc.path}`
+            return {
+              title: (gc.meta?.title as string) || gc.path,
+              url: gcPath,
+              icon: iconClass((gc.meta?.icon as string) || ''),
+              isActive: currentPath === gcPath || currentPath.startsWith(`${gcPath}/`),
+            }
+          })
+        : undefined,
+    }
+  })
+})
 </script>
 
 <template>
-  <!-- 主布局容器 -->
   <div class="w-screen h-screen overflow-hidden bg-background">
-    <!-- App sidebar fixed -->
-    <GlobalLayoutSidebar />
+    <GlobalLayoutSidebar :items="appMenuItems" :active-path="activeAppPath" />
 
-    <!-- 2. 主体内容区域 -->
     <div class="h-full min-h-0 pl-16 flex bg-background">
-      <!-- Menu sidebar -->
       <div
         :class="isSidebarOpen ? 'w-56 mr-2' : 'w-0 mr-0'"
         class="mt-2 mb-2 bg-secondary rounded-2xl transform-gpu transition-all duration-300 ease-out overflow-x-hidden"
       >
         <PfSliderbarProvider>
-          <PfSidebar class="mr-2"></PfSidebar>
+          <PfSidebar class="mr-2" :items="sidebarItems"></PfSidebar>
         </PfSliderbarProvider>
       </div>
 
-      <!-- main content -->
       <div
         class="flex-1 min-h-0 min-w-0 my-3 mr-2 rounded-2xl bg-secondary flex flex-col overflow-hidden"
       >

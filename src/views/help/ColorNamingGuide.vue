@@ -250,6 +250,22 @@ const heroBadgeStyle = {
         </div>
         <div class="grid grid-cols-1 gap-3">
           <div
+            v-for="token in group.tokens"
+            :key="token.name"
+            class="flex items-center gap-4 rounded-xl border border-border bg-background px-4 py-4"
+          >
+            <div
+              class="h-12 w-20 shrink-0 rounded-xl border border-border shadow-sm"
+              :style="tokenStyle(token.name)"
+            ></div>
+            <div class="min-w-0">
+              <div class="font-mono text-sm text-foreground">{{ token.name }}</div>
+              <div class="mt-1 text-sm text-muted-foreground">{{ token.usage }}</div>
+            </div>
+          </div>
+        </div>
+      </pf-card>
+    </section>
 
     <section>
       <pf-card class="p-5 gap-4">
@@ -268,22 +284,6 @@ const heroBadgeStyle = {
               {{ recipe.combo }}
             </div>
             <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ recipe.note }}</pf-text>
-          </div>
-        </div>
-      </pf-card>
-    </section>
-            v-for="token in group.tokens"
-            :key="token.name"
-            class="flex items-center gap-4 rounded-xl border border-border bg-background px-4 py-4"
-          >
-            <div
-              class="h-12 w-20 shrink-0 rounded-xl border border-border shadow-sm"
-              :style="tokenStyle(token.name)"
-            ></div>
-            <div class="min-w-0">
-              <div class="font-mono text-sm text-foreground">{{ token.name }}</div>
-              <div class="mt-1 text-sm text-muted-foreground">{{ token.usage }}</div>
-            </div>
           </div>
         </div>
       </pf-card>

@@ -58,6 +58,10 @@ export type PfDataTableColumnConfig = {
 
 export type PfDataTableDetailConfig = {
   show?: boolean
+  /**
+   * 自定义详情渲染，仅在 detail 场景生效，优先级高于顶层 render。
+   */
+  render?: (value: unknown, rowData: Record<string, any>) => VNodeChild
 }
 
 export type PfDataTableItem<T = Record<string, any>> = PfFormConfigItem<T> & {
