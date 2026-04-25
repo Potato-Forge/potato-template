@@ -34,6 +34,14 @@ const customRenderNode = computed(() => {
   })
 })
 
+const isPrimitiveCustomRender = computed(() => {
+  return (
+    typeof customRenderNode.value === 'string' ||
+    typeof customRenderNode.value === 'number' ||
+    typeof customRenderNode.value === 'boolean'
+  )
+})
+
 const optionsMap = computed(() => {
   if (props.item.type !== 'options') return new Map<any, string>()
 
@@ -129,8 +137,15 @@ const handleTextCopy = () => {
 </script>
 
 <template>
-  <div v-if="customRenderNode" class="flex w-full items-center" :class="customRenderAlignClass">
-    <component :is="customRenderNode" />
+  <div
+    v-if="customRenderNode !== null && customRenderNode !== undefined"
+    class="flex w-full items-center"
+    :class="customRenderAlignClass"
+  >
+    <span v-if="isPrimitiveCustomRender" :class="tableTextClass">{{
+      String(customRenderNode)
+    }}</span>
+    <component v-else :is="customRenderNode" />
   </div>
   <div v-else-if="item.type === 'icon'" class="inline-flex items-center gap-2">
     <Icon v-if="iconValue" :icon="iconValue" class="text-lg" />

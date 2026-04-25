@@ -11,4 +11,7 @@ interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string
   readonly VITE_API_BASE_URL: string
   readonly VITE_API_TIMEOUT: number
+  readonly VITE_SUPABASE_URL: string
+  readonly VITE_SUPABASE_KEY: string
+  readonly VITE_SUPABASE_ASSETS_PUBLIC_BASE_URL?: string
 }

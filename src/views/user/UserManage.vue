@@ -2,12 +2,17 @@
 import { z } from 'zod'
 import { h } from 'vue'
 import type { PfDataTableItem } from '@/components/pf/pf-data-table'
+import type { PfUploadFileItem } from '@/components/pf/pf-upload'
 import type { PfFormRules } from '@/components/pf/pf-form/PfForm.types'
 import {
   createUser,
   deleteUser,
   getUserDetail,
   getUsers,
+  removeUserAvatarByObjectPath,
+  removeUserAvatarByPublicUrl,
+  resolveAvatarPublicUrl,
+  uploadUserAvatar,
   updateUser,
   userKeys,
   type UserProfile,
@@ -24,13 +29,58 @@ const userSchema = z.object({
   username: z.string().min(1, '用户名不能为空').max(32, '用户名长度不能超过 32 个字符'),
   email: z.string().email('邮箱格式不正确').optional().or(z.literal('')),
   full_name: z.string().max(64, '姓名长度不能超过 64 个字符').optional().or(z.literal('')),
-  avatar_url: z.string().url('头像地址需要是有效 URL').optional().or(z.literal('')),
+  avatar_upload: z.array(z.any()).optional(),
   status: z.string().min(1, '状态不能为空'),
 })
 
 const formRules = computed<PfFormRules<Record<string, any>>>(() => ({
   schema: userSchema,
 }))
+
+const avatarUploadHandler = async (payload: {
+  file: File
+  onProgress: (percent: number) => void
+  signal: AbortSignal
+}) => {
+  const uploaded = await uploadUserAvatar(payload)
+  return {
+    remoteUrl: uploaded.publicUrl,
+    remotePath: uploaded.objectPath,
+  }
+}
+
+const toAvatarUploadItems = (avatarPath: string | null | undefined): PfUploadFileItem[] => {
+  if (!avatarPath) {
+    return []
+  }
+
+  const avatarUrl = resolveAvatarPublicUrl(avatarPath)
+  if (!avatarUrl) {
+    return []
+  }
+
+  return [
+    {
+      id: `avatar-${avatarPath}`,
+      name: avatarPath.split('/').pop() || 'avatar',
+      size: 0,
+      type: 'image/*',
+      status: 'success',
+      progress: 100,
+      isImage: true,
+      remoteUrl: avatarUrl,
+      remotePath: avatarPath,
+      isObjectUrl: false,
+    },
+  ]
+}
+
+const mapProfileForForm = (
+  profile: UserProfile,
+): UserProfile & { avatar_upload: PfUploadFileItem[] } => ({
+  ...profile,
+  avatar_upload: toAvatarUploadItems(profile.avatar_url),
+})
 
 const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
   {
@@ -83,19 +133,51 @@ const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
     },
   },
   {
+    name: '头像上传',
+    key: 'avatar_upload',
+    type: 'upload',
+    create: true,
+    edit: true,
+    query: false,
+    table: {
+      show: false,
+    },
+    detail: {
+      show: false,
+    },
+    config: {
+      trigger: 'gallery',
+      listType: 'gallery',
+      multiple: false,
+      accept: 'image/*',
+      maxFiles: 1,
+      maxSize: 5 * 1024 * 1024,
+      uploadHandler: avatarUploadHandler,
+    },
+    help: '上传后会自动保存到 Supabase Storage 的 assets 公共桶',
+  },
+  {
     name: '头像地址',
     key: 'avatar_url',
     type: 'text',
-    create: true,
-    edit: true,
+    create: false,
+    edit: false,
     query: false,
     table: {
       minWidth: 120,
       align: 'center',
       render: (value) => {
-        if (!value) return '-'
+        if (!value) {
+          return h('span', '-')
+        }
+
+        const avatarUrl = resolveAvatarPublicUrl(String(value))
+        if (!avatarUrl) {
+          return h('span', '-')
+        }
+
         return h('img', {
-          src: String(value),
+          src: avatarUrl,
           alt: 'avatar',
           class: 'h-8 w-8 rounded-full object-cover',
         })
@@ -104,9 +186,17 @@ const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
     detail: {
       show: true,
       render: (value: unknown) => {
-        if (!value) return '-'
+        if (!value) {
+          return h('span', '-')
+        }
+
+        const avatarUrl = resolveAvatarPublicUrl(String(value))
+        if (!avatarUrl) {
+          return h('span', '-')
+        }
+
         return h(PfImg, {
-          src: String(value),
+          src: avatarUrl,
           alt: 'avatar',
           class: 'size-8',
         })
@@ -193,35 +283,99 @@ const columns = computed<PfDataTableItem<UserProfile>[]>(() => [
 ])
 
 const handleListQuery = async (query: Record<string, any>) => {
-  return await getUsers({
+  const users = await getUsers({
     username: query.username || null,
     email: query.email || null,
     status: query.status || null,
   })
+
+  return users.map((item) => mapProfileForForm(item))
 }
 
 const handleDetailQuery = async (id: string | number) => {
-  return await getUserDetail(id)
+  const profile = await getUserDetail(id)
+  return mapProfileForForm(profile)
+}
+
+const getFirstAvatarFileItem = (payload: Record<string, any>) => {
+  const files = Array.isArray(payload.avatar_upload)
+    ? (payload.avatar_upload as PfUploadFileItem[])
+    : []
+  if (!files.length) return null
+  return files[0] || null
+}
+
+const resolveAvatarUpload = async (payload: Record<string, any>, userId: string) => {
+  void userId
+  const avatarFileItem = getFirstAvatarFileItem(payload)
+  if (!avatarFileItem) {
+    return {
+      avatarPath: null as string | null,
+      uploadedObjectPath: null as string | null,
+    }
+  }
+
+  if (avatarFileItem.file instanceof File && !avatarFileItem.remotePath) {
+    throw new Error('头像上传尚未完成，请稍后重试')
+  }
+
+  const avatarPath = avatarFileItem.remotePath || null
+  const isUploadedByCurrentSubmit = Boolean(avatarFileItem.file instanceof File && avatarPath)
+
+  return {
+    avatarPath,
+    uploadedObjectPath: isUploadedByCurrentSubmit ? avatarPath : null,
+  }
 }
 
 const handleCreate = async (payload: Record<string, any>) => {
-  return await createUser({
-    username: payload.username || null,
-    email: payload.email || null,
-    full_name: payload.full_name || null,
-    avatar_url: payload.avatar_url || null,
-    status: payload.status,
-  })
+  const userId = crypto.randomUUID()
+  const { avatarPath, uploadedObjectPath } = await resolveAvatarUpload(payload, userId)
+
+  try {
+    return await createUser({
+      id: userId,
+      username: payload.username || null,
+      email: payload.email || null,
+      full_name: payload.full_name || null,
+      avatar_url: avatarPath,
+      status: payload.status,
+    })
+  } catch (error) {
+    if (uploadedObjectPath) {
+      await removeUserAvatarByObjectPath(uploadedObjectPath).catch(() => undefined)
+    }
+    throw error
+  }
 }
 
 const handleUpdate = async (id: string | number, payload: Record<string, any>) => {
-  return await updateUser(id, {
-    username: payload.username || null,
-    email: payload.email || null,
-    full_name: payload.full_name || null,
-    avatar_url: payload.avatar_url || null,
-    status: payload.status,
-  })
+  const userId = String(id)
+  const currentProfile = await getUserDetail(userId)
+  const hasNewAvatar = Boolean(getFirstAvatarFileItem(payload)?.file)
+  const { avatarPath, uploadedObjectPath } = await resolveAvatarUpload(payload, userId)
+  const nextAvatarPath = hasNewAvatar ? avatarPath : currentProfile.avatar_url
+
+  try {
+    const updated = await updateUser(userId, {
+      username: payload.username || null,
+      email: payload.email || null,
+      full_name: payload.full_name || null,
+      avatar_url: nextAvatarPath,
+      status: payload.status,
+    })
+
+    if (hasNewAvatar && currentProfile.avatar_url && currentProfile.avatar_url !== nextAvatarPath) {
+      await removeUserAvatarByPublicUrl(currentProfile.avatar_url).catch(() => undefined)
+    }
+
+    return updated
+  } catch (error) {
+    if (uploadedObjectPath) {
+      await removeUserAvatarByObjectPath(uploadedObjectPath).catch(() => undefined)
+    }
+    throw error
+  }
 }
 
 const handleDelete = async (id: string | number) => {

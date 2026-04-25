@@ -30,6 +30,9 @@ const localFiles = ref<PfUploadFileItem[]>([])
 const isDragging = ref(false)
 const toastVisible = ref(true)
 const progressTimers = new Map<string, number>()
+const uploadControllers = new Map<string, AbortController>()
+
+const cloneUploadItem = (item: PfUploadFileItem): PfUploadFileItem => ({ ...item })
 
 const syncToOutside = () => {
   const snapshot = localFiles.value.map((item) => ({ ...item }))
@@ -40,7 +43,8 @@ const syncToOutside = () => {
 watch(
   () => props.modelValue,
   (value) => {
-    localFiles.value = [...value]
+    // modelValue may come from readonly form state, so clone to mutable items.
+    localFiles.value = value.map((item) => cloneUploadItem(item))
   },
   { immediate: true },
 )
@@ -147,6 +151,78 @@ const startFakeUpload = (id: string) => {
   progressTimers.set(id, timer)
 }
 
+const runUploadByHandler = async (id: string) => {
+  const target = localFiles.value.find((item) => item.id === id)
+  if (!target || !(target.file instanceof File)) {
+    return
+  }
+
+  if (!props.uploadHandler) {
+    startFakeUpload(id)
+    return
+  }
+
+  clearTimer(id)
+  const controller = new AbortController()
+  uploadControllers.set(id, controller)
+
+  target.status = 'uploading'
+  target.progress = 0
+  target.error = undefined
+  syncToOutside()
+
+  try {
+    const result = await props.uploadHandler({
+      file: target.file,
+      signal: controller.signal,
+      onProgress: (percent) => {
+        const latest = localFiles.value.find((item) => item.id === id)
+        if (!latest || latest.status !== 'uploading') {
+          return
+        }
+
+        const normalized = Number.isFinite(percent)
+          ? Math.max(0, Math.min(100, percent))
+          : latest.progress
+        latest.progress = normalized
+        syncToOutside()
+      },
+    })
+
+    const latest = localFiles.value.find((item) => item.id === id)
+    if (!latest) {
+      return
+    }
+
+    latest.status = 'success'
+    latest.progress = 100
+    latest.error = undefined
+    if (result?.remoteUrl) {
+      latest.remoteUrl = result.remoteUrl
+    }
+    if (result?.remotePath) {
+      latest.remotePath = result.remotePath
+    }
+    syncToOutside()
+  } catch (error) {
+    const latest = localFiles.value.find((item) => item.id === id)
+    if (!latest) {
+      return
+    }
+
+    if (controller.signal.aborted) {
+      return
+    }
+
+    latest.status = 'error'
+    latest.progress = Math.max(0, Math.min(100, latest.progress || 0))
+    latest.error = error instanceof Error ? error.message : '上传失败，请重试'
+    syncToOutside()
+  } finally {
+    uploadControllers.delete(id)
+  }
+}
+
 const addFiles = (files: File[]) => {
   if (!files.length) return
 
@@ -204,7 +280,9 @@ const addFiles = (files: File[]) => {
   toastVisible.value = true
   localFiles.value.push(...next)
   syncToOutside()
-  next.forEach((item) => startFakeUpload(item.id))
+  next.forEach((item) => {
+    void runUploadByHandler(item.id)
+  })
 }
 
 const onInputChange = (event: Event) => {
@@ -249,6 +327,14 @@ const clearTimer = (id: string) => {
   }
 }
 
+const abortUpload = (id: string) => {
+  const controller = uploadControllers.get(id)
+  if (controller) {
+    controller.abort()
+    uploadControllers.delete(id)
+  }
+}
+
 const revokePreview = (item: PfUploadFileItem) => {
   if (item.isObjectUrl && item.previewUrl) {
     URL.revokeObjectURL(item.previewUrl)
@@ -259,6 +345,7 @@ const removeFile = (id: string) => {
   const target = localFiles.value.find((item) => item.id === id)
   if (!target) return
 
+  abortUpload(id)
   clearTimer(id)
   revokePreview(target)
   localFiles.value = localFiles.value.filter((item) => item.id !== id)
@@ -274,11 +361,12 @@ const retryUpload = (id: string) => {
   target.progress = 0
   target.error = undefined
   syncToOutside()
-  startFakeUpload(id)
+  void runUploadByHandler(id)
 }
 
 const clearAll = () => {
   localFiles.value.forEach((item) => {
+    abortUpload(item.id)
     clearTimer(item.id)
     revokePreview(item)
   })
@@ -323,6 +411,7 @@ watch(
 
 onBeforeUnmount(() => {
   localFiles.value.forEach((item) => {
+    abortUpload(item.id)
     clearTimer(item.id)
     revokePreview(item)
   })

@@ -1,6 +1,11 @@
 import type { AnyFieldApi } from '@tanstack/vue-form'
 import type { JSX } from 'vue/jsx-runtime'
 import type { ZodType } from 'zod'
+import type {
+  PfUploadHandler,
+  PfUploadListType,
+  PfUploadTriggerType,
+} from '@/components/pf/pf-upload'
 
 export type PfFormFieldApi = AnyFieldApi
 
@@ -277,6 +282,26 @@ export type PfFormConfigItemOptions<
 }
 
 /**
+ * 上传类型
+ */
+export type PfFormConfigItemUpload<
+  T = Record<string, unknown>,
+  K extends keyof T & string = keyof T & string,
+> = PfFormConfigBase<T, K> & {
+  type: 'upload'
+  config?: {
+    trigger?: PfUploadTriggerType
+    listType?: PfUploadListType
+    multiple?: boolean
+    accept?: string
+    maxFiles?: number
+    maxSize?: number
+    showToast?: boolean
+    uploadHandler?: PfUploadHandler
+  }
+}
+
+/**
  * 所有表单配置项类型的联合
  */
 export type PfFormConfigItem<T = any> =
@@ -287,6 +312,7 @@ export type PfFormConfigItem<T = any> =
   | PfFormConfigItemIcon<T>
   | PfFormConfigItemToggle<T>
   | PfFormConfigItemOptions<T>
+  | PfFormConfigItemUpload<T>
 
 /**
  * 表单配置数组

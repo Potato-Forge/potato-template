@@ -15,9 +15,25 @@ export interface PfUploadFileItem {
   file?: File
   previewUrl?: string
   remoteUrl?: string
+  remotePath?: string
   isImage: boolean
   isObjectUrl?: boolean
 }
+
+export type PfUploadHandlerPayload = {
+  file: File
+  onProgress: (percent: number) => void
+  signal: AbortSignal
+}
+
+export type PfUploadHandlerResult = {
+  remoteUrl?: string
+  remotePath?: string
+}
+
+export type PfUploadHandler = (
+  payload: PfUploadHandlerPayload,
+) => Promise<PfUploadHandlerResult | void>
 
 export interface PfUploadProps {
   modelValue?: PfUploadFileItem[]
@@ -30,5 +46,6 @@ export interface PfUploadProps {
   maxSize?: number
   failRate?: number
   showToast?: boolean
+  uploadHandler?: PfUploadHandler
   class?: HTMLAttributes['class']
 }

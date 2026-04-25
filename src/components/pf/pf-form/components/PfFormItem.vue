@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns'
 import type { PfFormConfigItem } from '../PfForm.types'
+import type { PfUploadFileItem } from '@/components/pf/pf-upload'
 import PfFormItemDatetime from './PfFormItemDatetime.vue'
 import PfFormItemText from './PfFormItemText.vue'
 import PfFormItemOptions from './PfFormItemOptions.vue'
@@ -77,6 +78,11 @@ const currentLength = computed(() => {
 
 const showCount = computed(() => {
   return props.config.type === 'text' && !props.config.readonly && !!maxLength.value
+})
+
+const uploadModelValue = computed<PfUploadFileItem[]>(() => {
+  if (!Array.isArray(props.modelValue)) return []
+  return props.modelValue as PfUploadFileItem[]
 })
 </script>
 
@@ -165,6 +171,28 @@ const showCount = computed(() => {
         @update:model-value="handleChange"
         @blur="handleBlur"
       />
+    </template>
+
+    <!-- type:upload -->
+    <template v-else-if="config.type === 'upload'">
+      <template v-if="config.readonly">
+        <pf-form-item-text>{{ uploadModelValue.length }} 个文件</pf-form-item-text>
+      </template>
+      <template v-else>
+        <PfUpload
+          :model-value="uploadModelValue"
+          :trigger="config.config?.trigger"
+          :list-type="config.config?.listType"
+          :multiple="config.config?.multiple"
+          :accept="config.config?.accept"
+          :max-files="config.config?.maxFiles"
+          :max-size="config.config?.maxSize"
+          :show-toast="config.config?.showToast"
+          :upload-handler="config.config?.uploadHandler"
+          :disabled="config.readonly || config.disabled"
+          @update:model-value="handleChange"
+        />
+      </template>
     </template>
 
     <div

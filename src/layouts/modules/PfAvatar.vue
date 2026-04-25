@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import { supabase } from '@/api'
+import { resolveAvatarPublicUrl } from '@/api/user/user'
+import useUserStore from '@/store/userStore'
 
 const router = useRouter()
+const userStore = useUserStore()
+
+const avatarSrc = computed(() => resolveAvatarPublicUrl(userStore.profile?.avatar_url))
+const avatarFallback = computed(() => {
+  const username = userStore.profile?.username || userStore.profile?.full_name
+  if (!username) return 'U'
+  return username.slice(0, 1).toUpperCase()
+})
 
 const handleSignOut = async () => {
   const { error } = await supabase.auth.signOut()
@@ -20,8 +30,8 @@ const handleSignOut = async () => {
       <Avatar
         class="cursor-pointer transition transform duration-200 ease-in-out active:(scale-90)"
       >
-        <AvatarImage src="https://picsum.photos/200" alt="avatar" />
-        <AvatarFallback>CN</AvatarFallback>
+        <AvatarImage :src="avatarSrc || ''" alt="avatar" />
+        <AvatarFallback>{{ avatarFallback }}</AvatarFallback>
       </Avatar>
     </DropdownMenuTrigger>
 
