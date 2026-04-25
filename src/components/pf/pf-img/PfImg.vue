@@ -44,15 +44,55 @@ watch(
 
 const previewImages = computed(() => {
   const provided = props.previewSrcList.filter((item) => Boolean(item))
-  if (provided.length > 0) {
-    return provided
+  const source = activeSrc.value || props.src
+
+  const raw = provided.length > 0 ? provided : source ? [source] : []
+
+  const unique: string[] = []
+  const memo = new Set<string>()
+  raw.forEach((item) => {
+    if (memo.has(item)) {
+      return
+    }
+    memo.add(item)
+    unique.push(item)
+  })
+
+  return unique
+})
+
+const currentPreviewSrc = computed(() => activeSrc.value || props.src || '')
+
+const previewGalleryImages = computed(() => {
+  if (!currentPreviewSrc.value) {
+    return previewImages.value
   }
 
-  const source = activeSrc.value || props.src
-  return source ? [source] : []
+  return previewImages.value.filter((item) => item !== currentPreviewSrc.value)
 })
 
 const canPreview = computed(() => props.preview && previewImages.value.length > 0)
+
+const blurFocusInsideViewer = () => {
+  const active = document.activeElement as HTMLElement | null
+  if (!active) {
+    return
+  }
+
+  if (active.closest('.viewer-container')) {
+    active.blur()
+  }
+}
+
+const restoreTriggerFocus = () => {
+  const el = containerRef.value
+  if (!el) {
+    return
+  }
+
+  // 关闭 viewer 后把焦点还给触发器，避免焦点落在被隐藏节点。
+  el.focus({ preventScroll: true })
+}
 
 const viewerOptions = computed(() => {
   const singleImage = previewImages.value.length <= 1
@@ -61,10 +101,25 @@ const viewerOptions = computed(() => {
     navbar: !singleImage,
     toolbar: singleImage
       ? {
+          zoomIn: true,
+          zoomOut: true,
+          oneToOne: true,
+          reset: true,
           prev: false,
+          play: false,
           next: false,
+          rotateLeft: true,
+          rotateRight: true,
+          flipHorizontal: true,
+          flipVertical: true,
         }
       : true,
+    hide: () => {
+      blurFocusInsideViewer()
+    },
+    hidden: () => {
+      restoreTriggerFocus()
+    },
   }
 
   return {
@@ -74,8 +129,8 @@ const viewerOptions = computed(() => {
 })
 
 const previewStartIndex = computed(() => {
-  if (!props.src) return 0
-  const index = previewImages.value.findIndex((item) => item === props.src)
+  if (!currentPreviewSrc.value) return 0
+  const index = previewImages.value.findIndex((item) => item === currentPreviewSrc.value)
   return index >= 0 ? index : 0
 })
 
@@ -211,7 +266,7 @@ const imgClass = computed(() =>
     </div>
 
     <div class="hidden">
-      <img v-for="image in previewImages" :key="image" :src="image" alt="preview image" />
+      <img v-for="image in previewGalleryImages" :key="image" :src="image" alt="preview image" />
     </div>
   </div>
 

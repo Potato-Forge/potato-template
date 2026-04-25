@@ -1,18 +1,4 @@
 <script setup lang="ts">
-import {
-  EyeIcon,
-  FileArchiveIcon,
-  FileAudioIcon,
-  FileCodeIcon,
-  FileIcon,
-  FileImageIcon,
-  FileTextIcon,
-  FileVideoIcon,
-  Loader2Icon,
-  RefreshCcwIcon,
-  Trash2Icon,
-  UploadCloudIcon,
-} from 'lucide-vue-next'
 import { cn } from '@/lib/utils'
 import { pfToast } from '@/components/pf/pf-toast'
 import type { PfUploadFileItem, PfUploadProps } from './PfUpload.types'
@@ -42,6 +28,7 @@ const emit = defineEmits<{
 const inputRef = ref<HTMLInputElement | null>(null)
 const localFiles = ref<PfUploadFileItem[]>([])
 const isDragging = ref(false)
+const toastVisible = ref(true)
 const progressTimers = new Map<string, number>()
 
 const syncToOutside = () => {
@@ -76,16 +63,16 @@ const formatFileSize = (size: number) => {
 }
 
 const getFileIcon = (item: PfUploadFileItem) => {
-  if (item.isImage) return FileImageIcon
-  if (item.type.startsWith('video/')) return FileVideoIcon
-  if (item.type.startsWith('audio/')) return FileAudioIcon
-  if (item.type.includes('zip') || item.type.includes('rar')) return FileArchiveIcon
-  if (item.type.includes('json') || item.type.includes('javascript')) return FileCodeIcon
+  if (item.isImage) return 'i-tabler-file-type-jpg'
+  if (item.type.startsWith('video/')) return 'i-tabler-file-type-mp4'
+  if (item.type.startsWith('audio/')) return 'i-tabler-file-music'
+  if (item.type.includes('zip') || item.type.includes('rar')) return 'i-tabler-file-zip'
+  if (item.type.includes('json') || item.type.includes('javascript')) return 'i-tabler-file-code'
   if (item.type.includes('text') || item.type.includes('word') || item.type.includes('pdf')) {
-    return FileTextIcon
+    return 'i-tabler-file-text'
   }
 
-  return FileIcon
+  return 'i-tabler-file'
 }
 
 const previewImages = computed(() =>
@@ -214,6 +201,7 @@ const addFiles = (files: File[]) => {
     return
   }
 
+  toastVisible.value = true
   localFiles.value.push(...next)
   syncToOutside()
   next.forEach((item) => startFakeUpload(item.id))
@@ -298,6 +286,10 @@ const clearAll = () => {
   syncToOutside()
 }
 
+const closeToast = () => {
+  toastVisible.value = false
+}
+
 const openImagePreview = (id: string) => {
   const target = document.querySelector<HTMLElement>(`[data-preview-id="pf-upload-preview-${id}"]`)
   target?.click()
@@ -312,6 +304,21 @@ const handleDropZoneKeydown = (event: KeyboardEvent) => {
 
 const triggerClass = computed(() =>
   cn('w-full', props.trigger === 'gallery' ? 'max-w-[132px]' : '', props.class),
+)
+
+const isInlineGalleryMode = computed(
+  () => props.trigger === 'gallery' && props.listType === 'gallery',
+)
+
+const canAddMore = computed(() => !props.disabled && localFiles.value.length < props.maxFiles)
+
+watch(
+  () => localFiles.value.length,
+  (length) => {
+    if (length > 0) {
+      toastVisible.value = true
+    }
+  },
 )
 
 onBeforeUnmount(() => {
@@ -338,6 +345,77 @@ onBeforeUnmount(() => {
       <PfButton :disabled="props.disabled" icon="i-tabler-upload" @click="openFileDialog">
         选择文件
       </PfButton>
+    </div>
+
+    <div v-else-if="isInlineGalleryMode" class="flex flex-wrap gap-3">
+      <div
+        v-for="item in localFiles"
+        :key="item.id"
+        class="group relative h-32 w-32 overflow-hidden rounded-lg border border-border bg-card"
+      >
+        <div class="h-full w-full">
+          <PfImg
+            v-if="item.isImage"
+            :data-preview-id="`pf-upload-preview-${item.id}`"
+            :src="item.previewUrl || item.remoteUrl"
+            :preview="true"
+            :preview-src-list="previewImages"
+            class="h-full w-full"
+            img-class="h-full w-full"
+            object-fit="cover"
+            :rounded="false"
+          />
+          <div v-else class="flex h-full w-full items-center justify-center bg-muted">
+            <div :class="cn(getFileIcon(item), 'text-4xl text-muted-foreground')"></div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="absolute right-1.5 top-1.5 hidden size-7 items-center justify-center rounded-full bg-background/85 text-foreground group-hover:inline-flex"
+          @click="removeFile(item.id)"
+        >
+          <div class="i-tabler-trash text-sm"></div>
+        </button>
+
+        <button
+          v-if="item.isImage"
+          type="button"
+          class="absolute left-1.5 top-1.5 hidden size-7 items-center justify-center rounded-full bg-background/85 text-foreground group-hover:inline-flex"
+          @click="openImagePreview(item.id)"
+        >
+          <div class="i-tabler-eye text-sm"></div>
+        </button>
+
+        <div
+          class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent px-2 pb-2 pt-8"
+        >
+          <p class="truncate text-xs text-white">{{ item.name }}</p>
+          <p class="text-[11px] text-white/85">
+            <template v-if="item.status === 'uploading'">{{ Math.floor(item.progress) }}%</template>
+            <template v-else-if="item.status === 'success'">上传成功</template>
+            <template v-else>上传失败</template>
+          </p>
+        </div>
+      </div>
+
+      <button
+        v-if="canAddMore"
+        type="button"
+        :disabled="props.disabled"
+        :class="
+          cn(
+            'h-32 w-32 rounded-lg border border-dashed border-border bg-muted/40 text-muted-foreground transition-colors',
+            'inline-flex flex-col items-center justify-center gap-2 hover:bg-muted',
+            props.disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer',
+            props.class,
+          )
+        "
+        @click="openFileDialog"
+      >
+        <div class="i-tabler-plus text-2xl"></div>
+        <span class="text-xs">上传文件</span>
+      </button>
     </div>
 
     <button
@@ -376,7 +454,7 @@ onBeforeUnmount(() => {
       @drop="handleDrop"
       @keydown="handleDropZoneKeydown"
     >
-      <UploadCloudIcon class="mx-auto size-10" />
+      <div class="i-tabler-cloud-upload mx-auto text-4xl"></div>
       <p class="mt-3 text-sm font-medium text-foreground">将文件拖拽到这里上传</p>
       <p class="mt-1 text-xs text-muted-foreground">或点击区域选择文件</p>
       <p class="mt-2 text-xs text-muted-foreground">
@@ -384,7 +462,7 @@ onBeforeUnmount(() => {
       </p>
     </div>
 
-    <div v-if="localFiles.length" class="space-y-3">
+    <div v-if="localFiles.length && !isInlineGalleryMode" class="space-y-3">
       <div class="flex items-center justify-between">
         <span class="text-sm font-semibold text-foreground"
           >文件列表 ({{ localFiles.length }})</span
@@ -398,7 +476,9 @@ onBeforeUnmount(() => {
           :key="item.id"
           class="group flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2"
         >
-          <div class="h-12 w-12 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+          <div
+            class="relative h-12 w-12 shrink-0 overflow-hidden rounded-md border border-border bg-muted"
+          >
             <PfImg
               v-if="item.isImage"
               :data-preview-id="`pf-upload-preview-${item.id}`"
@@ -413,18 +493,18 @@ onBeforeUnmount(() => {
             <component
               :is="getFileIcon(item)"
               v-else
-              class="m-auto mt-3 block size-6 text-muted-foreground"
+              class="m-auto mt-3 block text-2xl text-muted-foreground"
             />
-          </div>
 
-          <button
-            v-if="item.isImage"
-            type="button"
-            class="hidden size-8 shrink-0 items-center justify-center rounded border border-border bg-background text-foreground hover:bg-muted group-hover:inline-flex"
-            @click="openImagePreview(item.id)"
-          >
-            <EyeIcon class="size-4" />
-          </button>
+            <button
+              v-if="item.isImage"
+              type="button"
+              class="absolute inset-0 hidden items-center justify-center bg-black/35 text-white group-hover:flex"
+              @click="openImagePreview(item.id)"
+            >
+              <div class="i-tabler-eye text-base"></div>
+            </button>
+          </div>
 
           <div class="min-w-0 flex-1">
             <div class="flex items-center justify-between gap-2">
@@ -437,7 +517,8 @@ onBeforeUnmount(() => {
                 v-if="item.status === 'uploading'"
                 class="inline-flex items-center gap-1 text-info"
               >
-                <Loader2Icon class="size-3 animate-spin" /> 上传中 {{ Math.floor(item.progress) }}%
+                <div class="i-tabler-loader-2 animate-spin text-xs"></div>
+                上传中 {{ Math.floor(item.progress) }}%
               </span>
               <span v-else-if="item.status === 'success'" class="text-success">上传成功</span>
               <span v-else class="text-destructive">{{ item.error || '上传失败' }}</span>
@@ -458,7 +539,7 @@ onBeforeUnmount(() => {
               class="inline-flex size-8 items-center justify-center rounded hover:bg-muted"
               @click="retryUpload(item.id)"
             >
-              <RefreshCcwIcon class="size-4 text-warning" />
+              <div class="i-tabler-refresh text-base text-warning"></div>
             </button>
 
             <button
@@ -466,7 +547,7 @@ onBeforeUnmount(() => {
               class="inline-flex size-8 items-center justify-center rounded hover:bg-muted"
               @click="removeFile(item.id)"
             >
-              <Trash2Icon class="size-4 text-muted-foreground" />
+              <div class="i-tabler-trash text-base text-muted-foreground"></div>
             </button>
           </div>
         </div>
@@ -491,7 +572,7 @@ onBeforeUnmount(() => {
               :rounded="false"
             />
             <div v-else class="flex h-full w-full items-center justify-center bg-muted">
-              <component :is="getFileIcon(item)" class="size-10 text-muted-foreground" />
+              <div :class="cn(getFileIcon(item), 'text-4xl text-muted-foreground')"></div>
             </div>
           </div>
 
@@ -500,7 +581,7 @@ onBeforeUnmount(() => {
             class="absolute right-1.5 top-1.5 hidden size-7 items-center justify-center rounded-full bg-background/85 text-foreground group-hover:inline-flex"
             @click="removeFile(item.id)"
           >
-            <Trash2Icon class="size-4" />
+            <div class="i-tabler-trash text-sm"></div>
           </button>
 
           <button
@@ -509,7 +590,7 @@ onBeforeUnmount(() => {
             class="absolute left-1.5 top-1.5 hidden size-7 items-center justify-center rounded-full bg-background/85 text-foreground group-hover:inline-flex"
             @click="openImagePreview(item.id)"
           >
-            <EyeIcon class="size-4" />
+            <div class="i-tabler-eye text-sm"></div>
           </button>
 
           <div
@@ -529,10 +610,10 @@ onBeforeUnmount(() => {
     </div>
 
     <PfUploadToast
-      v-if="props.showToast"
+      v-if="props.showToast && toastVisible"
       :files="localFiles"
       @remove="removeFile"
-      @clear="clearAll"
+      @close="closeToast"
     />
   </div>
 </template>
