@@ -515,7 +515,7 @@ watch(
             </template>
           </vxe-column>
 
-          <vxe-column title="操作" width="230" fixed="right" align="center">
+          <vxe-column title="操作" width="280" fixed="right" align="center">
             <template #default="{ row }">
               <div class="flex items-center justify-center gap-2">
                 <pf-button v-if="!hideDetail" size="sm" variant="outline" @click="openDetail(row)">
@@ -534,6 +534,7 @@ watch(
                     {{ isRowDeleting(row) ? '删除中...' : '删除' }}
                   </pf-button>
                 </div>
+                <slot name="extra-actions" :row="row" />
               </div>
             </template>
           </vxe-column>

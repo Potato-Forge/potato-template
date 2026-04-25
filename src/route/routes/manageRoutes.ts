@@ -27,6 +27,15 @@ const manageRoutes: RouteRecordRaw[] = [
         },
         component: () => import('@/views/user/UserManage.vue'),
       },
+      {
+        path: 'roles',
+        name: 'roleManage',
+        meta: {
+          title: '角色管理',
+          icon: 'tabler:shield-check',
+        },
+        component: () => import('@/views/roles/RoleSettings.vue'),
+      },
     ],
   },
 ]

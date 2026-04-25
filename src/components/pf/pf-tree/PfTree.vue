@@ -35,6 +35,20 @@ const getTreeData = () => {
   return treeRef.value ? treeRef.value.getData() : []
 }
 
+const getCheckedKeys = (): (string | number)[] => {
+  if (!treeRef.value) return []
+  return treeRef.value.getChecked().map((stat: any) => stat.data[props.valueKey])
+}
+
+const setCheckedByKeys = (keys: (string | number)[]) => {
+  if (!treeRef.value) return
+  const keySet = new Set(keys.map(String))
+  for (const stat of treeRef.value.statsFlat) {
+    const key = String(stat.data[props.valueKey])
+    stat.checked = keySet.has(key)
+  }
+}
+
 // emits
 const emit = defineEmits<{
   (event: 'update:modelValue', value: PfTreeNode[]): void
@@ -95,6 +109,8 @@ const isNodeChoosen = (stat: any) => {
 // expose
 defineExpose({
   getTreeData,
+  getCheckedKeys,
+  setCheckedByKeys,
 })
 </script>
 

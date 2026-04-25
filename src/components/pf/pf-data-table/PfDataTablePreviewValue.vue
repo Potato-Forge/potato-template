@@ -108,10 +108,38 @@ const tableTextClass = computed(() => {
   return 'block max-w-full overflow-hidden text-ellipsis whitespace-nowrap'
 })
 
+const tableTextRef = ref<HTMLElement | null>(null)
+const isTextOverflowing = ref(false)
+
+const updateOverflowState = () => {
+  const el = tableTextRef.value
+  if (!el) {
+    isTextOverflowing.value = false
+    return
+  }
+
+  // Add a tiny tolerance to avoid sub-pixel jitter.
+  isTextOverflowing.value = el.scrollWidth > el.clientWidth + 1
+}
+
+watch(
+  [normalizedText, tableTextDisplay, () => props.scene],
+  async () => {
+    await nextTick()
+    updateOverflowState()
+  },
+  { immediate: true },
+)
+
+useResizeObserver(tableTextRef, () => {
+  updateOverflowState()
+})
+
 const showTableTooltip = computed(() => {
   if (props.scene !== 'table') return false
   if (tableTextDisplay.value !== 'ellipsis') return false
-  return props.item.table?.tooltip !== false
+  if (props.item.table?.tooltip === false) return false
+  return isTextOverflowing.value
 })
 
 const customRenderAlignClass = computed(() => {
@@ -157,7 +185,7 @@ const handleTextCopy = () => {
     placement="top"
     :interactive="true"
   >
-    <span :class="tableTextClass">{{ normalizedText }}</span>
+    <span ref="tableTextRef" :class="tableTextClass">{{ normalizedText }}</span>
     <template #content>
       <div>
         <div class="max-w-xs break-words text-left text-sm text-gray-200">{{ normalizedText }}</div>
@@ -170,5 +198,5 @@ const handleTextCopy = () => {
       </div>
     </template>
   </pf-tooltip>
-  <span v-else :class="tableTextClass">{{ normalizedText }}</span>
+  <span v-else ref="tableTextRef" :class="tableTextClass">{{ normalizedText }}</span>
 </template>
