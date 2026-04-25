@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   SidebarGroup,
@@ -12,11 +13,16 @@ import {
 } from '@/components/ui/sidebar'
 import type { SidebarItem } from '.'
 
-const props = withDefaults(defineProps<{
-  items?: SidebarItem[]
-}>(), {
-  items: () => [],
-})
+const props = withDefaults(
+  defineProps<{
+    items?: SidebarItem[]
+  }>(),
+  {
+    items: () => [],
+  },
+)
+
+const isIconifyName = (icon?: string) => Boolean(icon && icon.includes(':'))
 
 const isHightlight = (item: SidebarItem) => {
   const isEndLeaf = !item.items || item.items.length === 0
@@ -45,7 +51,12 @@ const isHightlight = (item: SidebarItem) => {
           <SidebarMenuItem>
             <CollapsibleTrigger as-child>
               <SidebarMenuButton :class="isHightlight(item)" :tooltip="item.title">
-                <div v-if="item.icon" :class="item.icon" class="shrink-0" />
+                <Icon
+                  v-if="isIconifyName(item.icon)"
+                  :icon="item.icon!"
+                  class="text-base shrink-0"
+                />
+                <div v-else-if="item.icon" :class="item.icon" class="shrink-0" />
                 <span>{{ item.title }}</span>
                 <div
                   class="i-tabler-chevron-right ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
@@ -68,7 +79,12 @@ const isHightlight = (item: SidebarItem) => {
                           :class="isHightlight(subItem)"
                           :tooltip="subItem.title"
                         >
-                          <div v-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
+                          <Icon
+                            v-if="isIconifyName(subItem.icon)"
+                            :icon="subItem.icon!"
+                            class="text-base shrink-0"
+                          />
+                          <div v-else-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
                           <span>{{ subItem.title }}</span>
                           <div
                             class="i-tabler-chevron-right ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"
@@ -82,13 +98,15 @@ const isHightlight = (item: SidebarItem) => {
                             v-for="thirdItem in subItem.items"
                             :key="thirdItem.title"
                           >
-                            <SidebarMenuSubButton
-                              :class="isHightlight(thirdItem)"
-                              as-child
-                            >
+                            <SidebarMenuSubButton :class="isHightlight(thirdItem)" as-child>
                               <router-link :to="thirdItem.url || '/'">
+                                <Icon
+                                  v-if="isIconifyName(thirdItem.icon)"
+                                  :icon="thirdItem.icon!"
+                                  class="text-base shrink-0"
+                                />
                                 <span
-                                  v-if="thirdItem.icon"
+                                  v-else-if="thirdItem.icon"
                                   :class="thirdItem.icon"
                                   class="shrink-0"
                                 />
@@ -108,7 +126,12 @@ const isHightlight = (item: SidebarItem) => {
                       :tooltip="subItem.title"
                     >
                       <router-link :to="subItem.url || '/'">
-                        <div v-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
+                        <Icon
+                          v-if="isIconifyName(subItem.icon)"
+                          :icon="subItem.icon!"
+                          class="text-base shrink-0"
+                        />
+                        <div v-else-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
                         <span>{{ subItem.title }}</span>
                       </router-link>
                     </SidebarMenuButton>
@@ -120,13 +143,10 @@ const isHightlight = (item: SidebarItem) => {
         </Collapsible>
 
         <SidebarMenuItem v-else>
-          <SidebarMenuButton
-            :class="isHightlight(item)"
-            as-child
-            :tooltip="item.title"
-          >
+          <SidebarMenuButton :class="isHightlight(item)" as-child :tooltip="item.title">
             <router-link :to="item.url || '/'">
-              <div v-if="item.icon" :class="item.icon" class="shrink-0" />
+              <Icon v-if="isIconifyName(item.icon)" :icon="item.icon!" class="text-base shrink-0" />
+              <div v-else-if="item.icon" :class="item.icon" class="shrink-0" />
               <span>{{ item.title }}</span>
             </router-link>
           </SidebarMenuButton>

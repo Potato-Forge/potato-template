@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { RouteRecordRaw } from 'vue-router'
-import { routes, resolveRouteChildren } from '@/route'
+import adminRoutes from '@/route/routes/adminRoutes'
+import manageRoutes from '@/route/routes/manageRoutes'
+import helpRoutes from '@/route/routes/helpRoutes'
 import type { SidebarItem } from '@/components/pf/pf-sidebar'
 import GlobalLayoutSidebar from './components/global-layout-sidebar/GlobalLayoutSidebar.vue'
 import GlobalLayoutHeader from './components/global-layout-header/GlobalLayoutHeader.vue'
@@ -11,12 +13,6 @@ const { isSidebarOpen } = storeToRefs(systemStore)
 
 const route = useRoute()
 
-const iconClass = (icon: string) => {
-  if (!icon) return ''
-  const idx = icon.indexOf(':')
-  return idx === -1 ? icon : `i-${icon.slice(0, idx)}-${icon.slice(idx + 1)}`
-}
-
 interface AppMenuItem {
   path: string
   title: string
@@ -24,19 +20,27 @@ interface AppMenuItem {
   firstChildPath: string
 }
 
+const appRouteChildren = [...adminRoutes, ...manageRoutes, ...helpRoutes]
+
+const resolveRouteChildren = (currentPath: string): RouteRecordRaw[] => {
+  for (const parent of appRouteChildren) {
+    const parentPath = parent.path.startsWith('/') ? parent.path : `/${parent.path}`
+    if (currentPath === parentPath || currentPath.startsWith(`${parentPath}/`)) {
+      return parent.children || []
+    }
+  }
+  return []
+}
+
 const appMenuItems = computed<AppMenuItem[]>(() => {
-  const rootRoute = routes[0]
-  if (!rootRoute || !rootRoute.children) return []
-  return rootRoute.children.map((child: RouteRecordRaw) => {
+  return appRouteChildren.map((child: RouteRecordRaw) => {
     const parentPath = child.path.startsWith('/') ? child.path : `/${child.path}`
     const firstChild = child.children?.[0]
-    const firstChildPath = firstChild
-      ? `${parentPath}/${firstChild.path}`
-      : parentPath
+    const firstChildPath = firstChild ? `${parentPath}/${firstChild.path}` : parentPath
     return {
       path: parentPath,
       title: (child.meta?.title as string) || child.path,
-      icon: iconClass((child.meta?.icon as string) || ''),
+      icon: (child.meta?.icon as string) || '',
       firstChildPath,
     }
   })
@@ -62,7 +66,7 @@ const sidebarItems = computed<SidebarItem[]>(() => {
     return {
       title: (child.meta?.title as string) || child.path,
       url: childPath,
-      icon: iconClass((child.meta?.icon as string) || ''),
+      icon: (child.meta?.icon as string) || '',
       isActive: currentPath === childPath || currentPath.startsWith(`${childPath}/`),
       items: grandChildren
         ? grandChildren.map((gc: RouteRecordRaw) => {
@@ -70,7 +74,7 @@ const sidebarItems = computed<SidebarItem[]>(() => {
             return {
               title: (gc.meta?.title as string) || gc.path,
               url: gcPath,
-              icon: iconClass((gc.meta?.icon as string) || ''),
+              icon: (gc.meta?.icon as string) || '',
               isActive: currentPath === gcPath || currentPath.startsWith(`${gcPath}/`),
             }
           })
