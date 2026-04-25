@@ -64,6 +64,46 @@ export type PfDataTableDetailConfig = {
   render?: (value: unknown, rowData: Record<string, any>) => VNodeChild
 }
 
+export type PfDataTableActionColumnConfig = {
+  /**
+   * 操作列展示开关。
+   * @default true
+   */
+  show?: boolean
+  /**
+   * 宽度策略：
+   * - fixed: 仅在传入 width 时固定列宽（支持超出）
+   * - auto: 自动宽度（可被内容撑开）
+   * @default fixed
+   */
+  widthMode?: 'fixed' | 'auto'
+  /**
+   * 操作列宽度（传入后会锁定列宽；auto 模式下会作为 minWidth 兜底）。
+   */
+  width?: number | string
+  /**
+   * 操作列最小宽度（auto 模式生效）。
+   */
+  minWidth?: number | string
+  /**
+   * 是否自动换行：
+   * - wrap: 自动换行
+   * - nowrap: 强制一行
+   * @default nowrap
+   */
+  lineMode?: 'wrap' | 'nowrap'
+  /**
+   * 操作列固定位置。
+   * @default right
+   */
+  fixed?: 'left' | 'right' | false
+  /**
+   * 操作列内容对齐方式。
+   * @default center
+   */
+  align?: 'left' | 'center' | 'right'
+}
+
 export type PfDataTableItem<T = Record<string, any>> = PfFormConfigItem<T> & {
   query?: boolean | PfDataTableQueryConfig<T>
   table?: PfDataTableColumnConfig

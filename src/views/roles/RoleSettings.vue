@@ -12,6 +12,7 @@ import {
   type Role,
 } from '@/api/role/role'
 import RolePermission from './components/RolePermission.vue'
+import RoleUserBinding from './components/RoleUserBinding.vue'
 
 const roleSchema = z.object({
   // `code` 在编辑模式下不展示,若这里强制必填会导致 update 提交被 schema 拦截。
@@ -130,6 +131,13 @@ const openRolePermission = (row: Record<string, any>) => {
   activeRoleName.value = row.name
   permissionOpen.value = true
 }
+
+const roleUserOpen = ref(false)
+const openRoleUserBinding = (row: Record<string, any>) => {
+  activeRoleCode.value = row.code
+  activeRoleName.value = row.name
+  roleUserOpen.value = true
+}
 </script>
 
 <template>
@@ -147,12 +155,23 @@ const openRolePermission = (row: Record<string, any>) => {
     row-key="id"
   >
     <template #extra-actions="{ row }">
-      <pf-button size="sm" variant="outline" @click="openRolePermission(row)"> 权限配置 </pf-button>
+      <pf-button size="tiny" type="info" variant="outline" @click="openRolePermission(row)">
+        权限配置
+      </pf-button>
+      <pf-button size="tiny" type="info" variant="outline" @click="openRoleUserBinding(row)">
+        用户管理
+      </pf-button>
     </template>
   </pf-data-table>
 
   <RolePermission
     v-model:open="permissionOpen"
+    :role-code="activeRoleCode"
+    :role-name="activeRoleName"
+  />
+
+  <RoleUserBinding
+    v-model:open="roleUserOpen"
     :role-code="activeRoleCode"
     :role-name="activeRoleName"
   />

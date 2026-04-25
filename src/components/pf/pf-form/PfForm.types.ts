@@ -242,6 +242,8 @@ export type PfFormConfigItemToggle<
 export type PfFormSelectOption = {
   label: string
   value: any
+  description?: string
+  searchText?: string
   disabled?: boolean
 }
 

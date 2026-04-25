@@ -18,6 +18,7 @@ import {
   type UserProfile,
 } from '@/api/user/user'
 import PfImg from '@/components/pf/pf-img/PfImg.vue'
+import UserRoleBinding from './components/UserRoleBinding.vue'
 
 const defaultQuery = {
   username: '',
@@ -381,6 +382,16 @@ const handleUpdate = async (id: string | number, payload: Record<string, any>) =
 const handleDelete = async (id: string | number) => {
   await deleteUser(id)
 }
+
+const userRoleOpen = ref(false)
+const activeUserId = ref('')
+const activeUsername = ref('')
+
+const openUserRoleBinding = (row: Record<string, any>) => {
+  activeUserId.value = String(row.id)
+  activeUsername.value = row.username || row.full_name || row.email || String(row.id)
+  userRoleOpen.value = true
+}
 </script>
 
 <template>
@@ -396,7 +407,15 @@ const handleDelete = async (id: string | number) => {
     :form-rules="formRules"
     container-mode="modal"
     row-key="id"
-  />
+  >
+    <template #extra-actions="{ row }">
+      <pf-button size="tiny" type="info" variant="outline" @click="openUserRoleBinding(row)"
+        >角色管理</pf-button
+      >
+    </template>
+  </pf-data-table>
+
+  <UserRoleBinding v-model:open="userRoleOpen" :user-id="activeUserId" :username="activeUsername" />
 </template>
 
 <style scoped></style>

@@ -4,6 +4,7 @@ import { supabase } from '..'
 export type Role = Database['public']['Tables']['roles']['Row']
 export type RoleInsert = Database['public']['Tables']['roles']['Insert']
 export type RoleUpdate = Database['public']['Tables']['roles']['Update']
+export type Profile = Database['public']['Tables']['profiles']['Row']
 
 export const roleKeys = {
   all: ['roles'] as const,
@@ -113,6 +114,60 @@ export const setRolePermissions = async (
     permission_id,
   }))
   const { error: insertError } = await supabase.from('role_permissions').insert(rows)
+  if (insertError) {
+    throw new Error(insertError.message)
+  }
+}
+
+export const getRoleUserIds = async (roleCode: string): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select('user_id')
+    .eq('role_code', roleCode)
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data.map((item) => item.user_id)
+}
+
+export const getUsersByRole = async (roleCode: string): Promise<Profile[]> => {
+  const userIds = await getRoleUserIds(roleCode)
+  if (userIds.length === 0) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .in('id', userIds)
+    .order('username', { ascending: true, nullsFirst: false })
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data
+}
+
+export const setRoleUsers = async (roleCode: string, userIds: string[]): Promise<void> => {
+  const { error: deleteError } = await supabase
+    .from('user_roles')
+    .delete()
+    .eq('role_code', roleCode)
+  if (deleteError) {
+    throw new Error(deleteError.message)
+  }
+
+  const normalizedUserIds = Array.from(new Set(userIds.filter(Boolean)))
+  if (normalizedUserIds.length === 0) return
+
+  const { error: insertError } = await supabase.from('user_roles').insert(
+    normalizedUserIds.map((userId) => ({
+      role_code: roleCode,
+      user_id: userId,
+    })),
+  )
   if (insertError) {
     throw new Error(insertError.message)
   }

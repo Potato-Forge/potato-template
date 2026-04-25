@@ -131,6 +131,44 @@ export const deleteUser = async (id: string | number) => {
   }
 }
 
+export const getUserRoleCodes = async (userId: string | number): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from('user_roles')
+    .select('role_code')
+    .eq('user_id', String(userId))
+
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  return data.map((item) => item.role_code)
+}
+
+export const setUserRoles = async (userId: string | number, roleCodes: string[]): Promise<void> => {
+  const normalizedUserId = String(userId)
+
+  const { error: deleteError } = await supabase
+    .from('user_roles')
+    .delete()
+    .eq('user_id', normalizedUserId)
+  if (deleteError) {
+    throw new Error(deleteError.message)
+  }
+
+  const normalizedRoleCodes = Array.from(new Set(roleCodes.filter(Boolean)))
+  if (normalizedRoleCodes.length === 0) return
+
+  const { error: insertError } = await supabase.from('user_roles').insert(
+    normalizedRoleCodes.map((roleCode) => ({
+      user_id: normalizedUserId,
+      role_code: roleCode,
+    })),
+  )
+  if (insertError) {
+    throw new Error(insertError.message)
+  }
+}
+
 const getFileExtension = (fileName: string) => {
   const parts = fileName.split('.')
   if (parts.length <= 1) return 'bin'

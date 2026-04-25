@@ -16,7 +16,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import PfDataTableDetail from './PfDataTableDetail.vue'
 import PfDataTableForm from './PfDataTableForm.vue'
 import PfDataTablePreviewValue from './PfDataTablePreviewValue.vue'
-import type { PfDataTableContainerMode, PfDataTableItem } from './PfDataTable.types'
+import type {
+  PfDataTableActionColumnConfig,
+  PfDataTableContainerMode,
+  PfDataTableItem,
+} from './PfDataTable.types'
 
 const props = withDefaults(
   defineProps<{
@@ -38,6 +42,7 @@ const props = withDefaults(
     hideDetail?: boolean
     hideEdit?: boolean
     hideDelete?: boolean
+    actionColumn?: PfDataTableActionColumnConfig
     /**
      * 是否在组件挂载后用 `defaultQuery` 自动拉取列表。
      * 设为 false 后用户必须显式点击"查询"按钮才会触发首次请求。
@@ -63,6 +68,7 @@ const props = withDefaults(
     hideDetail: false,
     hideEdit: false,
     hideDelete: false,
+    actionColumn: () => ({}),
     autoFetch: true,
   },
 )
@@ -431,6 +437,51 @@ const showQuery = computed(() => queryFormItems.value.length > 0)
 const queryButtonText = computed(() => (isQueryBusy.value ? '查询中...' : '查询'))
 const resetButtonText = computed(() => (isResettingQuery.value ? '重置中...' : '重置'))
 
+const actionColumnConfig = computed(() => {
+  const config = props.actionColumn || {}
+  const lineMode = config.lineMode || 'nowrap'
+  const widthMode = config.widthMode || 'fixed'
+  const hasExplicitWidth = config.width !== undefined
+  const hasExplicitMinWidth = config.minWidth !== undefined
+
+  let width: number | string | undefined
+  let minWidth: number | string | undefined
+
+  if (widthMode === 'fixed') {
+    // 仅显式配置 width 时锁定宽度；未配置时用 minWidth 兜底并允许列继续扩展。
+    if (hasExplicitWidth) {
+      width = config.width
+    }
+
+    if (hasExplicitMinWidth) {
+      minWidth = config.minWidth
+    } else if (!hasExplicitWidth) {
+      minWidth = 280
+    }
+  } else {
+    // auto 模式不锁死宽度，允许内容撑开；wrap 模式给一个默认最小宽度避免挤压。
+    minWidth = config.minWidth ?? config.width ?? 280
+  }
+
+  return {
+    show: config.show !== false,
+    fixed: config.fixed === false ? undefined : config.fixed || 'right',
+    align: config.align || 'center',
+    lineMode,
+    width,
+    minWidth,
+  }
+})
+
+const actionButtonsClass = computed(() => {
+  const align = actionColumnConfig.value.align
+  const justifyClass =
+    align === 'left' ? 'justify-start' : align === 'right' ? 'justify-end' : 'justify-center'
+  const wrapClass =
+    actionColumnConfig.value.lineMode === 'wrap' ? 'flex-wrap' : 'flex-nowrap whitespace-nowrap'
+  return ['flex items-center gap-2', justifyClass, wrapClass]
+})
+
 // light/dark switch
 const isDark = useDark()
 watch(
@@ -515,18 +566,30 @@ watch(
             </template>
           </vxe-column>
 
-          <vxe-column title="操作" width="280" fixed="right" align="center">
+          <vxe-column
+            v-if="actionColumnConfig.show"
+            title="操作"
+            :width="actionColumnConfig.width"
+            :min-width="actionColumnConfig.minWidth"
+            :fixed="actionColumnConfig.fixed"
+            :align="actionColumnConfig.align"
+          >
             <template #default="{ row }">
-              <div class="flex items-center justify-center gap-2">
-                <pf-button v-if="!hideDetail" size="sm" variant="outline" @click="openDetail(row)">
+              <div :class="actionButtonsClass">
+                <pf-button
+                  v-if="!hideDetail"
+                  size="tiny"
+                  variant="outline"
+                  @click="openDetail(row)"
+                >
                   详情
                 </pf-button>
-                <pf-button v-if="!hideEdit" size="sm" variant="outline" @click="openEdit(row)">
+                <pf-button v-if="!hideEdit" size="tiny" variant="outline" @click="openEdit(row)">
                   编辑
                 </pf-button>
                 <div v-if="!hideDelete">
                   <pf-button
-                    size="sm"
+                    size="tiny"
                     variant="destructive"
                     :disabled="deleteMutation.isPending.value"
                     @click="openDeleteConfirm(row)"

@@ -73,7 +73,10 @@ const searchQuery = ref('')
 const filteredOptions = computed(() => {
   if (!props.searchable || !searchQuery.value) return resolvedOptions.value
   const q = searchQuery.value.toLowerCase()
-  return resolvedOptions.value.filter((opt) => opt.label.toLowerCase().includes(q))
+  return resolvedOptions.value.filter((opt) => {
+    const searchSource = [opt.label, opt.description, opt.searchText].filter(Boolean).join(' ')
+    return searchSource.toLowerCase().includes(q)
+  })
 })
 
 const selectedLabels = computed(() => {
@@ -196,7 +199,7 @@ onMounted(() => {
           <li
             v-for="opt in filteredOptions"
             :key="opt.value"
-            class="flex cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
+            class="flex cursor-pointer items-start gap-2 rounded px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground"
             :class="[
               opt.disabled ? 'cursor-not-allowed opacity-50' : '',
               isSelected(opt.value) ? 'bg-primary/10 text-primary font-medium' : '',
@@ -217,7 +220,12 @@ onMounted(() => {
               class="h-4 w-4 shrink-0 transition-opacity"
               :class="isSelected(opt.value) ? 'opacity-100 text-primary' : 'opacity-0'"
             />
-            {{ opt.label }}
+            <span class="min-w-0 flex-1">
+              <span class="block truncate">{{ opt.label }}</span>
+              <span v-if="opt.description" class="block text-xs text-muted-foreground truncate">
+                {{ opt.description }}
+              </span>
+            </span>
           </li>
         </ul>
 
@@ -248,7 +256,7 @@ onMounted(() => {
     <label
       v-for="opt in resolvedOptions"
       :key="opt.value"
-      class="flex cursor-pointer items-center gap-2 text-sm select-none"
+      class="flex cursor-pointer items-start gap-2 text-sm select-none"
       :class="opt.disabled ? 'cursor-not-allowed opacity-50' : ''"
     >
       <span
@@ -258,7 +266,12 @@ onMounted(() => {
       >
         <Icon v-if="isSelected(opt.value)" icon="tabler:check" class="h-3 w-3" />
       </span>
-      {{ opt.label }}
+      <span class="min-w-0">
+        <span class="block leading-4">{{ opt.label }}</span>
+        <span v-if="opt.description" class="block text-xs text-muted-foreground leading-4">
+          {{ opt.description }}
+        </span>
+      </span>
     </label>
   </div>
 </template>
