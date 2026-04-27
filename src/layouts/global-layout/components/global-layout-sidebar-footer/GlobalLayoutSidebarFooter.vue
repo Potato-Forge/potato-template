@@ -13,7 +13,7 @@ const router = useRouter()
       size="icon"
       class="rounded-full text-foreground/50"
       variant="ghost"
-      @click="router.push('/help/theme')"
+      @click="router.push('/help/system')"
     >
       <div class="i-tabler-help"></div>
     </PfButton>

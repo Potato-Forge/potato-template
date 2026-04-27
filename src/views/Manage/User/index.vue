@@ -409,7 +409,12 @@ const openUserRoleBinding = (row: Record<string, any>) => {
     row-key="id"
   >
     <template #extra-actions="{ row }">
-      <pf-button size="tiny" type="info" variant="outline" @click="openUserRoleBinding(row)"
+      <pf-button
+        v-permission="'manage:user:role'"
+        size="tiny"
+        type="info"
+        variant="outline"
+        @click="openUserRoleBinding(row)"
         >角色管理</pf-button
       >
     </template>

@@ -28,7 +28,7 @@ const permissionSchema = z
     code: z
       .string()
       .min(1, '权限编码不能为空')
-      .regex(/^[a-zA-Z_][a-zA-Z0-9_]*$/, '权限编码格式不正确'),
+      .regex(/^[a-zA-Z_][a-zA-Z0-9_]*(?::[a-zA-Z_][a-zA-Z0-9_]*)*$/, '权限编码格式不正确'),
     sort: z.coerce.number().int('排序必须为整数').min(1, '排序不能小于 1'),
     type: z.enum(['menu', 'button', 'api']),
     path: z.string().nullable().optional(),
@@ -54,15 +54,6 @@ const permissionSchema = z
       })
     }
 
-    if (path && !component) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['component'],
-        message: '已填写权限路由时，请补充 view 组件路径',
-      })
-      return
-    }
-
     if (component && !/^[a-z0-9-]+(?:\/[a-z0-9-]+)*(?:\.vue)?$/i.test(component)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -74,22 +65,6 @@ const permissionSchema = z
 
 const formRules = computed<PfFormRules<Record<string, any>>>(() => ({
   schema: permissionSchema,
-  onSubmit: ({ value }) => {
-    const errors: Record<string, string> = {}
-    const permType = value.type || 'menu'
-
-    // 菜单类型的特殊验证
-    if (permType === 'menu') {
-      const path = typeof value.path === 'string' ? value.path.trim() : ''
-      const component = typeof value.component === 'string' ? value.component.trim() : ''
-
-      if (path && !component) {
-        errors.component = '已填写权限路由时，请补充 view 组件路径'
-      }
-    }
-
-    return Object.keys(errors).length > 0 ? { fields: errors } : undefined
-  },
 }))
 
 watchEffect(() => {
@@ -170,11 +145,11 @@ const formConfig = computed<PfFormConfig<AllPermissionItem>>(() => [
     name: '权限编码',
     key: 'code',
     type: 'text',
-    help: '权限的唯一标识，建议使用英文和下划线',
+    help: '权限的唯一标识，建议使用英文，用:冒号分隔不同层级（如 user:create、user:update）',
     rules: {
       required: true,
       pattern: {
-        value: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
+        value: /^[a-zA-Z_][a-zA-Z0-9_]*(?::[a-zA-Z_][a-zA-Z0-9_]*)*$/,
         message: '权限编码格式不正确',
       },
     },
@@ -212,9 +187,9 @@ const formConfig = computed<PfFormConfig<AllPermissionItem>>(() => [
     key: 'component',
     type: 'text',
     visibleIf: (formValues) => isType('menu', formValues),
-    help: '前端权限对应的 view 组件路径，最后以.vue 结尾，默认从 views/ 下寻找',
+    help: '推荐填写目录路径（如 Manage/Permission），系统会自动命中 views/Manage/Permission/index.vue；也兼容旧格式',
     rules: {
-      required: true,
+      required: false,
       pattern: {
         value: /^[a-z0-9-]+(?:\/[a-z0-9-]+)*(?:\.vue)?$/i,
         message: 'view 组件路径格式不正确',

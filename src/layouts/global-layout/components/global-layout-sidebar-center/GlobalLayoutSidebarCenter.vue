@@ -21,7 +21,12 @@ const handleClick = (item: AppMenuItem) => {
 
 const isMobile = () => window.innerWidth < 768
 
-const isIconifyName = (icon: string) => icon.includes(':')
+const normalizeIconifyName = (icon?: string) => {
+  if (!icon) return ''
+  if (icon.includes(':')) return icon
+  if (icon.startsWith('i-')) return ''
+  return `tabler:${icon}`
+}
 
 const tooltipOptions = (content: string) => ({
   content,
@@ -45,7 +50,11 @@ const tooltipOptions = (content: string) => ({
       v-pf-tooltip="tooltipOptions(item.title)"
       @click="handleClick(item)"
     >
-      <Icon v-if="isIconifyName(item.icon)" :icon="item.icon" class="text-xl" />
+      <Icon
+        v-if="normalizeIconifyName(item.icon)"
+        :icon="normalizeIconifyName(item.icon)"
+        class="text-xl"
+      />
       <div v-else-if="item.icon" :class="item.icon" class="text-xl"></div>
     </div>
   </div>

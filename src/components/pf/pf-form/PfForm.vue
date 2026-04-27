@@ -166,12 +166,13 @@ const runFieldRules = (stage: 'change' | 'blur' | 'submit', value: Record<string
 
     const fieldKey = String(config.key)
     const fieldValue = value[fieldKey]
+    const normalizedStringValue = typeof fieldValue === 'string' ? fieldValue.trim() : fieldValue
 
     const isEmpty =
-      fieldValue === null ||
-      fieldValue === undefined ||
-      (typeof fieldValue === 'string' && fieldValue.length === 0) ||
-      (Array.isArray(fieldValue) && fieldValue.length === 0)
+      normalizedStringValue === null ||
+      normalizedStringValue === undefined ||
+      (typeof normalizedStringValue === 'string' && normalizedStringValue.length === 0) ||
+      (Array.isArray(normalizedStringValue) && normalizedStringValue.length === 0)
 
     if (config.rules.required && isEmpty) {
       fields[fieldKey] =
@@ -206,7 +207,11 @@ const runFieldRules = (stage: 'change' | 'blur' | 'submit', value: Record<string
     }
 
     const patternRule = getPatternRule(config.rules.pattern)
-    if (patternRule && typeof fieldValue === 'string' && !patternRule.value.test(fieldValue)) {
+    if (
+      patternRule &&
+      typeof normalizedStringValue === 'string' &&
+      !patternRule.value.test(normalizedStringValue)
+    ) {
       fields[fieldKey] = patternRule.message || `${config.name}格式不正确`
     }
   })

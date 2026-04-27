@@ -26,6 +26,7 @@ provide('permissionManager', manager)
         <div class="w-full flex items-center justify-between">
           <pf-text :prefix-line="true" as="h3">权限列表</pf-text>
           <pf-button
+            v-permission="'manage:permission:create'"
             variant="outline"
             size="sm"
             icon="i-tabler-plus"
@@ -41,6 +42,7 @@ provide('permissionManager', manager)
           :draggable="manager.canDragTree.value"
           :reordering="manager.isReordering.value"
           :on-create-draft-node="manager.createDraftNode"
+          :on-delete-node="manager.deleteNode"
           @update:choosen="handleChoose"
           @update:treeData="handleTreeDataChange"
         ></permission-tree>

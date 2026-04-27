@@ -280,7 +280,9 @@ const heroBadgeStyle = {
               <div class="font-mono text-sm text-foreground">{{ recipe.state }}</div>
               <div class="text-xs text-muted-foreground">{{ recipe.level }}</div>
             </div>
-            <div class="mb-2 rounded-md border border-border px-2 py-1 font-mono text-xs text-foreground">
+            <div
+              class="mb-2 rounded-md border border-border px-2 py-1 font-mono text-xs text-foreground"
+            >
               {{ recipe.combo }}
             </div>
             <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ recipe.note }}</pf-text>

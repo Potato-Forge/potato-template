@@ -10,6 +10,7 @@ const props = defineProps<{
   draggable?: boolean
   reordering?: boolean
   onCreateDraftNode?: (parentId?: string | number) => Promise<boolean> | boolean
+  onDeleteNode?: (id: string | number) => Promise<boolean> | boolean
 }>()
 
 const emits = defineEmits(['update:choosen', 'update:treeData'])
@@ -37,6 +38,18 @@ const handleCreateChild = async (nodeId: string | number) => {
   await props.onCreateDraftNode(nodeId)
 }
 
+const handleDeleteNode = async (nodeId: string | number) => {
+  if (!props.onDeleteNode) return
+  await props.onDeleteNode(nodeId)
+}
+
+const canDropAsChild = (stat: any) => {
+  const type = stat?.data?.type
+  // Only menu nodes can hold children.
+  if (type === 'button' || type === 'api') return false
+  return true
+}
+
 // tree methods
 const treeRef = useTemplateRef('tree')
 
@@ -56,15 +69,17 @@ defineExpose({
       ref="tree"
       v-model="treeDataModel"
       :chooseable="true"
+      :checkable="false"
       :draggable="props.draggable"
+      :each-droppable="canDropAsChild"
       v-model:choosen="choosenNodes"
     >
       <template #icon="{ node }">
         <!-- 显示节点类型图标 -->
         <Icon
           v-if="node.type === 'button'"
-          icon="tabler:square"
-          class="text-lg mr-1 text-warning"
+          icon="tabler:crop-3-2-filled"
+          class="text-lg mr-1 text-info"
           title="按钮类型"
         />
         <Icon
@@ -77,6 +92,20 @@ defineExpose({
         <Icon v-else-if="node.icon" :icon="`tabler:${node.icon}`" class="text-lg mr-1" />
       </template>
 
+      <template #text="{ node }">
+        <pf-text v-if="node.type === 'button'" class="text-md text-info">{{
+          node.name || node.text
+        }}</pf-text>
+
+        <pf-text v-else-if="node.type === 'api'" class="text-md text-info">{{
+          node.name || node.text
+        }}</pf-text>
+
+        <pf-text v-else class="text-md font-semibold text-foreground">{{
+          node.name || node.text
+        }}</pf-text>
+      </template>
+
       <template #actions="{ node }">
         <div class="flex items-center">
           <pf-button
@@ -84,13 +113,14 @@ defineExpose({
             size="icon-sm"
             variant="ghost"
             icon="i-tabler-circle-plus"
-            @click="handleCreateChild(node.id)"
+            @click.stop="handleCreateChild(node.id)"
           ></pf-button>
           <pf-button
             v-pf-tooltip="{ content: '删除节点' }"
             size="icon-sm"
             variant="ghost"
             icon="i-tabler-trash"
+            @click.stop="handleDeleteNode(node.id)"
           ></pf-button>
         </div>
       </template>

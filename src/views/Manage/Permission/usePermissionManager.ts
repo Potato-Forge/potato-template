@@ -1,5 +1,6 @@
 import {
   createPermission,
+  deletePermissions,
   getAllPermissions,
   permissionKeys,
   reorderPermissions,
@@ -155,6 +156,30 @@ export function usePermissionManager() {
   const getCurrentDraftPermission = () => {
     if (currentDraftId.value === null) return null
     return ensurePermissions().find((item) => item.id === currentDraftId.value) || null
+  }
+
+  const getDescendantIds = (id: number): number[] => {
+    const all = ensurePermissions()
+    const childMap = new Map<number | null, number[]>()
+
+    for (const item of all) {
+      const children = childMap.get(item.parent_id) || []
+      children.push(item.id)
+      childMap.set(item.parent_id, children)
+    }
+
+    const ids: number[] = []
+    const stack = [id]
+
+    while (stack.length > 0) {
+      const currentId = stack.pop()
+      if (currentId === undefined) continue
+      ids.push(currentId)
+      const children = childMap.get(currentId) || []
+      stack.push(...children)
+    }
+
+    return ids
   }
 
   const editingSnapshot = ref<Record<string, any> | null>(null)
@@ -390,6 +415,38 @@ export function usePermissionManager() {
     return '请稍后重试'
   }
 
+  const deleteMutation = useMutation({
+    mutationFn: deletePermissions,
+    onMutate: async (ids) => {
+      await queryClient.cancelQueries({ queryKey: permissionKeys.all })
+      const previous = ensurePermissions()
+
+      queryClient.setQueryData<Permission[]>(permissionKeys.all, (old = []) =>
+        old.filter((item) => !ids.includes(item.id)),
+      )
+
+      return { previous }
+    },
+    onError: (error, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(permissionKeys.all, context.previous)
+      }
+
+      pfToast.error('删除权限失败', getErrorMessage(error))
+    },
+    onSuccess: (_data, ids) => {
+      if (ids.some((id) => String(id) === String(choosenId.value))) {
+        choosenId.value = null
+        resetEditingState()
+      }
+
+      pfToast.success('删除权限成功')
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: permissionKeys.all })
+    },
+  })
+
   const createMutation = useMutation({
     mutationFn: createPermission,
     onMutate: async (payload) => {
@@ -541,6 +598,58 @@ export function usePermissionManager() {
     scheduleReorderCommit()
   }
 
+  const deleteNode = async (targetId: string | number) => {
+    const canContinue = await confirmDiscardIfDirty()
+    if (!canContinue) return false
+
+    const normalizedId = Number.parseInt(String(targetId), 10)
+    const permission = getPermissionById(targetId)
+    if (!permission) return false
+
+    const modal = usePfModal()
+
+    if (normalizedId <= 0) {
+      const confirmed = await modal.confirm({
+        title: '确认删除',
+        description: '将删除当前未保存节点，确定继续吗？',
+        positiveText: '确认删除',
+        negativeText: '取消',
+      })
+
+      if (!confirmed) return false
+
+      queryClient.setQueryData<Permission[]>(permissionKeys.all, (old = []) =>
+        old.filter((item) => String(item.id) !== String(targetId)),
+      )
+
+      if (String(choosenId.value) === String(targetId)) {
+        choosenId.value = null
+        resetEditingState()
+      }
+
+      return true
+    }
+
+    const ids = getDescendantIds(normalizedId)
+    const childrenCount = Math.max(ids.length - 1, 0)
+    const label = permission.name || permission.code || `#${permission.id}`
+
+    await modal.confirm({
+      title: '确认删除',
+      description:
+        childrenCount > 0
+          ? `当前删除的权限“${label}”还有 ${childrenCount} 个子权限，建议先处理子权限。点击确定后，将连同其所有子权限一起删除，且删除后不可恢复。`
+          : `将删除“${label}”，删除后不可恢复。`,
+      positiveText: '确认删除',
+      negativeText: '取消',
+      onPositive: async () => {
+        await deleteMutation.mutateAsync(ids)
+      },
+    })
+
+    return true
+  }
+
   const saveCurrent = async (values: Record<string, any>) => {
     if (formMode.value === 'create') {
       const payload = sanitizeCreatePayload(values)
@@ -582,6 +691,7 @@ export function usePermissionManager() {
     cancelEditing,
     markFormChanged,
     reorderTree,
+    deleteNode,
     saveCurrent,
     canDragTree: computed(() => !isCreating.value && !createMutation.isPending.value),
     isReordering: computed(() => reorderMutation.isPending.value || isReorderQueued.value),

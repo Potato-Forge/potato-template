@@ -155,10 +155,22 @@ const openRoleUserBinding = (row: Record<string, any>) => {
     row-key="id"
   >
     <template #extra-actions="{ row }">
-      <pf-button size="tiny" type="info" variant="outline" @click="openRolePermission(row)">
+      <pf-button
+        v-permission="'manage:role:permission'"
+        size="tiny"
+        type="info"
+        variant="outline"
+        @click="openRolePermission(row)"
+      >
         权限配置
       </pf-button>
-      <pf-button size="tiny" type="info" variant="outline" @click="openRoleUserBinding(row)">
+      <pf-button
+        v-permission="'manage:role:user'"
+        size="tiny"
+        type="info"
+        variant="outline"
+        @click="openRoleUserBinding(row)"
+      >
         用户管理
       </pf-button>
     </template>

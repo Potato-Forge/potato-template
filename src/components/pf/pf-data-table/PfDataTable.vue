@@ -2,7 +2,11 @@
 import 'vxe-table/lib/style.css'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { VxeColumn, VxeTable, VxeUI } from 'vxe-table'
-import type { PfFormConfigItem, PfFormRules } from '@/components/pf/pf-form/PfForm.types'
+import type {
+  PfFormConfigItem,
+  PfFormFieldRules,
+  PfFormRules,
+} from '@/components/pf/pf-form/PfForm.types'
 import { pfToast } from '@/components/pf/pf-toast'
 import { usePfModal } from '@/components/pf/pf-modal/usePfModal'
 import {
@@ -94,6 +98,12 @@ const getItemConfig = (item: PfDataTableItem) => {
   return undefined
 }
 
+const normalizeQueryRules = (rules?: PfFormFieldRules) => {
+  if (!rules) return undefined
+  const { required, ...rest } = rules
+  return Object.keys(rest).length ? rest : undefined
+}
+
 const queryFormItems = computed<PfFormConfigItem[]>(() => {
   return props.columns
     .map((item) => {
@@ -102,6 +112,7 @@ const queryFormItems = computed<PfFormConfigItem[]>(() => {
       if (item.query === true) {
         return {
           ...item,
+          rules: normalizeQueryRules(item.rules),
           readonly: false,
           disabled: false,
         } as PfFormConfigItem
@@ -115,7 +126,7 @@ const queryFormItems = computed<PfFormConfigItem[]>(() => {
         type: item.query.type || item.type,
         default: item.query.default ?? item.default,
         help: item.query.help ?? item.help,
-        rules: item.query.rules,
+        rules: normalizeQueryRules(item.query.rules),
         config: item.query.config ?? getItemConfig(item),
         readonly: false,
         disabled: false,

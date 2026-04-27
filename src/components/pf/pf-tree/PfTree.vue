@@ -2,31 +2,22 @@
 import { Draggable } from '@he-tree/vue'
 import PfTreeCheckbox from './PfTreeCheckbox.vue'
 import type { PfTreeNode } from '.'
+import type { PfTreeProps } from './types/PfTreeProps.types'
 import { Icon } from '@iconify/vue'
 
 // props
-const props = withDefaults(
-  defineProps<{
-    modelValue: PfTreeNode[]
-    labelKey?: string
-    valueKey?: string
-    childrenKey?: string
-    disabledKey?: string
-    chooseable?: boolean
-    checkable?: boolean
-    draggable?: boolean
-    choosen?: string | number | null
-  }>(),
-  {
-    labelKey: 'name',
-    valueKey: 'id',
-    childrenKey: 'children',
-    disabledKey: 'disabled',
-    chooseable: true,
-    checkable: true,
-    draggable: false,
-  },
-)
+const props = withDefaults(defineProps<PfTreeProps>(), {
+  labelKey: 'name',
+  valueKey: 'id',
+  childrenKey: 'children',
+  disabledKey: 'disabled',
+  chooseable: true,
+  checkable: true,
+  draggable: false,
+  rootDroppable: true,
+  dragOpen: true,
+  dragOpenDelay: 120,
+})
 
 // Tree Instance
 const treeRef = useTemplateRef('tree')
@@ -44,7 +35,7 @@ const setCheckedByKeys = (keys: (string | number)[]) => {
   if (!treeRef.value) return
   const keySet = new Set(keys.map(String))
   for (const stat of treeRef.value.statsFlat) {
-    const key = String(stat.data[props.valueKey])
+    const key = String((stat.data as Record<string, unknown>)[props.valueKey])
     stat.checked = keySet.has(key)
   }
 }
@@ -124,8 +115,19 @@ defineExpose({
     :key-field="props.valueKey"
     :nodeKey="(stat) => stat.data[props.valueKey]"
     :disable-drag="!props.draggable"
+    :each-droppable="props.eachDroppable"
+    :root-droppable="props.rootDroppable"
+    :drag-open="props.dragOpen"
+    :drag-open-delay="props.dragOpenDelay"
     @check:node="onCheckNode"
   >
+    <template #placeholder>
+      <div class="pf-tree-drop-indicator" aria-hidden="true">
+        <div class="pf-tree-drop-indicator-v"></div>
+        <div class="pf-tree-drop-indicator-h"></div>
+      </div>
+    </template>
+
     <template #default="{ node, stat }">
       <div
         class="relative w-full h-10 flex items-stretch pr-2 hover:(bg-secondary) transition-colors ease-in-out duration-200 rounded overflow-hidden"
@@ -133,7 +135,7 @@ defineExpose({
         @click="onChooseNode(stat)"
       >
         <!-- Checkbox  -->
-        <div class="flex items-center mx-2">
+        <div v-if="props.checkable" class="flex items-center mx-2">
           <pf-tree-checkbox v-model="stat.checked" class="mx-1" @click.stop />
         </div>
 
@@ -151,13 +153,15 @@ defineExpose({
         </div>
 
         <!-- Node Text -->
-        <div class="flex-grow flex items-center whitespace-nowrap">
+        <div class="flex-grow flex items-center whitespace-nowrap mx-2">
           <!-- Node Icon -->
           <slot name="icon" :node="node" :stat="stat">
             <Icon v-if="node.icon" :icon="`tabler:${node.icon}`" class="text-lg mr-1" />
           </slot>
           <slot
             name="text"
+            :node="node"
+            :stat="stat"
             :class="isNodeChoosen(stat) ? 'text-selected-foreground' : 'text-on-surface'"
             >{{ node.name || node.text }}</slot
           >
@@ -165,7 +169,7 @@ defineExpose({
 
         <!-- Node SubText -->
         <div class="flex items-center">
-          <slot name="subText"></slot>
+          <slot name="subText" :node="node" :stat="stat"></slot>
         </div>
 
         <!-- Node Actions -->
@@ -226,6 +230,35 @@ defineExpose({
 
 .pf-tree .tree-node-inner {
   animation: tree-row-in 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.pf-tree .drag-placeholder-wrapper .he-tree-drag-placeholder {
+  height: 0;
+  min-height: 0;
+  border: 0;
+  background: transparent;
+}
+
+.pf-tree-drop-indicator {
+  position: relative;
+  height: 0;
+  width: 100%;
+}
+
+.pf-tree-drop-indicator-h {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  border-top: 2px solid hsl(var(--primary));
+}
+
+.pf-tree-drop-indicator-v {
+  position: absolute;
+  left: 0;
+  top: -9px;
+  height: 10px;
+  border-left: 2px solid hsl(var(--primary));
 }
 
 @keyframes tree-row-in {

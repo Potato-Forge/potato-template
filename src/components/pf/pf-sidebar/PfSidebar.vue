@@ -22,7 +22,12 @@ const props = withDefaults(
   },
 )
 
-const isIconifyName = (icon?: string) => Boolean(icon && icon.includes(':'))
+const normalizeIconifyName = (icon?: string) => {
+  if (!icon) return ''
+  if (icon.includes(':')) return icon
+  if (icon.startsWith('i-')) return ''
+  return `tabler:${icon}`
+}
 
 const isHightlight = (item: SidebarItem) => {
   const isEndLeaf = !item.items || item.items.length === 0
@@ -52,8 +57,8 @@ const isHightlight = (item: SidebarItem) => {
             <CollapsibleTrigger as-child>
               <SidebarMenuButton :class="isHightlight(item)" :tooltip="item.title">
                 <Icon
-                  v-if="isIconifyName(item.icon)"
-                  :icon="item.icon!"
+                  v-if="normalizeIconifyName(item.icon)"
+                  :icon="normalizeIconifyName(item.icon)"
                   class="text-base shrink-0"
                 />
                 <div v-else-if="item.icon" :class="item.icon" class="shrink-0" />
@@ -80,8 +85,8 @@ const isHightlight = (item: SidebarItem) => {
                           :tooltip="subItem.title"
                         >
                           <Icon
-                            v-if="isIconifyName(subItem.icon)"
-                            :icon="subItem.icon!"
+                            v-if="normalizeIconifyName(subItem.icon)"
+                            :icon="normalizeIconifyName(subItem.icon)"
                             class="text-base shrink-0"
                           />
                           <div v-else-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
@@ -101,8 +106,8 @@ const isHightlight = (item: SidebarItem) => {
                             <SidebarMenuSubButton :class="isHightlight(thirdItem)" as-child>
                               <router-link :to="thirdItem.url || '/'">
                                 <Icon
-                                  v-if="isIconifyName(thirdItem.icon)"
-                                  :icon="thirdItem.icon!"
+                                  v-if="normalizeIconifyName(thirdItem.icon)"
+                                  :icon="normalizeIconifyName(thirdItem.icon)"
                                   class="text-base shrink-0"
                                 />
                                 <span
@@ -127,8 +132,8 @@ const isHightlight = (item: SidebarItem) => {
                     >
                       <router-link :to="subItem.url || '/'">
                         <Icon
-                          v-if="isIconifyName(subItem.icon)"
-                          :icon="subItem.icon!"
+                          v-if="normalizeIconifyName(subItem.icon)"
+                          :icon="normalizeIconifyName(subItem.icon)"
                           class="text-base shrink-0"
                         />
                         <div v-else-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
@@ -145,7 +150,11 @@ const isHightlight = (item: SidebarItem) => {
         <SidebarMenuItem v-else>
           <SidebarMenuButton :class="isHightlight(item)" as-child :tooltip="item.title">
             <router-link :to="item.url || '/'">
-              <Icon v-if="isIconifyName(item.icon)" :icon="item.icon!" class="text-base shrink-0" />
+              <Icon
+                v-if="normalizeIconifyName(item.icon)"
+                :icon="normalizeIconifyName(item.icon)"
+                class="text-base shrink-0"
+              />
               <div v-else-if="item.icon" :class="item.icon" class="shrink-0" />
               <span>{{ item.title }}</span>
             </router-link>

@@ -8,7 +8,7 @@ const isPath = (result: boolean | string) => {
 }
 
 const routeGuard = async (router: Router) => {
-  router.beforeEach(async (to, from, next) => {
+  router.beforeEach(async (to, _from, next) => {
     // 登录守卫
     const loginResult = await loginGuard(to)
     if (isPath(loginResult)) {
@@ -16,13 +16,13 @@ const routeGuard = async (router: Router) => {
     }
 
     // 个人资料守卫
-    const profileResult = await profileGuard(to)
+    const profileResult = await profileGuard()
     if (isPath(profileResult)) {
       return next(profileResult)
     }
 
     // 权限守卫
-    const permissionResult = await permissionGuard(to)
+    const permissionResult = await permissionGuard(to, router)
     if (isPath(permissionResult)) {
       return next(permissionResult)
     }

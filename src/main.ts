@@ -15,6 +15,9 @@ import { pfTooltipPlugin } from '@/components/pf/pf-tooltip'
 import { pfModalPlugin } from '@/components/pf/pf-modal'
 import { pfToast } from '@/components/pf/pf-toast'
 
+// directives
+import { vPermission } from '@/directives/vPermission'
+
 // tanstach/vue-query
 import { MutationCache, QueryCache, QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
 
@@ -53,5 +56,7 @@ app.use(VueQueryPlugin, {
 
 pfTooltipPlugin(app)
 pfModalPlugin(app)
+
+app.directive('permission', vPermission)
 
 app.mount('#app')

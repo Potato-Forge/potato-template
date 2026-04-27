@@ -187,6 +187,11 @@ export type Database = {
           p_name: string
           p_parent_id: number
           p_type: string
+          p_path: string | null
+          p_component: string | null
+          p_icon: string | null
+          p_is_hidden: boolean
+          p_sort: number
         }[]
       }
       has_roles: { Args: { role_codes: string[] }; Returns: boolean }

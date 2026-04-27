@@ -52,6 +52,25 @@ export const updatePermission = async (id: number, payload: PermissionUpdate) =>
   return data
 }
 
+export const deletePermissions = async (ids: number[]) => {
+  if (ids.length === 0) return
+
+  const { error: rolePermissionError } = await supabase
+    .from('role_permissions')
+    .delete()
+    .in('permission_id', ids)
+
+  if (rolePermissionError) {
+    throw new Error(rolePermissionError.message)
+  }
+
+  const { error } = await supabase.from('permissions').delete().in('id', ids)
+
+  if (error) {
+    throw new Error(error.message)
+  }
+}
+
 export const reorderPermissions = async (updates: PermissionSortUpdate[]) => {
   const { error } = await supabase.rpc('reorder_permissions', {
     updates,

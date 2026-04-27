@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { RouteRecordRaw } from 'vue-router'
-import adminRoutes from '@/route/routes/adminRoutes'
-import manageRoutes from '@/route/routes/manageRoutes'
-import helpRoutes from '@/route/routes/helpRoutes'
 import type { SidebarItem } from '@/components/pf/pf-sidebar'
 import GlobalLayoutSidebar from './components/global-layout-sidebar/GlobalLayoutSidebar.vue'
 import GlobalLayoutHeader from './components/global-layout-header/GlobalLayoutHeader.vue'
 import { useSystemStore } from '@/store/systemStore'
+import usePermissionStore from '@/store/permissionStore'
 
 const systemStore = useSystemStore()
 const { isSidebarOpen } = storeToRefs(systemStore)
+
+const permissionStore = usePermissionStore()
 
 const route = useRoute()
 
@@ -20,10 +20,14 @@ interface AppMenuItem {
   firstChildPath: string
 }
 
-const appRouteChildren = [...adminRoutes, ...manageRoutes, ...helpRoutes]
+/**
+ * 动态路由树来自 permissionStore，已按权限过滤（超级管理员直接获得全量路由）。
+ * 无需在此层再次 filterByPermission。
+ */
+const appRouteChildren = computed(() => permissionStore.dynamicRoutes)
 
 const resolveRouteChildren = (currentPath: string): RouteRecordRaw[] => {
-  for (const parent of appRouteChildren) {
+  for (const parent of appRouteChildren.value) {
     const parentPath = parent.path.startsWith('/') ? parent.path : `/${parent.path}`
     if (currentPath === parentPath || currentPath.startsWith(`${parentPath}/`)) {
       return parent.children || []
@@ -33,7 +37,7 @@ const resolveRouteChildren = (currentPath: string): RouteRecordRaw[] => {
 }
 
 const appMenuItems = computed<AppMenuItem[]>(() => {
-  return appRouteChildren.map((child: RouteRecordRaw) => {
+  return appRouteChildren.value.map((child: RouteRecordRaw) => {
     const parentPath = child.path.startsWith('/') ? child.path : `/${child.path}`
     const firstChild = child.children?.[0]
     const firstChildPath = firstChild ? `${parentPath}/${firstChild.path}` : parentPath
