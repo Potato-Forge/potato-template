@@ -1,25 +1,44 @@
 <script setup lang="ts">
 import { supabase } from '@/api'
-import { resolveAvatarPublicUrl } from '@/api/user/user'
 import useUserStore from '@/store/userStore'
+import usePermissionStore from '@/store/permissionStore'
+import useGlobalLoadingStore from '@/store/globalLoadingStore'
 
 const router = useRouter()
 const userStore = useUserStore()
+const permissionStore = usePermissionStore()
+const globalLoadingStore = useGlobalLoadingStore()
 
-const avatarSrc = computed(() => resolveAvatarPublicUrl(userStore.profile?.avatar_url))
-const avatarFallback = computed(() => {
-  const username = userStore.profile?.username || userStore.profile?.full_name
-  if (!username) return 'U'
-  return username.slice(0, 1).toUpperCase()
-})
+const avatarSrc = computed(() => userStore.avatarUrl)
+const avatarFallback = computed(() => userStore.displayName)
 
 const handleSignOut = async () => {
-  const { error } = await supabase.auth.signOut()
-  if (error) {
-    console.error('Error signing out:', error.message)
-  } else {
-    router.push('/login')
+  // 1. 先移除动态路由（必须在 clearPermissions 之前，因为 clearPermissions 会清空 dynamicRoutes）
+  const routeNames = permissionStore.dynamicRoutes.map((r) => r.name).filter(Boolean) as (
+    | string
+    | symbol
+  )[]
+  for (const name of routeNames) {
+    router.removeRoute(name)
   }
+
+  // 2. 清空所有内存状态
+  permissionStore.clearPermissions()
+  userStore.clearUser()
+  globalLoadingStore.reset()
+
+  // 3. 清除记住我偏好
+  localStorage.removeItem('potato_remember_me')
+
+  // 4. 从 Supabase 登出
+  try {
+    await supabase.auth.signOut()
+  } catch (error) {
+    console.error('Error signing out:', error)
+  }
+
+  // 5. 导航到登录页
+  router.push('/login')
 }
 </script>
 
