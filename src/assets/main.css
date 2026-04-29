@@ -2,3 +2,154 @@
 
 /* UnoCSS 的基础层注入 */
 @unocss;
+
+:root {
+  --wrapper-bg: hsl(var(--background));
+  --cube-color: #0000;
+  --highlight-color: hsl(var(--primary));
+}
+
+.dark {
+  --wrapper-bg: hsl(var(--background));
+  --cube-color: #0000;
+  --highlight-color: hsl(var(--primary));
+}
+
+@keyframes translate-z {
+  0%,
+  40%,
+  100% {
+    transform: translateZ(-2px);
+  }
+  30% {
+    transform: translateZ(16px) translateY(-1px);
+  }
+}
+
+@keyframes face-color {
+  0%,
+  50%,
+  100% {
+    background-color: var(--cube-color);
+  }
+  10% {
+    background-color: var(--highlight-color);
+  }
+}
+
+@keyframes face-glow {
+  0%,
+  50%,
+  100% {
+    color: #fff0;
+    filter: none;
+  }
+  30% {
+    color: #fff;
+    filter: drop-shadow(0 14px 10px var(--highlight-color));
+  }
+}
+
+@keyframes edge-glow {
+  0%,
+  40%,
+  100% {
+    box-shadow:
+      inset 0 0 2px 1px #0001,
+      inset 0 0 12px 1px #fff1;
+  }
+  30% {
+    box-shadow: 0 0 2px 0 var(--highlight-color);
+  }
+}
+
+.wrapper-grid {
+  --cube-size: 22px;
+  display: grid;
+  grid-template-columns: repeat(7, var(--cube-size));
+  gap: 8px;
+  perspective: 600px;
+  transform-style: preserve-3d;
+}
+
+.cube {
+  position: relative;
+  width: var(--cube-size);
+  height: var(--cube-size);
+  transform-style: preserve-3d;
+  animation: translate-z 1.8s ease-in-out infinite;
+}
+
+.cube:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.cube:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.cube:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.cube:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+.cube:nth-child(5) {
+  animation-delay: 0.32s;
+}
+
+.cube:nth-child(6) {
+  animation-delay: 0.4s;
+}
+
+.cube:nth-child(7) {
+  animation-delay: 0.48s;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid hsl(var(--border));
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff0;
+  background-color: var(--cube-color);
+  animation:
+    face-color 1.8s ease-in-out infinite,
+    edge-glow 1.8s ease-in-out infinite;
+}
+
+.face-front {
+  transform: translateZ(calc(var(--cube-size) / 2));
+  animation:
+    face-color 1.8s ease-in-out infinite,
+    edge-glow 1.8s ease-in-out infinite,
+    face-glow 1.8s ease-in-out infinite;
+}
+
+.face-back {
+  transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.face-right {
+  transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.face-left {
+  transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.face-top {
+  transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.face-bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+

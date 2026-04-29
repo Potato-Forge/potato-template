@@ -72,6 +72,7 @@ declare module 'vue' {
     FormItem: typeof import('./../components/ui/form/FormItem.vue')['default']
     FormLabel: typeof import('./../components/ui/form/FormLabel.vue')['default']
     FormMessage: typeof import('./../components/ui/form/FormMessage.vue')['default']
+    GlobalLoadingOverlay: typeof import('./../components/ui/loader/GlobalLoadingOverlay.vue')['default']
     Input: typeof import('./../components/ui/input/Input.vue')['default']
     Label: typeof import('./../components/ui/label/Label.vue')['default']
     Pagination: typeof import('./../components/ui/pagination/Pagination.vue')['default']

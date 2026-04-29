@@ -4,6 +4,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { supabase } from '@/api'
 import { pfToast } from '@/components/pf/pf-toast'
 import { useForm } from 'vee-validate'
+import useGlobalLoadingStore from '@/store/globalLoadingStore'
 
 const schema = toTypedSchema(
   z.object({
@@ -13,17 +14,21 @@ const schema = toTypedSchema(
 )
 
 const { meta, defineField, handleSubmit, errors } = useForm({ validationSchema: schema })
+const globalLoadingStore = useGlobalLoadingStore()
 
 const [username, usernameProps] = defineField('username')
 const [password, passwordProps] = defineField('password')
 
 const onSubmit = handleSubmit(async (values) => {
+  globalLoadingStore.start()
+
   const { error } = await supabase.auth.signInWithPassword({
     email: values.username,
     password: values.password,
   })
 
   if (error) {
+    globalLoadingStore.end()
     pfToast.error(error.message)
     return
   }
