@@ -15,6 +15,7 @@ declare module 'vue-router' {
     icon?: PermissionRow['icon']
     is_hidden?: PermissionRow['is_hidden']
     is_external?: PermissionRow['is_external']
+    layout?: PermissionRow['layout']
     sort?: PermissionRow['sort']
   }
 }

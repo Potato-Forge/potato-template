@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import type { RouteRecordRaw } from 'vue-router'
-import type { SidebarItem } from '@/components/pf/pf-sidebar'
 import GlobalLayoutSidebar from './components/global-layout-sidebar/GlobalLayoutSidebar.vue'
-import GlobalLayoutHeader from './components/global-layout-header/GlobalLayoutHeader.vue'
-import { useSystemStore } from '@/store/systemStore'
 import usePermissionStore from '@/store/permissionStore'
-
-const systemStore = useSystemStore()
-const { isSidebarOpen } = storeToRefs(systemStore)
 
 const permissionStore = usePermissionStore()
 
@@ -25,16 +19,6 @@ interface AppMenuItem {
  * 无需在此层再次 filterByPermission。
  */
 const appRouteChildren = computed(() => permissionStore.dynamicRoutes)
-
-const resolveRouteChildren = (currentPath: string): RouteRecordRaw[] => {
-  for (const parent of appRouteChildren.value) {
-    const parentPath = parent.path.startsWith('/') ? parent.path : `/${parent.path}`
-    if (currentPath === parentPath || currentPath.startsWith(`${parentPath}/`)) {
-      return parent.children || []
-    }
-  }
-  return []
-}
 
 const appMenuItems = computed<AppMenuItem[]>(() => {
   return appRouteChildren.value.map((child: RouteRecordRaw) => {
@@ -59,59 +43,17 @@ const activeAppPath = computed(() => {
   }
   return ''
 })
-
-const sidebarItems = computed<SidebarItem[]>(() => {
-  if (!activeAppPath.value) return []
-  const children = resolveRouteChildren(route.path)
-  const currentPath = route.path
-  return children.map((child: RouteRecordRaw) => {
-    const childPath = `${activeAppPath.value}/${child.path}`
-    const grandChildren = child.children
-    return {
-      title: (child.meta?.title as string) || child.path,
-      url: childPath,
-      icon: (child.meta?.icon as string) || '',
-      isActive: currentPath === childPath || currentPath.startsWith(`${childPath}/`),
-      items: grandChildren
-        ? grandChildren.map((gc: RouteRecordRaw) => {
-            const gcPath = `${childPath}/${gc.path}`
-            return {
-              title: (gc.meta?.title as string) || gc.path,
-              url: gcPath,
-              icon: (gc.meta?.icon as string) || '',
-              isActive: currentPath === gcPath || currentPath.startsWith(`${gcPath}/`),
-            }
-          })
-        : undefined,
-    }
-  })
-})
 </script>
 
 <template>
-  <div class="w-screen h-screen overflow-hidden bg-background">
+  <div class="w-screen h-screen overflow-hidden bg-app-shell text-app-shell-foreground">
     <GlobalLayoutSidebar :items="appMenuItems" :active-path="activeAppPath" />
 
-    <div class="h-full min-h-0 pl-16 flex bg-background">
+    <div class="h-full min-h-0 pl-[4.5rem] pr-3 py-3 bg-transparent">
       <div
-        :class="isSidebarOpen ? 'w-56 mr-2' : 'w-0 mr-0'"
-        class="mt-2 mb-2 bg-secondary rounded-2xl transform-gpu transition-all duration-300 ease-out overflow-x-hidden"
+        class="h-full min-h-0 rounded-[1.5rem] bg-app-frame-surface shadow-[inset_0_1px_0_hsl(var(--background)/0.54),inset_18px_0_36px_-36px_hsl(var(--foreground)/0.18)]"
       >
-        <PfSliderbarProvider>
-          <PfSidebar class="mr-2" :items="sidebarItems"></PfSidebar>
-        </PfSliderbarProvider>
-      </div>
-
-      <div
-        class="flex-1 min-h-0 min-w-0 my-3 mr-2 rounded-2xl bg-secondary flex flex-col overflow-hidden"
-      >
-        <header class="h-12 border-b-1px border-border mx-2">
-          <GlobalLayoutHeader></GlobalLayoutHeader>
-        </header>
-
-        <main class="flex-1 min-h-0 overflow-hidden">
-          <router-view></router-view>
-        </main>
+        <router-view></router-view>
       </div>
     </div>
   </div>

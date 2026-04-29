@@ -10,7 +10,7 @@ if (!manager) {
 }
 
 const { choosenPath, choosenPermission, formMode } = manager
-const menuOnlyKeys = ['path', 'component', 'is_external'] as const
+const menuOnlyKeys = ['path', 'component', 'is_external', 'layout'] as const
 const lastPermissionType = ref<'menu' | 'button' | 'api' | null>(null)
 
 // form
@@ -33,12 +33,14 @@ const permissionSchema = z
     type: z.enum(['menu', 'button', 'api']),
     path: z.string().nullable().optional(),
     component: z.string().nullable().optional(),
+    layout: z.string().nullable().optional(),
   })
   .superRefine((value, ctx) => {
     if (value.type !== 'menu') return
 
     const path = typeof value.path === 'string' ? value.path.trim() : ''
     const component = typeof value.component === 'string' ? value.component.trim() : ''
+    const layout = typeof value.layout === 'string' ? value.layout.trim() : ''
 
     if (!path) {
       ctx.addIssue({
@@ -59,6 +61,14 @@ const permissionSchema = z
         code: z.ZodIssueCode.custom,
         path: ['component'],
         message: 'view 组件路径格式不正确',
+      })
+    }
+
+    if (!layout) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['layout'],
+        message: '页面模板不能为空',
       })
     }
   })
@@ -194,6 +204,21 @@ const formConfig = computed<PfFormConfig<AllPermissionItem>>(() => [
         value: /^[a-z0-9-]+(?:\/[a-z0-9-]+)*(?:\.vue)?$/i,
         message: 'view 组件路径格式不正确',
       },
+    },
+  },
+  {
+    name: '页面模板',
+    key: 'layout',
+    type: 'options',
+    default: 'admin',
+    visibleIf: (formValues) => isType('menu', formValues),
+    help: '选择该菜单使用的页面布局模板，默认【菜单页面】',
+    config: {
+      variant: 'combobox',
+      options: [{ label: '菜单页面', value: 'admin' }],
+    },
+    rules: {
+      required: true,
     },
   },
   {

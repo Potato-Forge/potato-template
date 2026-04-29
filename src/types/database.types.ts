@@ -17,6 +17,7 @@ export type Database = {
           id: number
           is_external: string | null
           is_hidden: boolean | null
+          layout: string | null
           name: string
           parent_id: number | null
           path: string | null
@@ -32,6 +33,7 @@ export type Database = {
           id?: number
           is_external?: string | null
           is_hidden?: boolean | null
+          layout?: string | null
           name: string
           parent_id?: number | null
           path?: string | null
@@ -47,6 +49,7 @@ export type Database = {
           id?: number
           is_external?: string | null
           is_hidden?: boolean | null
+          layout?: string | null
           name?: string
           parent_id?: number | null
           path?: string | null
@@ -192,6 +195,7 @@ export type Database = {
           p_icon: string | null
           p_is_hidden: boolean
           p_sort: number
+          p_layout: string | null
         }[]
       }
       has_roles: { Args: { role_codes: string[] }; Returns: boolean }

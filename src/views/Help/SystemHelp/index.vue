@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
+import PageLayout from '@/layouts/page-layout/PageLayout.vue'
 
 const tokenStyle = (token: string) => ({
   backgroundColor: `hsl(var(--${token}))`,
@@ -10,6 +10,26 @@ const tokenGroups = [
     title: '基础表面',
     description: '页面骨架、主要容器和浮层使用的长期结构色。',
     tokens: [
+      {
+        name: 'app-shell',
+        usage: '应用整体背景、全局外层空间底色',
+      },
+      {
+        name: 'sidebar-surface',
+        usage: '一级/二级导航容器背景',
+      },
+      {
+        name: 'header-surface',
+        usage: '右侧 header 容器背景，支持轻透明叠层',
+      },
+      {
+        name: 'content-surface',
+        usage: '主内容卡片与 page layout 默认背景',
+      },
+      {
+        name: 'content-muted',
+        usage: '内容区外层缓冲背景、卡片之间的衔接底色',
+      },
       {
         name: 'background',
         usage: '应用主背景、大页面底色',
@@ -222,7 +242,7 @@ const heroBadgeStyle = {
 </script>
 
 <template>
-  <PageLayoutSingle class="min-h-0 gap-4 overflow-y-auto">
+  <PageLayout mode="flow" background="transparent" class="min-h-0 gap-4">
     <section class="rounded-2xl border border-border bg-card px-6 py-5">
       <div class="flex items-start justify-between gap-6">
         <div class="space-y-3">
@@ -313,7 +333,7 @@ const heroBadgeStyle = {
         </div>
       </pf-card>
     </section>
-  </PageLayoutSingle>
+  </PageLayout>
 </template>
 
 <style scoped></style>

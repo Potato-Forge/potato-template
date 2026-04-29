@@ -2,6 +2,7 @@
 import { z } from 'zod'
 import type { PfDataTableItem } from '@/components/pf/pf-data-table'
 import type { PfFormRules } from '@/components/pf/pf-form/PfForm.types'
+import PageLayout from '@/layouts/page-layout/PageLayout.vue'
 import {
   getRoles,
   getRoleDetail,
@@ -141,40 +142,42 @@ const openRoleUserBinding = (row: Record<string, any>) => {
 </script>
 
 <template>
-  <pf-data-table
-    :columns="columns"
-    :query-key-base="roleKeys.all"
-    :default-query="defaultQuery"
-    :list-query="handleListQuery"
-    :detail="handleDetailQuery"
-    :create="handleCreate"
-    :update="handleUpdate"
-    :delete="handleDelete"
-    :form-rules="formRules"
-    container-mode="drawer"
-    row-key="id"
-  >
-    <template #extra-actions="{ row }">
-      <pf-button
-        v-permission="'manage:role:permission'"
-        size="tiny"
-        type="info"
-        variant="outline"
-        @click="openRolePermission(row)"
-      >
-        权限配置
-      </pf-button>
-      <pf-button
-        v-permission="'manage:role:user'"
-        size="tiny"
-        type="info"
-        variant="outline"
-        @click="openRoleUserBinding(row)"
-      >
-        用户管理
-      </pf-button>
-    </template>
-  </pf-data-table>
+  <PageLayout mode="single" background="transparent">
+    <pf-data-table
+      :columns="columns"
+      :query-key-base="roleKeys.all"
+      :default-query="defaultQuery"
+      :list-query="handleListQuery"
+      :detail="handleDetailQuery"
+      :create="handleCreate"
+      :update="handleUpdate"
+      :delete="handleDelete"
+      :form-rules="formRules"
+      container-mode="drawer"
+      row-key="id"
+    >
+      <template #extra-actions="{ row }">
+        <pf-button
+          v-permission="'manage:role:permission'"
+          size="tiny"
+          type="info"
+          variant="outline"
+          @click="openRolePermission(row)"
+        >
+          权限配置
+        </pf-button>
+        <pf-button
+          v-permission="'manage:role:user'"
+          size="tiny"
+          type="info"
+          variant="outline"
+          @click="openRoleUserBinding(row)"
+        >
+          用户管理
+        </pf-button>
+      </template>
+    </pf-data-table>
+  </PageLayout>
 
   <RolePermission
     v-model:open="permissionOpen"

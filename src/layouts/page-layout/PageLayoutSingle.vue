@@ -1,20 +1,9 @@
 <script setup lang="ts">
-import { twMerge } from 'tailwind-merge'
-
-const attrs = useAttrs()
-
-const containerClass = computed(() => {
-  return twMerge(
-    'w-full h-full min-h-0 flex flex-col p-4 overflow-hidden',
-    (attrs.class as string) || '',
-  )
-})
+import PageLayout from './PageLayout.vue'
 </script>
 
 <template>
-  <div v-bind="{ ...attrs, class: containerClass }">
+  <PageLayout mode="single" background="card" v-bind="$attrs">
     <slot name="default"></slot>
-  </div>
+  </PageLayout>
 </template>
-
-<style scoped></style>

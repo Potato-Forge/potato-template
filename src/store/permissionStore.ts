@@ -1,6 +1,8 @@
 import { supabase } from '@/api'
+import AdminLayout from '@/layouts/admin-layout/index.vue'
 import type { Database } from '@/types/database.types'
 import { defineStore } from 'pinia'
+import { markRaw } from 'vue'
 import type { RouteRecordRaw } from 'vue-router'
 
 export type PermissionItem =
@@ -28,20 +30,38 @@ function resolveComponent(componentPath: string | null | undefined) {
 
   for (const key of candidates) {
     if (pageModules[key]) {
-      return pageModules[key] as (() => Promise<unknown>) | undefined
+      return markRaw(pageModules[key] as (() => Promise<unknown>) | undefined)
     }
   }
 
   // Last fallback: tolerate accidental case mismatch in DB values.
   const lowerCandidates = new Set(candidates.map((item) => item.toLowerCase()))
   const matchedKey = Object.keys(pageModules).find((key) => lowerCandidates.has(key.toLowerCase()))
-  return matchedKey ? (pageModules[matchedKey] as (() => Promise<unknown>) | undefined) : undefined
+  return matchedKey
+    ? markRaw(pageModules[matchedKey] as (() => Promise<unknown>) | undefined)
+    : undefined
 }
 
 /** Grab the last URL segment as a relative route path ('admin/dashboard' → 'dashboard'). */
 function lastSegment(path: string | null | undefined): string {
   if (!path) return ''
   return path.replace(/\/$/, '').split('/').filter(Boolean).pop() ?? ''
+}
+
+function resolveLayoutComponent(layout: string | null | undefined) {
+  switch (layout ?? 'admin') {
+    case 'admin':
+      return markRaw(AdminLayout)
+    default:
+      return markRaw(AdminLayout)
+  }
+}
+
+function markRouteRecordRaw(route: RouteRecordRaw): RouteRecordRaw {
+  return markRaw({
+    ...route,
+    children: route.children?.map((child) => markRouteRecordRaw(child)),
+  }) as RouteRecordRaw
 }
 
 /** Build a RouteRecordRaw tree from flat menu permissions. */
@@ -62,17 +82,18 @@ export function buildRoutesFromPermissions(permissions: PermissionItem[]): Route
             title: m.p_name ?? '',
             icon: m.p_icon ?? '',
             code: m.p_code ?? undefined,
+            layout: m.p_layout ?? 'admin',
           },
         }
-        return (
+        return markRouteRecordRaw(
           children.length
             ? {
                 ...base,
                 redirect: String(children[0]?.path ?? ''),
                 children,
               }
-            : { ...base, component: resolveComponent(m.p_component) }
-        ) as RouteRecordRaw
+            : { ...base, component: resolveComponent(m.p_component) },
+        )
       })
   }
 
@@ -89,17 +110,19 @@ export function buildRoutesFromPermissions(permissions: PermissionItem[]): Route
           title: m.p_name ?? '',
           icon: m.p_icon ?? '',
           code: m.p_code ?? undefined,
+          layout: m.p_layout ?? 'admin',
         },
       }
-      return (
+      return markRouteRecordRaw(
         children.length
           ? {
               ...base,
+              component: resolveLayoutComponent(m.p_layout),
               redirect: String(children[0]?.path ?? ''),
               children,
             }
-          : { ...base, component: resolveComponent(m.p_component) }
-      ) as RouteRecordRaw
+          : { ...base, component: resolveComponent(m.p_component) },
+      )
     })
 }
 
@@ -172,7 +195,7 @@ const usePermissionStore = defineStore('permission', {
       if (this.isSuperAdmin) {
         const { data, error } = await supabase
           .from('permissions')
-          .select('id, code, name, parent_id, type, path, component, icon, is_hidden, sort')
+          .select('id, code, name, parent_id, type, path, component, icon, is_hidden, sort, layout')
           .eq('status', true)
           .order('sort', { ascending: true })
         if (error) throw error
@@ -187,6 +210,7 @@ const usePermissionStore = defineStore('permission', {
           p_icon: p.icon,
           p_is_hidden: (p.is_hidden as boolean | null) ?? false,
           p_sort: (p.sort as number | null) ?? 0,
+          p_layout: p.layout,
         })) as Permission
       } else {
         const { data, error } = await supabase.rpc('get_user_permissions')

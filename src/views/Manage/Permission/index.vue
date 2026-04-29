@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
+import PageLayout from '@/layouts/page-layout/PageLayout.vue'
 import PermissionTree from './components/PermissionTree.vue'
 import PermissionForm from './components/PermissionForm.vue'
 import { usePermissionManager } from './usePermissionManager'
@@ -19,9 +19,11 @@ const handleTreeDataChange = (treeData: PfTreeNode[]) => {
 provide('permissionManager', manager)
 </script>
 <template>
-  <PageLayoutSingle class="flex flex-row gap-4">
+  <PageLayout mode="single" background="transparent" class="flex flex-row gap-4">
     <!-- all Permission tree -->
-    <pf-card class="w-40% h-full min-h-0 flex flex-col overflow-hidden">
+    <pf-card
+      class="w-40% h-full min-h-0 flex flex-col overflow-hidden border-border/45 bg-content-surface"
+    >
       <template #header>
         <div class="w-full flex items-center justify-between">
           <pf-text :prefix-line="true" as="h3">权限列表</pf-text>
@@ -49,10 +51,12 @@ provide('permissionManager', manager)
       </div>
     </pf-card>
     <!-- edit area -->
-    <div class="flex-1 h-full min-h-0">
+    <div
+      class="flex-1 h-full min-h-0 rounded-2xl border border-border/45 bg-content-surface p-4 shadow-[0_24px_48px_-32px_hsl(var(--foreground)/0.22)]"
+    >
       <permission-form></permission-form>
     </div>
-  </PageLayoutSingle>
+  </PageLayout>
 </template>
 
 <style scoped></style>

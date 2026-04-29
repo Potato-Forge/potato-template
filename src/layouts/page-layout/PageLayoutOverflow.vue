@@ -1,9 +1,9 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import PageLayout from './PageLayout.vue'
+</script>
 
 <template>
-  <div class="w-full hfull flex flex-col p-4">
+  <PageLayout mode="flow" background="card" v-bind="$attrs">
     <slot name="default"></slot>
-  </div>
+  </PageLayout>
 </template>
-
-<style scoped></style>

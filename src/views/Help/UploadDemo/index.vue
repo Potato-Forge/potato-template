@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PageLayoutSingle from '@/layouts/page-layout/PageLayoutSingle.vue'
+import PageLayout from '@/layouts/page-layout/PageLayout.vue'
 import type { PfUploadFileItem } from '@/components/pf/pf-upload'
 
 const imageDemo = {
@@ -15,7 +15,7 @@ const uploadFilesC = ref<PfUploadFileItem[]>([])
 </script>
 
 <template>
-  <PageLayoutSingle class="min-h-0 overflow-y-auto space-y-6">
+  <PageLayout mode="flow" background="transparent" class="min-h-0 space-y-6">
     <PfCard shadow class="overflow-hidden">
       <template #header>
         <div class="flex flex-col">
@@ -108,5 +108,5 @@ const uploadFilesC = ref<PfUploadFileItem[]>([])
         />
       </div>
     </PfCard>
-  </PageLayoutSingle>
+  </PageLayout>
 </template>

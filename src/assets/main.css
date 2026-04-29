@@ -3,6 +3,25 @@
 /* UnoCSS 的基础层注入 */
 @unocss;
 
+html,
+body,
+#app {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top left, hsl(var(--primary) / 0.035), transparent 28%),
+    linear-gradient(
+      180deg,
+      hsl(var(--app-shell)) 0%,
+      hsl(var(--background)) 55%,
+      hsl(var(--content-muted)) 100%
+    );
+  color: hsl(var(--foreground));
+}
+
+body {
+  background-attachment: fixed;
+}
+
 :root {
   --wrapper-bg: hsl(var(--background));
   --cube-color: #0000;
@@ -151,5 +170,3 @@
 .face-bottom {
   transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
 }
-
-

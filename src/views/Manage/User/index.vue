@@ -4,6 +4,7 @@ import { h } from 'vue'
 import type { PfDataTableItem } from '@/components/pf/pf-data-table'
 import type { PfUploadFileItem } from '@/components/pf/pf-upload'
 import type { PfFormRules } from '@/components/pf/pf-form/PfForm.types'
+import PageLayout from '@/layouts/page-layout/PageLayout.vue'
 import {
   createUser,
   deleteUser,
@@ -395,30 +396,32 @@ const openUserRoleBinding = (row: Record<string, any>) => {
 </script>
 
 <template>
-  <pf-data-table
-    :columns="columns"
-    :query-key-base="userKeys.all"
-    :default-query="defaultQuery"
-    :list-query="handleListQuery"
-    :detail="handleDetailQuery"
-    :create="handleCreate"
-    :update="handleUpdate"
-    :delete="handleDelete"
-    :form-rules="formRules"
-    container-mode="modal"
-    row-key="id"
-  >
-    <template #extra-actions="{ row }">
-      <pf-button
-        v-permission="'manage:user:role'"
-        size="tiny"
-        type="info"
-        variant="outline"
-        @click="openUserRoleBinding(row)"
-        >角色管理</pf-button
-      >
-    </template>
-  </pf-data-table>
+  <PageLayout mode="single" background="transparent">
+    <pf-data-table
+      :columns="columns"
+      :query-key-base="userKeys.all"
+      :default-query="defaultQuery"
+      :list-query="handleListQuery"
+      :detail="handleDetailQuery"
+      :create="handleCreate"
+      :update="handleUpdate"
+      :delete="handleDelete"
+      :form-rules="formRules"
+      container-mode="modal"
+      row-key="id"
+    >
+      <template #extra-actions="{ row }">
+        <pf-button
+          v-permission="'manage:user:role'"
+          size="tiny"
+          type="info"
+          variant="outline"
+          @click="openUserRoleBinding(row)"
+          >角色管理</pf-button
+        >
+      </template>
+    </pf-data-table>
+  </PageLayout>
 
   <UserRoleBinding v-model:open="userRoleOpen" :user-id="activeUserId" :username="activeUsername" />
 </template>
