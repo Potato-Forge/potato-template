@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import type { RouteRecordRedirectOption, RouteRecordNormalized } from 'vue-router'
+import type { RouteRecordNormalized, RouteRecordRaw } from 'vue-router'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,6 +18,8 @@ const router = useRouter()
 const systemStore = useSystemStore()
 const { isSidebarOpen } = storeToRefs(systemStore)
 
+type ReachableRouteRecord = RouteRecordRaw | RouteRecordNormalized
+
 const joinRoutePath = (basePath: string, nextPath: string) => {
   if (!nextPath) return basePath
   if (nextPath.startsWith('/')) return nextPath
@@ -25,7 +27,11 @@ const joinRoutePath = (basePath: string, nextPath: string) => {
   return `${normalizedBase}/${nextPath.replace(/^\//, '')}`
 }
 
-const resolveRedirectPath = (basePath: string, redirect: RouteRecordRedirectOption) => {
+const resolveRedirectPath = (basePath: string, redirect: ReachableRouteRecord['redirect']) => {
+  if (!redirect) {
+    return basePath
+  }
+
   if (typeof redirect === 'string') {
     return joinRoutePath(basePath, redirect)
   }
@@ -34,11 +40,11 @@ const resolveRedirectPath = (basePath: string, redirect: RouteRecordRedirectOpti
     return basePath
   }
 
-  if (redirect.path) {
+  if ('path' in redirect && typeof redirect.path === 'string') {
     return joinRoutePath(basePath, redirect.path)
   }
 
-  if (redirect.name) {
+  if ('name' in redirect && redirect.name) {
     return router.resolve({ name: redirect.name, params: route.params }).path
   }
 
@@ -46,7 +52,7 @@ const resolveRedirectPath = (basePath: string, redirect: RouteRecordRedirectOpti
 }
 
 const resolveFirstReachablePath = (
-  record: RouteRecordNormalized | undefined,
+  record: ReachableRouteRecord | undefined,
   fallbackPath: string,
 ): string => {
   if (!record) return fallbackPath
@@ -55,11 +61,14 @@ const resolveFirstReachablePath = (
     return resolveRedirectPath(record.path || fallbackPath, record.redirect)
   }
 
-  if (record.components && Object.keys(record.components).length > 0) {
+  if (
+    ('components' in record && record.components && Object.keys(record.components).length > 0) ||
+    ('component' in record && !!record.component)
+  ) {
     return record.path || fallbackPath
   }
 
-  const firstChild = record.children[0]
+  const firstChild = record.children?.[0]
   if (!firstChild) {
     return record.path || fallbackPath
   }
