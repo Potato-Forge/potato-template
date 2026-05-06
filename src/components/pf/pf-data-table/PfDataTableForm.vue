@@ -53,7 +53,7 @@ defineExpose({
       </pf-text>
     </div>
 
-    <div class="min-h-0 flex-1 overflow-auto pr-1">
+    <div class="min-h-0 flex-1 overflow-auto px-1 pb-1">
       <pf-form
         ref="formRef"
         :form-config="columns"
