@@ -8,6 +8,99 @@ export type Database = {
   }
   public: {
     Tables: {
+      organizations: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          status: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          status?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          status?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      org_members: {
+        Row: {
+          org_id: string
+          user_id: string
+          created_at: string
+        }
+        Insert: {
+          org_id: string
+          user_id: string
+          created_at?: string
+        }
+        Update: {
+          org_id?: string
+          user_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'org_members_org_id_fkey'
+            columns: ['org_id']
+            isOneToOne: false
+            referencedRelation: 'organizations'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'org_members_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      org_roles: {
+        Row: {
+          org_id: string
+          role_code: string
+          created_at: string
+        }
+        Insert: {
+          org_id: string
+          role_code: string
+          created_at?: string
+        }
+        Update: {
+          org_id?: string
+          role_code?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'org_roles_org_id_fkey'
+            columns: ['org_id']
+            isOneToOne: false
+            referencedRelation: 'organizations'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'org_roles_role_code_fkey'
+            columns: ['role_code']
+            isOneToOne: false
+            referencedRelation: 'roles'
+            referencedColumns: ['code']
+          },
+        ]
+      }
       announcement_comments: {
         Row: {
           announcement_id: string
