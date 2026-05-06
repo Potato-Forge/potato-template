@@ -40,7 +40,7 @@ const [passwordField, passwordProps] = defineField('password')
 
 // Sync form field value to parent model
 watch(passwordField, (val) => {
-  passwordModel.value = val
+  passwordModel.value = val ?? ''
 })
 
 const onSubmit = handleSubmit(async (values) => {
@@ -54,6 +54,7 @@ const onSubmit = handleSubmit(async (values) => {
   } else {
     localStorage.removeItem('potato_remember_me')
   }
+  localStorage.setItem('potato_login_at', String(Date.now()))
 
   const { error } = await supabase.auth.signInWithPassword({
     email: values.username,

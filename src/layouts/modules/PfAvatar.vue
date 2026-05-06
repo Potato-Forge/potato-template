@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { supabase } from '@/api'
+import useNotificationStore from '@/store/notificationStore'
 import useUserStore from '@/store/userStore'
 import usePermissionStore from '@/store/permissionStore'
 import useGlobalLoadingStore from '@/store/globalLoadingStore'
@@ -8,9 +9,19 @@ const router = useRouter()
 const userStore = useUserStore()
 const permissionStore = usePermissionStore()
 const globalLoadingStore = useGlobalLoadingStore()
+const notificationStore = useNotificationStore()
 
 const avatarSrc = computed(() => userStore.avatarUrl)
 const avatarFallback = computed(() => userStore.displayName)
+const unreadCount = computed(() => notificationStore.unreadCount)
+const canOpenMessagePage = computed(() =>
+  permissionStore.hasPermission('manage:notification:message'),
+)
+
+const openMessageCenter = async () => {
+  if (!canOpenMessagePage.value) return
+  await router.push('/manage/notification/message')
+}
 
 const handleSignOut = async () => {
   // 1. 先移除动态路由（必须在 clearPermissions 之前，因为 clearPermissions 会清空 dynamicRoutes）
@@ -26,6 +37,7 @@ const handleSignOut = async () => {
   permissionStore.clearPermissions()
   userStore.clearUser()
   globalLoadingStore.reset()
+  notificationStore.reset()
 
   // 3. 清除记住我偏好
   localStorage.removeItem('potato_remember_me')
@@ -40,6 +52,10 @@ const handleSignOut = async () => {
   // 5. 导航到登录页
   router.push('/login')
 }
+
+onMounted(() => {
+  void notificationStore.ensureInitialized()
+})
 </script>
 
 <template>
@@ -56,7 +72,7 @@ const handleSignOut = async () => {
 
     <!-- menu content -->
     <DropdownMenuContent class="w-56" side="right">
-      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuLabel>我的账户</DropdownMenuLabel>
       <DropdownMenuGroup>
         <DropdownMenuItem>
           Profile
@@ -73,6 +89,10 @@ const handleSignOut = async () => {
         <DropdownMenuItem>
           Keyboard shortcuts
           <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem :disabled="!canOpenMessagePage" @select="openMessageCenter">
+          查看更多消息
+          <DropdownMenuShortcut>{{ unreadCount > 0 ? `${unreadCount}` : '' }}</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuGroup>
       <DropdownMenuSeparator />

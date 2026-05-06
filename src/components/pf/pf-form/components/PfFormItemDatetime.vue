@@ -4,11 +4,14 @@ import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { zhCN } from 'date-fns/locale'
 import { useDark } from '@vueuse/core'
-import { format as DateFormat } from 'date-fns'
+import { format as DateFormat, isValid as isValidDate, parse as DateParse } from 'date-fns'
+
+type PfFormDatePrimitive = string | number | Date | null
+type PfFormDateValue = PfFormDatePrimitive | PfFormDatePrimitive[]
 
 const props = withDefaults(
   defineProps<{
-    modelValue: string | string[] | null
+    modelValue: PfFormDateValue
     type?: 'date' | 'time' | 'datetime'
     format?: 'timestamp' | 'format' | 'iso' | string
     range?: boolean
@@ -20,7 +23,7 @@ const props = withDefaults(
 )
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: string | string[] | null): void
+  (e: 'update:modelValue', value: PfFormDateValue): void
 }>()
 
 const isDark = useDark()
@@ -59,6 +62,43 @@ const pickerFormats = computed(() => {
   }
 })
 
+const resolvedOutputFormat = computed(() => {
+  if (!props.format || props.format === 'format') {
+    return displayFormat.value
+  }
+
+  return props.format
+})
+
+const textInputConfig = computed(() => {
+  return {
+    format: displayFormat.value,
+    openMenu: 'open',
+    enterSubmit: true,
+    tabSubmit: true,
+    applyOnBlur: true,
+    selectOnFocus: true,
+  }
+})
+
+const timeConfig = computed(() => {
+  const now = new Date()
+  return {
+    timePickerInline: true,
+    hoursIncrement: 1,
+    minutesIncrement: 1,
+    secondsIncrement: 1,
+    hoursGridIncrement: 1,
+    minutesGridIncrement: 1,
+    secondsGridIncrement: 1,
+    startTime: {
+      hours: now.getHours(),
+      minutes: now.getMinutes(),
+      seconds: now.getSeconds(),
+    },
+  }
+})
+
 const pickerUi = computed(() => {
   return {
     input:
@@ -73,32 +113,104 @@ const pickerUi = computed(() => {
   }
 })
 
-const handleUpdateValue = (val: string[] | string | null) => {
+const toValidDate = (value: PfFormDatePrimitive): Date | null => {
+  if (value == null || value === '') return null
+
+  if (value instanceof Date) {
+    return isValidDate(value) ? value : null
+  }
+
+  if (typeof value === 'number') {
+    const parsed = new Date(value)
+    return isValidDate(parsed) ? parsed : null
+  }
+
+  const normalized = value.trim()
+  if (!normalized) return null
+
+  if (props.format === 'timestamp') {
+    const timestamp = Number(normalized)
+    if (!Number.isNaN(timestamp)) {
+      const parsed = new Date(timestamp)
+      if (isValidDate(parsed)) return parsed
+    }
+  }
+
+  if (props.format && props.format !== 'iso' && props.format !== 'format') {
+    const parsed = DateParse(normalized, props.format, new Date())
+    if (isValidDate(parsed)) return parsed
+  }
+
+  const parsedByDisplay = DateParse(normalized, displayFormat.value, new Date())
+  if (isValidDate(parsedByDisplay)) return parsedByDisplay
+
+  const parsedByNative = new Date(normalized)
+  return isValidDate(parsedByNative) ? parsedByNative : null
+}
+
+const serializeDate = (value: Date | null) => {
+  if (!value || !isValidDate(value)) return null
+
+  if (resolvedOutputFormat.value === 'timestamp') {
+    return value.getTime()
+  }
+
+  if (resolvedOutputFormat.value === 'iso') {
+    return value.toISOString()
+  }
+
+  return DateFormat(value, resolvedOutputFormat.value)
+}
+
+const pickerModelValue = computed<Date | Date[] | null>(() => {
+  if (Array.isArray(props.modelValue)) {
+    const parsedRange = props.modelValue.map((item) => toValidDate(item))
+    return parsedRange.every(Boolean) ? (parsedRange as Date[]) : null
+  }
+
+  return toValidDate(props.modelValue)
+})
+
+const handleUpdateValue = (val: Date | Date[] | null) => {
   if (!val) {
     emit('update:modelValue', null)
     return
   }
+
   if (Array.isArray(val)) {
     const [start, end] = val
-    emit('update:modelValue', start && end ? [start, end] : null)
-  } else {
-    emit('update:modelValue', val)
+    emit('update:modelValue', start && end ? [serializeDate(start), serializeDate(end)] : null)
+    return
   }
+
+  emit('update:modelValue', serializeDate(val))
+}
+
+const formatActionPreviewValue = (value: Date | Date[] | null | undefined) => {
+  if (!value) return ''
+
+  const formatSingle = (item: Date) => DateFormat(item, displayFormat.value)
+
+  if (Array.isArray(value)) {
+    return value.filter((item): item is Date => isValidDate(item)).map(formatSingle).join(' ~ ')
+  }
+
+  return isValidDate(value) ? formatSingle(value) : ''
 }
 </script>
 
 <template>
   <div class="pf-datepicker">
     <VueDatePicker
-      :model-value="props.modelValue"
+      :model-value="pickerModelValue"
       @update:model-value="handleUpdateValue"
       :locale="zhCN"
       :dark="isDark"
-      :model-type="props.format"
       :formats="pickerFormats"
       :ui="pickerUi"
       :range="props.range || false"
-      :time-config="{ timePickerInline: true }"
+      :text-input="textInputConfig"
+      :time-config="timeConfig"
       :action-row="pickerSlotUi.actionRowTranslate"
     >
       <template #input-icon>
@@ -152,7 +264,7 @@ const handleUpdateValue = (val: string[] | string | null) => {
       </template>
 
       <template #action-preview="{ value }">
-        <span class="text-primary">{{ DateFormat(value as Date, displayFormat) }}</span>
+        <span class="text-primary">{{ formatActionPreviewValue(value as Date | Date[] | null) }}</span>
       </template>
     </VueDatePicker>
   </div>

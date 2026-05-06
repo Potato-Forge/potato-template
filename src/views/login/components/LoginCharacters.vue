@@ -68,7 +68,9 @@ watch(
 // --- purple peeking when password visible & has content ---
 let peekTimeout: ReturnType<typeof setTimeout>
 watch([() => props.passwordLength, () => props.showPassword], ([len, show]) => {
-  if (len > 0 && show) {
+  const passwordLength = len ?? 0
+
+  if (passwordLength > 0 && show) {
     function schedulePeek() {
       peekTimeout = setTimeout(
         () => {

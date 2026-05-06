@@ -14,6 +14,7 @@ export type Permission = Database['public']['Functions']['get_user_permissions']
  * Used to resolve route component strings stored in the permissions table.
  */
 const pageModules = import.meta.glob('/src/views/**/*.vue')
+const fallbackNotFoundModule = pageModules['/src/views/404/index.vue']
 
 function resolveComponent(componentPath: string | null | undefined) {
   if (!componentPath) return undefined
@@ -29,17 +30,23 @@ function resolveComponent(componentPath: string | null | undefined) {
   ]
 
   for (const key of candidates) {
-    if (pageModules[key]) {
-      return markRaw(pageModules[key] as (() => Promise<unknown>) | undefined)
+    const moduleLoader = pageModules[key]
+    if (moduleLoader) {
+      return markRaw(moduleLoader)
     }
   }
 
   // Last fallback: tolerate accidental case mismatch in DB values.
   const lowerCandidates = new Set(candidates.map((item) => item.toLowerCase()))
   const matchedKey = Object.keys(pageModules).find((key) => lowerCandidates.has(key.toLowerCase()))
-  return matchedKey
-    ? markRaw(pageModules[matchedKey] as (() => Promise<unknown>) | undefined)
-    : undefined
+  if (matchedKey) {
+    const moduleLoader = pageModules[matchedKey]
+    if (moduleLoader) {
+      return markRaw(moduleLoader)
+    }
+  }
+
+  return undefined
 }
 
 /** Grab the last URL segment as a relative route path ('admin/dashboard' → 'dashboard'). */
@@ -64,6 +71,13 @@ function markRouteRecordRaw(route: RouteRecordRaw): RouteRecordRaw {
   }) as RouteRecordRaw
 }
 
+function resolveMenuComponent(componentPath: string | null | undefined) {
+  return (
+    resolveComponent(componentPath) ??
+    (fallbackNotFoundModule ? markRaw(fallbackNotFoundModule) : markRaw(AdminLayout))
+  )
+}
+
 /** Build a RouteRecordRaw tree from flat menu permissions. */
 export function buildRoutesFromPermissions(permissions: PermissionItem[]): RouteRecordRaw[] {
   const menus = permissions.filter((p) => p.p_type === 'menu')
@@ -85,15 +99,17 @@ export function buildRoutesFromPermissions(permissions: PermissionItem[]): Route
             layout: m.p_layout ?? 'admin',
           },
         }
-        return markRouteRecordRaw(
-          children.length
-            ? {
-                ...base,
-                redirect: String(children[0]?.path ?? ''),
-                children,
-              }
-            : { ...base, component: resolveComponent(m.p_component) },
-        )
+        const route: RouteRecordRaw = children.length
+          ? {
+              ...base,
+              redirect: String(children[0]?.path ?? ''),
+              children,
+            }
+          : {
+              ...base,
+              component: resolveMenuComponent(m.p_component),
+            }
+        return markRouteRecordRaw(route)
       })
   }
 
@@ -113,16 +129,18 @@ export function buildRoutesFromPermissions(permissions: PermissionItem[]): Route
           layout: m.p_layout ?? 'admin',
         },
       }
-      return markRouteRecordRaw(
-        children.length
-          ? {
-              ...base,
-              component: resolveLayoutComponent(m.p_layout),
-              redirect: String(children[0]?.path ?? ''),
-              children,
-            }
-          : { ...base, component: resolveComponent(m.p_component) },
-      )
+      const route: RouteRecordRaw = children.length
+        ? {
+            ...base,
+            component: resolveLayoutComponent(m.p_layout),
+            redirect: String(children[0]?.path ?? ''),
+            children,
+          }
+        : {
+            ...base,
+            component: resolveMenuComponent(m.p_component),
+          }
+      return markRouteRecordRaw(route)
     })
 }
 

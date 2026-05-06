@@ -214,6 +214,7 @@ export function usePermissionManager() {
       icon: null,
       is_external: null,
       is_hidden: null,
+      layout: null,
       parent_id: parentId,
       path: null,
       sort: maxSort + 1,

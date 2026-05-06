@@ -12,6 +12,7 @@ import {
 import { useSystemStore } from '@/store/systemStore'
 import SidebarHambergurButton from '@/layouts/global-layout/components/global-layout-header/components/SidebarHambergurButton.vue'
 import AdminLayoutSearch from './AdminLayoutSearch.vue'
+import AdminLayoutNotificationMenu from './AdminLayoutNotificationMenu.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -192,8 +193,9 @@ const routeTitle = computed(() => String(route.meta?.title ?? ''))
         </div>
       </div>
 
-      <div class="shrink-0">
+      <div class="shrink-0 flex items-center gap-3">
         <AdminLayoutSearch></AdminLayoutSearch>
+        <AdminLayoutNotificationMenu></AdminLayoutNotificationMenu>
       </div>
     </div>
   </header>

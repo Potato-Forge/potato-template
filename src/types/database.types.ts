@@ -8,6 +8,150 @@ export type Database = {
   }
   public: {
     Tables: {
+      announcement_comments: {
+        Row: {
+          announcement_id: string
+          content: string
+          created_at: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          content: string
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'announcement_comments_announcement_id_fkey'
+            columns: ['announcement_id']
+            isOneToOne: false
+            referencedRelation: 'announcements'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'announcement_comments_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      announcement_likes: {
+        Row: {
+          announcement_id: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'announcement_likes_announcement_id_fkey'
+            columns: ['announcement_id']
+            isOneToOne: false
+            referencedRelation: 'announcements'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'announcement_likes_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      announcements: {
+        Row: {
+          allow_comment: boolean
+          content: string
+          created_at: string
+          created_by: string | null
+          expire_at: string | null
+          id: string
+          pinned: boolean
+          priority: string
+          publish_at: string | null
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          allow_comment?: boolean
+          content: string
+          created_at?: string
+          created_by?: string | null
+          expire_at?: string | null
+          id?: string
+          pinned?: boolean
+          priority?: string
+          publish_at?: string | null
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          allow_comment?: boolean
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          expire_at?: string | null
+          id?: string
+          pinned?: boolean
+          priority?: string
+          publish_at?: string | null
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'announcements_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'announcements_updated_by_fkey'
+            columns: ['updated_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       permissions: {
         Row: {
           code: string | null
@@ -154,6 +298,177 @@ export type Database = {
         }
         Relationships: []
       }
+      system_message_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          created_at: string
+          detail: Json
+          id: string
+          message_id: string
+          recipient_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          message_id: string
+          recipient_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          created_at?: string
+          detail?: Json
+          id?: string
+          message_id?: string
+          recipient_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'system_message_logs_actor_user_id_fkey'
+            columns: ['actor_user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'system_message_logs_message_id_fkey'
+            columns: ['message_id']
+            isOneToOne: false
+            referencedRelation: 'system_messages'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'system_message_logs_recipient_id_fkey'
+            columns: ['recipient_id']
+            isOneToOne: false
+            referencedRelation: 'system_message_recipients'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      system_message_recipients: {
+        Row: {
+          created_at: string
+          delivered_at: string | null
+          delivery_status: string
+          dismissed_at: string | null
+          id: string
+          message_id: string
+          read_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delivered_at?: string | null
+          delivery_status?: string
+          dismissed_at?: string | null
+          id?: string
+          message_id: string
+          read_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delivered_at?: string | null
+          delivery_status?: string
+          dismissed_at?: string | null
+          id?: string
+          message_id?: string
+          read_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'system_message_recipients_message_id_fkey'
+            columns: ['message_id']
+            isOneToOne: false
+            referencedRelation: 'system_messages'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'system_message_recipients_user_id_fkey'
+            columns: ['user_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      system_messages: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          expire_at: string | null
+          id: string
+          message_type: string
+          payload: Json
+          send_at: string | null
+          send_status: string
+          source_event: string | null
+          source_module: string | null
+          summary: string | null
+          target_role_codes: string[]
+          target_type: string
+          target_user_ids: string[]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          expire_at?: string | null
+          id?: string
+          message_type?: string
+          payload?: Json
+          send_at?: string | null
+          send_status?: string
+          source_event?: string | null
+          source_module?: string | null
+          summary?: string | null
+          target_role_codes?: string[]
+          target_type?: string
+          target_user_ids?: string[]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          expire_at?: string | null
+          id?: string
+          message_type?: string
+          payload?: Json
+          send_at?: string | null
+          send_status?: string
+          source_event?: string | null
+          source_module?: string | null
+          summary?: string | null
+          target_role_codes?: string[]
+          target_type?: string
+          target_user_ids?: string[]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'system_messages_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       user_roles: {
         Row: {
           role_code: string
@@ -182,6 +497,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      dispatch_system_message: { Args: { p_message_id: string }; Returns: number }
       get_user_permissions: {
         Args: never
         Returns: {
@@ -199,6 +515,39 @@ export type Database = {
         }[]
       }
       has_roles: { Args: { role_codes: string[] }; Returns: boolean }
+      mark_system_message_read: {
+        Args: { p_recipient_id: string }
+        Returns: {
+          created_at: string
+          delivered_at: string | null
+          delivery_status: string
+          dismissed_at: string | null
+          id: string
+          message_id: string
+          read_at: string | null
+          updated_at: string
+          user_id: string
+        }
+      }
+      publish_announcement: {
+        Args: { p_announcement_id: string }
+        Returns: {
+          allow_comment: boolean
+          content: string
+          created_at: string
+          created_by: string | null
+          expire_at: string | null
+          id: string
+          pinned: boolean
+          priority: string
+          publish_at: string | null
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+      }
       reorder_permissions: { Args: { updates: Json }; Returns: undefined }
     }
     Enums: {
