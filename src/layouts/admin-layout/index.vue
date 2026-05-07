@@ -6,41 +6,51 @@ import { useSystemStore } from '@/store/systemStore'
 import AdminLayoutHeader from './components/AdminLayoutHeader.vue'
 
 const route = useRoute()
+const router = useRouter()
 const permissionStore = usePermissionStore()
 const systemStore = useSystemStore()
 const { isSidebarOpen } = storeToRefs(systemStore)
 
-const appRouteChildren = computed(() => permissionStore.dynamicRoutes)
-
-const activeAppPath = computed(() => {
-  const path = route.path
-  for (const item of appRouteChildren.value) {
-    const itemPath = item.path.startsWith('/') ? item.path : `/${item.path}`
-    if (path === itemPath || path.startsWith(`${itemPath}/`)) {
-      return itemPath
-    }
-  }
-  return ''
+const currentAppRecord = computed<RouteRecordRaw | undefined>(() => {
+  const currentPath = route.path
+  return permissionStore.appRoutes.find((record) => {
+    const appPath = record.path.startsWith('/') ? record.path : `/${record.path}`
+    return currentPath === appPath || currentPath.startsWith(`${appPath}/`)
+  })
 })
 
-const resolveRouteChildren = (currentPath: string): RouteRecordRaw[] => {
-  for (const parent of appRouteChildren.value) {
-    const parentPath = parent.path.startsWith('/') ? parent.path : `/${parent.path}`
-    if (currentPath === parentPath || currentPath.startsWith(`${parentPath}/`)) {
-      return parent.children || []
-    }
+const activeAppPath = computed(() => {
+  const path = currentAppRecord.value?.path || ''
+  return path.startsWith('/') ? path : `/${path}`
+})
+
+const resolveRouteChildren = (): RouteRecordRaw[] => {
+  return currentAppRecord.value?.children || []
+}
+
+const joinRoutePath = (basePath: string, nextPath: string) => {
+  if (!nextPath) return basePath
+  if (nextPath.startsWith('/')) return nextPath
+  const normalizedBase = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath
+  return `${normalizedBase}/${nextPath.replace(/^\//, '')}`
+}
+
+const resolveRoutePath = (target: RouteRecordRaw, basePath: string) => {
+  if (target.name) {
+    return router.resolve({ name: target.name as string }).path
   }
-  return []
+
+  return joinRoutePath(basePath, String(target.path || ''))
 }
 
 const sidebarItems = computed<SidebarItem[]>(() => {
   if (!activeAppPath.value) return []
 
-  const children = resolveRouteChildren(route.path)
+  const children = resolveRouteChildren()
   const currentPath = route.path
 
   return children.map((child: RouteRecordRaw) => {
-    const childPath = `${activeAppPath.value}/${child.path}`
+    const childPath = resolveRoutePath(child, activeAppPath.value)
     const grandChildren = child.children
     return {
       title: (child.meta?.title as string) || child.path,
@@ -49,7 +59,7 @@ const sidebarItems = computed<SidebarItem[]>(() => {
       isActive: currentPath === childPath || currentPath.startsWith(`${childPath}/`),
       items: grandChildren
         ? grandChildren.map((gc: RouteRecordRaw) => {
-            const gcPath = `${childPath}/${gc.path}`
+            const gcPath = resolveRoutePath(gc, childPath)
             return {
               title: (gc.meta?.title as string) || gc.path,
               url: gcPath,

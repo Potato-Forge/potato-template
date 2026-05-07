@@ -5,6 +5,7 @@ import GlobalLayout from '@/layouts/global-layout/GlobalLayout.vue'
 
 // routes
 import commonRoutes from './routes/commonRoutes'
+import { staticAppRoutes } from './routes/appRoutes'
 
 // guards
 import routeGuard from './guard'
@@ -15,9 +16,7 @@ export const routes: RouteRecordRaw[] = [
     name: 'root',
     component: GlobalLayout,
     redirect: '/admin/dashboard',
-    // Dynamic app routes are registered via router.addRoute() in permissionGuard
-    // after the user's permissions are loaded.
-    children: [],
+    children: staticAppRoutes,
   },
   ...commonRoutes,
 ]

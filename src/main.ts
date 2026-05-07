@@ -9,6 +9,7 @@ import router from '@/route'
 import VueViewer from 'v-viewer'
 
 import { createPinia } from 'pinia'
+import { useSystemStore } from '@/store/systemStore'
 
 // pf components
 import { pfTooltipPlugin } from '@/components/pf/pf-tooltip'
@@ -46,13 +47,16 @@ const queryClient = new QueryClient({
 })
 
 const app = createApp(App)
+const pinia = createPinia()
 
-app.use(createPinia())
+app.use(pinia)
 app.use(router)
 app.use(VueViewer)
 app.use(VueQueryPlugin, {
   queryClient,
 })
+
+useSystemStore(pinia).initializeTheme()
 
 pfTooltipPlugin(app)
 pfModalPlugin(app)

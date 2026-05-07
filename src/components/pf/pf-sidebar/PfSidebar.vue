@@ -22,6 +22,8 @@ const props = withDefaults(
   },
 )
 
+const router = useRouter()
+
 const normalizeIconifyName = (icon?: string) => {
   if (!icon) return ''
   if (icon.includes(':')) return icon
@@ -37,6 +39,12 @@ const isHightlight = (item: SidebarItem) => {
     return isEndLeaf ? endLeafActiveClass : defaultActiveClass
   }
   return ''
+}
+
+const navigateTo = async (url?: string) => {
+  if (!url) return
+  if (router.currentRoute.value.path === url) return
+  await router.push(url)
 }
 </script>
 
@@ -103,20 +111,21 @@ const isHightlight = (item: SidebarItem) => {
                             v-for="thirdItem in subItem.items"
                             :key="thirdItem.title"
                           >
-                            <SidebarMenuSubButton :class="isHightlight(thirdItem)" as-child>
-                              <router-link :to="thirdItem.url || '/'">
-                                <Icon
-                                  v-if="normalizeIconifyName(thirdItem.icon)"
-                                  :icon="normalizeIconifyName(thirdItem.icon)"
-                                  class="text-base shrink-0"
-                                />
-                                <span
-                                  v-else-if="thirdItem.icon"
-                                  :class="thirdItem.icon"
-                                  class="shrink-0"
-                                />
-                                <span>{{ thirdItem.title }}</span>
-                              </router-link>
+                            <SidebarMenuSubButton
+                              :class="isHightlight(thirdItem)"
+                              @click="navigateTo(thirdItem.url)"
+                            >
+                              <Icon
+                                v-if="normalizeIconifyName(thirdItem.icon)"
+                                :icon="normalizeIconifyName(thirdItem.icon)"
+                                class="text-base shrink-0"
+                              />
+                              <span
+                                v-else-if="thirdItem.icon"
+                                :class="thirdItem.icon"
+                                class="shrink-0"
+                              />
+                              <span>{{ thirdItem.title }}</span>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         </SidebarMenuSub>
@@ -127,18 +136,16 @@ const isHightlight = (item: SidebarItem) => {
                   <SidebarMenuItem v-else>
                     <SidebarMenuButton
                       :class="isHightlight(subItem)"
-                      as-child
                       :tooltip="subItem.title"
+                      @click="navigateTo(subItem.url)"
                     >
-                      <router-link :to="subItem.url || '/'">
-                        <Icon
-                          v-if="normalizeIconifyName(subItem.icon)"
-                          :icon="normalizeIconifyName(subItem.icon)"
-                          class="text-base shrink-0"
-                        />
-                        <div v-else-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
-                        <span>{{ subItem.title }}</span>
-                      </router-link>
+                      <Icon
+                        v-if="normalizeIconifyName(subItem.icon)"
+                        :icon="normalizeIconifyName(subItem.icon)"
+                        class="text-base shrink-0"
+                      />
+                      <div v-else-if="subItem.icon" :class="subItem.icon" class="shrink-0" />
+                      <span>{{ subItem.title }}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 </SidebarMenuSubItem>
@@ -148,16 +155,18 @@ const isHightlight = (item: SidebarItem) => {
         </Collapsible>
 
         <SidebarMenuItem v-else>
-          <SidebarMenuButton :class="isHightlight(item)" as-child :tooltip="item.title">
-            <router-link :to="item.url || '/'">
-              <Icon
-                v-if="normalizeIconifyName(item.icon)"
-                :icon="normalizeIconifyName(item.icon)"
-                class="text-base shrink-0"
-              />
-              <div v-else-if="item.icon" :class="item.icon" class="shrink-0" />
-              <span>{{ item.title }}</span>
-            </router-link>
+          <SidebarMenuButton
+            :class="isHightlight(item)"
+            :tooltip="item.title"
+            @click="navigateTo(item.url)"
+          >
+            <Icon
+              v-if="normalizeIconifyName(item.icon)"
+              :icon="normalizeIconifyName(item.icon)"
+              class="text-base shrink-0"
+            />
+            <div v-else-if="item.icon" :class="item.icon" class="shrink-0" />
+            <span>{{ item.title }}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </template>

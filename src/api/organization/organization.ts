@@ -38,11 +38,7 @@ export const getOrganizations = async (query?: { name?: string; status?: boolean
 }
 
 export const getOrgDetail = async (id: string) => {
-  const { data, error } = await supabase
-    .from('organizations')
-    .select('*')
-    .eq('id', id)
-    .single()
+  const { data, error } = await supabase.from('organizations').select('*').eq('id', id).single()
   if (error) {
     throw new Error(error.message)
   }
@@ -50,11 +46,7 @@ export const getOrgDetail = async (id: string) => {
 }
 
 export const createOrg = async (payload: OrgInsert) => {
-  const { data, error } = await supabase
-    .from('organizations')
-    .insert(payload)
-    .select('*')
-    .single()
+  const { data, error } = await supabase.from('organizations').insert(payload).select('*').single()
   if (error) {
     throw new Error(error.message)
   }
@@ -86,10 +78,7 @@ export const deleteOrg = async (id: string) => {
 // ─────────────────────────────────────────────────────────
 
 export const getOrgMemberIds = async (orgId: string): Promise<string[]> => {
-  const { data, error } = await supabase
-    .from('org_members')
-    .select('user_id')
-    .eq('org_id', orgId)
+  const { data, error } = await supabase.from('org_members').select('user_id').eq('org_id', orgId)
   if (error) {
     throw new Error(error.message)
   }
@@ -98,10 +87,7 @@ export const getOrgMemberIds = async (orgId: string): Promise<string[]> => {
 
 /** Replaces all members for an organization (delete + insert). */
 export const setOrgMembers = async (orgId: string, userIds: string[]): Promise<void> => {
-  const { error: deleteError } = await supabase
-    .from('org_members')
-    .delete()
-    .eq('org_id', orgId)
+  const { error: deleteError } = await supabase.from('org_members').delete().eq('org_id', orgId)
   if (deleteError) {
     throw new Error(deleteError.message)
   }
@@ -122,10 +108,7 @@ export const setOrgMembers = async (orgId: string, userIds: string[]): Promise<v
 // ─────────────────────────────────────────────────────────
 
 export const getOrgRoleCodes = async (orgId: string): Promise<string[]> => {
-  const { data, error } = await supabase
-    .from('org_roles')
-    .select('role_code')
-    .eq('org_id', orgId)
+  const { data, error } = await supabase.from('org_roles').select('role_code').eq('org_id', orgId)
   if (error) {
     throw new Error(error.message)
   }
@@ -134,10 +117,7 @@ export const getOrgRoleCodes = async (orgId: string): Promise<string[]> => {
 
 /** Replaces all default roles for an organization (delete + insert). */
 export const setOrgRoles = async (orgId: string, roleCodes: string[]): Promise<void> => {
-  const { error: deleteError } = await supabase
-    .from('org_roles')
-    .delete()
-    .eq('org_id', orgId)
+  const { error: deleteError } = await supabase.from('org_roles').delete().eq('org_id', orgId)
   if (deleteError) {
     throw new Error(deleteError.message)
   }

@@ -87,6 +87,7 @@ declare module 'vue' {
     PfButton: typeof import('./../components/pf/pf-button/PfButton.vue')['default']
     PfCard: typeof import('./../components/pf/pf-card/PfCard.vue')['default']
     PfCheckbox: typeof import('./../components/pf/pf-checkbox/PfCheckbox.vue')['default']
+    PfColorPicker: typeof import('./../components/pf/pf-color-picker/PfColorPicker.vue')['default']
     PfConfigProvider: typeof import('./../components/pf/pf-config-provider/PfConfigProvider.vue')['default']
     PfDataTable: typeof import('./../components/pf/pf-data-table/PfDataTable.vue')['default']
     PfDataTableDetail: typeof import('./../components/pf/pf-data-table/PfDataTableDetail.vue')['default']

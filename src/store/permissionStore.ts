@@ -1,4 +1,5 @@
 import { supabase } from '@/api'
+import { staticAppRoutes } from '@/route/routes/appRoutes'
 import AdminLayout from '@/layouts/admin-layout/index.vue'
 import type { Database } from '@/types/database.types'
 import { defineStore } from 'pinia'
@@ -71,6 +72,17 @@ function markRouteRecordRaw(route: RouteRecordRaw): RouteRecordRaw {
   }) as RouteRecordRaw
 }
 
+function resolveRedirectTarget(route: RouteRecordRaw | undefined): RouteRecordRaw['redirect'] {
+  if (!route) return undefined
+  if (route.name) {
+    return { name: route.name as string }
+  }
+  if (typeof route.path === 'string' && route.path) {
+    return route.path.startsWith('/') ? route.path : `/${route.path.replace(/^\//, '')}`
+  }
+  return undefined
+}
+
 function resolveMenuComponent(componentPath: string | null | undefined) {
   return (
     resolveComponent(componentPath) ??
@@ -102,7 +114,7 @@ export function buildRoutesFromPermissions(permissions: PermissionItem[]): Route
         const route: RouteRecordRaw = children.length
           ? {
               ...base,
-              redirect: String(children[0]?.path ?? ''),
+              redirect: resolveRedirectTarget(children[0]),
               children,
             }
           : {
@@ -133,7 +145,7 @@ export function buildRoutesFromPermissions(permissions: PermissionItem[]): Route
         ? {
             ...base,
             component: resolveLayoutComponent(m.p_layout),
-            redirect: String(children[0]?.path ?? ''),
+            redirect: resolveRedirectTarget(children[0]),
             children,
           }
         : {
@@ -159,6 +171,8 @@ const usePermissionStore = defineStore('permission', {
   }),
 
   getters: {
+    appRoutes: (state): RouteRecordRaw[] => [...state.dynamicRoutes, ...staticAppRoutes],
+
     /** 所有菜单类权限 */
     menuPermissions: (state): Permission => state.permissions.filter((p) => p.p_type === 'menu'),
 

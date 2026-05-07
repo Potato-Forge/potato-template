@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import PfAvatar from '@/layouts/modules/PfAvatar.vue'
+import { useSystemStore } from '@/store/systemStore'
 import { useRouter } from 'vue-router'
 
-const isDark = useDark()
 const router = useRouter()
+const systemStore = useSystemStore()
+
+const isDark = computed({
+  get: () => systemStore.isDarkMode,
+  set: (value: boolean) => {
+    systemStore.setThemeMode(value ? 'dark' : 'light')
+  },
+})
 </script>
 
 <template>
@@ -19,7 +27,12 @@ const router = useRouter()
     </PfButton>
 
     <!-- settings btn -->
-    <PfButton size="icon" class="rounded-full text-foreground/50" variant="ghost">
+    <PfButton
+      size="icon"
+      class="rounded-full text-foreground/50"
+      variant="ghost"
+      @click="router.push('/system/theme-settings')"
+    >
       <div class="i-tabler-settings"></div>
     </PfButton>
 

@@ -169,17 +169,9 @@ const openRoleBinding = (row: Record<string, any>) => {
     </pf-data-table>
   </PageLayout>
 
-  <OrgMemberBinding
-    v-model:open="memberOpen"
-    :org-id="activeOrgId"
-    :org-name="activeOrgName"
-  />
+  <OrgMemberBinding v-model:open="memberOpen" :org-id="activeOrgId" :org-name="activeOrgName" />
 
-  <OrgRoleBinding
-    v-model:open="roleOpen"
-    :org-id="activeOrgId"
-    :org-name="activeOrgName"
-  />
+  <OrgRoleBinding v-model:open="roleOpen" :org-id="activeOrgId" :org-name="activeOrgName" />
 </template>
 
 <style scoped></style>

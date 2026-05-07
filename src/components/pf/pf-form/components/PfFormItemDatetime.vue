@@ -3,8 +3,8 @@ import { computed } from 'vue'
 import { VueDatePicker } from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
 import { zhCN } from 'date-fns/locale'
-import { useDark } from '@vueuse/core'
 import { format as DateFormat, isValid as isValidDate, parse as DateParse } from 'date-fns'
+import { useSystemStore } from '@/store/systemStore'
 
 type PfFormDatePrimitive = string | number | Date | null
 type PfFormDateValue = PfFormDatePrimitive | PfFormDatePrimitive[]
@@ -26,7 +26,8 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: PfFormDateValue): void
 }>()
 
-const isDark = useDark()
+const systemStore = useSystemStore()
+const { isDarkMode: isDark } = storeToRefs(systemStore)
 
 // custom picker ui
 const pickerSlotUi = computed(() => {
@@ -192,7 +193,10 @@ const formatActionPreviewValue = (value: Date | Date[] | null | undefined) => {
   const formatSingle = (item: Date) => DateFormat(item, displayFormat.value)
 
   if (Array.isArray(value)) {
-    return value.filter((item): item is Date => isValidDate(item)).map(formatSingle).join(' ~ ')
+    return value
+      .filter((item): item is Date => isValidDate(item))
+      .map(formatSingle)
+      .join(' ~ ')
   }
 
   return isValidDate(value) ? formatSingle(value) : ''
@@ -264,7 +268,9 @@ const formatActionPreviewValue = (value: Date | Date[] | null | undefined) => {
       </template>
 
       <template #action-preview="{ value }">
-        <span class="text-primary">{{ formatActionPreviewValue(value as Date | Date[] | null) }}</span>
+        <span class="text-primary">{{
+          formatActionPreviewValue(value as Date | Date[] | null)
+        }}</span>
       </template>
     </VueDatePicker>
   </div>

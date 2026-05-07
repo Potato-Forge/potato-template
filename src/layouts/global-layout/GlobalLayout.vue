@@ -6,6 +6,7 @@ import usePermissionStore from '@/store/permissionStore'
 const permissionStore = usePermissionStore()
 
 const route = useRoute()
+const router = useRouter()
 
 interface AppMenuItem {
   path: string
@@ -14,17 +15,60 @@ interface AppMenuItem {
   firstChildPath: string
 }
 
+const joinRoutePath = (basePath: string, nextPath: string) => {
+  if (!nextPath) return basePath
+  if (nextPath.startsWith('/')) return nextPath
+  const normalizedBase = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath
+  return `${normalizedBase}/${nextPath.replace(/^\//, '')}`
+}
+
+const resolveFirstReachablePath = (
+  record: RouteRecordRaw | undefined,
+  fallbackPath: string,
+): string => {
+  if (!record) return fallbackPath
+
+  if (record.redirect) {
+    if (typeof record.redirect === 'string') {
+      return record.redirect.startsWith('/')
+        ? record.redirect
+        : joinRoutePath(fallbackPath, record.redirect)
+    }
+
+    if (typeof record.redirect === 'object') {
+      return router.resolve(record.redirect).path
+    }
+  }
+
+  if (record.name) {
+    return router.resolve({ name: record.name as string }).path
+  }
+
+  if (record.children?.length) {
+    const firstChild = record.children[0]
+    return resolveFirstReachablePath(
+      firstChild,
+      joinRoutePath(fallbackPath, String(firstChild.path || '')),
+    )
+  }
+
+  return fallbackPath
+}
+
 /**
  * 动态路由树来自 permissionStore，已按权限过滤（超级管理员直接获得全量路由）。
  * 无需在此层再次 filterByPermission。
  */
-const appRouteChildren = computed(() => permissionStore.dynamicRoutes)
+const allAppRoutes = computed(() => permissionStore.appRoutes)
+
+const appRouteChildren = computed(() =>
+  allAppRoutes.value.filter((child: RouteRecordRaw) => !child.meta?.is_hidden),
+)
 
 const appMenuItems = computed<AppMenuItem[]>(() => {
   return appRouteChildren.value.map((child: RouteRecordRaw) => {
     const parentPath = child.path.startsWith('/') ? child.path : `/${child.path}`
-    const firstChild = child.children?.[0]
-    const firstChildPath = firstChild ? `${parentPath}/${firstChild.path}` : parentPath
+    const firstChildPath = resolveFirstReachablePath(child, parentPath)
     return {
       path: parentPath,
       title: (child.meta?.title as string) || child.path,
@@ -36,9 +80,10 @@ const appMenuItems = computed<AppMenuItem[]>(() => {
 
 const activeAppPath = computed(() => {
   const path = route.path
-  for (const item of appMenuItems.value) {
-    if (path === item.path || path.startsWith(`${item.path}/`)) {
-      return item.path
+  for (const item of allAppRoutes.value) {
+    const itemPath = item.path.startsWith('/') ? item.path : `/${item.path}`
+    if (path === itemPath || path.startsWith(`${itemPath}/`)) {
+      return itemPath
     }
   }
   return ''

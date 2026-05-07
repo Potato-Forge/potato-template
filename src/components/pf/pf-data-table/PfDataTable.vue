@@ -493,8 +493,11 @@ const actionButtonsClass = computed(() => {
   return ['flex items-center gap-2', justifyClass, wrapClass]
 })
 
+import { useSystemStore } from '@/store/systemStore'
+
 // light/dark switch
-const isDark = useDark()
+const systemStore = useSystemStore()
+const { isDarkMode: isDark } = storeToRefs(systemStore)
 watch(
   isDark,
   (val) => {
