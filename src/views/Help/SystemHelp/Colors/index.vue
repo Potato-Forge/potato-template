@@ -17,7 +17,8 @@ import {
         <div class="space-y-3">
           <pf-text as="h1" class="text-3xl">色彩规范</pf-text>
           <pf-text as="p" class="max-w-3xl text-muted-foreground mb-0">
-            色彩页只说明默认主色、可选预设、语义 token 和状态色的使用边界。做页面时先选语义 token，再决定具体组件样式。
+            色彩页只说明默认主色、可选预设、语义 token 和状态色的使用边界。做页面时先选语义
+            token，再决定具体组件样式。
           </pf-text>
         </div>
 
@@ -35,7 +36,8 @@ import {
         <div>
           <pf-text as="h3" class="mb-1">主题主色</pf-text>
           <pf-text as="p" class="mb-0 text-muted-foreground">
-            默认 primary 恢复为原有青绿色 #58B19F，对应的 light / dark primary、selected 和 ring 已同步。其余预设只作为替换方案，不改变 token 语义。
+            默认 primary 恢复为原有青绿色 #58B19F，对应的 light / dark primary、selected 和 ring
+            已同步。其余预设只作为替换方案，不改变 token 语义。
           </pf-text>
         </div>
 
@@ -47,11 +49,16 @@ import {
           >
             <div class="mb-3 flex items-center justify-between gap-3">
               <pf-text as="h4" class="mb-0">{{ preset.label }}</pf-text>
-              <span class="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
+              <span
+                class="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground"
+              >
                 {{ preset.key }}
               </span>
             </div>
-            <div class="mb-3 h-12 rounded-xl border border-border" :style="{ backgroundColor: preset.hex }"></div>
+            <div
+              class="mb-3 h-12 rounded-xl border border-border"
+              :style="{ backgroundColor: preset.hex }"
+            ></div>
             <pf-text as="p" class="mb-1 text-sm text-primary">{{ preset.role }}</pf-text>
             <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ preset.note }}</pf-text>
           </div>

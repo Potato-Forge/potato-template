@@ -26,7 +26,8 @@ const spacingPreviewBlocks = ['3.5rem', '2.5rem', '4.5rem']
         <div class="space-y-3">
           <pf-text as="h1" class="text-3xl">排版与空间</pf-text>
           <pf-text as="p" class="max-w-3xl text-muted-foreground mb-0">
-            这一页只约束与实现直接相关的基础样式：字阶、间距、圆角和阴影。页面里的 subtitle、description 和 help 文案都应提供实际提示，而不是重复标题。
+            这一页只约束与实现直接相关的基础样式：字阶、间距、圆角和阴影。页面里的
+            subtitle、description 和 help 文案都应提供实际提示，而不是重复标题。
           </pf-text>
         </div>
 
@@ -49,7 +50,9 @@ const spacingPreviewBlocks = ['3.5rem', '2.5rem', '4.5rem']
             class="rounded-2xl border border-border bg-background px-4 py-4"
           >
             <div class="mb-2 flex items-center justify-between gap-3">
-              <span class="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground">
+              <span
+                class="rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground"
+              >
                 {{ item.token }}
               </span>
               <span class="text-xs text-muted-foreground">{{ item.className }}</span>
@@ -66,8 +69,12 @@ const spacingPreviewBlocks = ['3.5rem', '2.5rem', '4.5rem']
         <pf-text as="h3" class="mb-0">文本约束</pf-text>
         <div class="space-y-3 text-sm text-muted-foreground">
           <p class="mb-0">标题使用 font-headline，正文使用 font-body，代码与快捷键使用 mono。</p>
-          <p class="mb-0">正文默认使用 foreground，说明类文本使用 muted-foreground，不继续增加私有灰色文字类。</p>
-          <p class="mb-0">帮助页、设置页和大块容器中的标题层级按 h1 → h2 → h3 递进，同层标题不混用尺寸。</p>
+          <p class="mb-0">
+            正文默认使用 foreground，说明类文本使用 muted-foreground，不继续增加私有灰色文字类。
+          </p>
+          <p class="mb-0">
+            帮助页、设置页和大块容器中的标题层级按 h1 → h2 → h3 递进，同层标题不混用尺寸。
+          </p>
         </div>
       </PfCard>
     </section>
@@ -112,7 +119,9 @@ const spacingPreviewBlocks = ['3.5rem', '2.5rem', '4.5rem']
               <pf-text as="h4" class="mb-0">{{ item.token }}</pf-text>
               <span class="text-xs text-primary">{{ item.value }}</span>
             </div>
-            <div class="mb-3 flex items-center gap-3 rounded-xl border border-dashed border-border/70 bg-card px-4 py-3">
+            <div
+              class="mb-3 flex items-center gap-3 rounded-xl border border-dashed border-border/70 bg-card px-4 py-3"
+            >
               <div
                 class="h-12 flex-1 border border-border bg-content-surface"
                 :style="{ borderRadius: radiusPreviewMap[item.token] }"

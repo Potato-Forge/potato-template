@@ -14,7 +14,7 @@ const buttonPreviewMap = {
   secondary: { variant: 'secondary', type: 'primary', label: '批量导出' },
   ghost: { variant: 'ghost', type: 'primary', label: '更多操作' },
   link: { variant: 'link', type: 'primary', label: '查看详情' },
-} satisfies Record<string, { variant: string, type: string, label: string }>
+} satisfies Record<string, { variant: string; type: string; label: string }>
 
 const toastPreviewMap = {
   success: 'border-success/30 bg-success/12 text-success',
@@ -33,7 +33,8 @@ const toastPreviewMap = {
         <div class="space-y-3">
           <pf-text as="h1" class="text-3xl">组件规范</pf-text>
           <pf-text as="p" class="max-w-3xl text-muted-foreground mb-0">
-            这一页只说明现有组件的推荐用法和禁用场景。规则直接对应 Button 变体、Toast 状态色、卡片层级和图标颜色 token。
+            这一页只说明现有组件的推荐用法和禁用场景。规则直接对应 Button 变体、Toast
+            状态色、卡片层级和图标颜色 token。
           </pf-text>
         </div>
 
@@ -69,8 +70,12 @@ const toastPreviewMap = {
                 {{ buttonPreviewMap[item.variant].label }}
               </PfButton>
             </div>
-            <pf-text as="p" class="mb-1 text-sm text-muted-foreground">推荐：{{ item.scenarios }}</pf-text>
-            <pf-text as="p" class="mb-0 text-sm text-muted-foreground">避免：{{ item.avoid }}</pf-text>
+            <pf-text as="p" class="mb-1 text-sm text-muted-foreground"
+              >推荐：{{ item.scenarios }}</pf-text
+            >
+            <pf-text as="p" class="mb-0 text-sm text-muted-foreground"
+              >避免：{{ item.avoid }}</pf-text
+            >
           </div>
         </div>
       </PfCard>
@@ -78,9 +83,15 @@ const toastPreviewMap = {
       <PfCard class="p-5 gap-4">
         <pf-text as="h3" class="mb-0">操作层级建议</pf-text>
         <div class="space-y-3 text-sm text-muted-foreground">
-          <p class="mb-0">同一操作区域只保留一个 default 主按钮，取消、关闭等退路操作优先使用 outline 或 ghost。</p>
-          <p class="mb-0">warning、risk、destructive 颜色只用于风险语义，不用于“只是想更显眼”的普通动作。</p>
-          <p class="mb-0">图标按钮默认使用 ghost，只有在工具栏或浮层中需要聚焦时才加 secondary 或 outline 背景。</p>
+          <p class="mb-0">
+            同一操作区域只保留一个 default 主按钮，取消、关闭等退路操作优先使用 outline 或 ghost。
+          </p>
+          <p class="mb-0">
+            warning、risk、destructive 颜色只用于风险语义，不用于“只是想更显眼”的普通动作。
+          </p>
+          <p class="mb-0">
+            图标按钮默认使用 ghost，只有在工具栏或浮层中需要聚焦时才加 secondary 或 outline 背景。
+          </p>
         </div>
       </PfCard>
     </section>
@@ -95,7 +106,9 @@ const toastPreviewMap = {
             class="rounded-2xl border border-border bg-background px-4 py-4"
           >
             <pf-text as="h4" class="mb-1">{{ item.title }}</pf-text>
-            <div class="mb-2 rounded-md border border-border px-2 py-1 font-mono text-xs text-foreground">
+            <div
+              class="mb-2 rounded-md border border-border px-2 py-1 font-mono text-xs text-foreground"
+            >
               {{ item.combo }}
             </div>
             <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ item.note }}</pf-text>
@@ -127,7 +140,9 @@ const toastPreviewMap = {
                 <div class="text-xs opacity-70">关闭</div>
               </div>
             </div>
-            <div class="mb-2 rounded-md border border-border px-2 py-1 font-mono text-xs text-foreground">
+            <div
+              class="mb-2 rounded-md border border-border px-2 py-1 font-mono text-xs text-foreground"
+            >
               {{ item.combo }}
             </div>
             <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ item.usage }}</pf-text>

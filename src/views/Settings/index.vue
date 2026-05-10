@@ -77,7 +77,8 @@ const isCustomColorActive = computed(() => themeSettings.value.colorSource === '
         <div class="space-y-3">
           <pf-text as="h1" class="text-3xl">主题设置</pf-text>
           <pf-text as="p" class="max-w-3xl text-muted-foreground mb-0">
-            管理当前设备的界面模式和主题主色。默认主色已恢复为原有青绿色 #58B19F，另提供蓝、金、玫瑰、狂歌紫与雾苔绿等可选预设，切换后会立即应用到主按钮、焦点轮廓和选中态。
+            管理当前设备的界面模式和主题主色。默认主色已恢复为原有青绿色
+            #58B19F，另提供蓝、金、玫瑰、狂歌紫与雾苔绿等可选预设，切换后会立即应用到主按钮、焦点轮廓和选中态。
           </pf-text>
         </div>
 
@@ -143,7 +144,8 @@ const isCustomColorActive = computed(() => themeSettings.value.colorSource === '
         <div class="mb-4 space-y-1">
           <pf-text as="h2" class="text-xl">主题主色</pf-text>
           <pf-text as="p" class="text-muted-foreground mb-0">
-            可以使用 6 组预设主题色，也可以通过自定义颜色生成一套自己的主色系统。预设优先用于常规场景，自定义颜色只建议用于品牌扩展。
+            可以使用 6
+            组预设主题色，也可以通过自定义颜色生成一套自己的主色系统。预设优先用于常规场景，自定义颜色只建议用于品牌扩展。
           </pf-text>
         </div>
 
@@ -291,12 +293,16 @@ const isCustomColorActive = computed(() => themeSettings.value.colorSource === '
             @click="router.push(item.path)"
           >
             <div class="mb-3 flex items-center gap-3">
-              <div class="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <div
+                class="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary"
+              >
                 <div :class="item.icon" class="text-lg"></div>
               </div>
               <pf-text as="h4" class="mb-0">{{ item.title }}</pf-text>
             </div>
-            <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ item.description }}</pf-text>
+            <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{
+              item.description
+            }}</pf-text>
           </button>
         </div>
       </section>

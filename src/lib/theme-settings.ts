@@ -214,17 +214,19 @@ export const getCustomThemeTokens = (hex: string): ThemePresetTokens => {
   }
 }
 
-export const THEME_PRESETS: Record<ThemePresetKey, { label: string; color: string; tokens: ThemePresetTokens }> =
-  Object.fromEntries(
-    Object.entries(THEME_PRESET_DEFINITIONS).map(([key, preset]) => [
-      key,
-      {
-        label: preset.label,
-        color: preset.color,
-        tokens: preset.tokens ?? getCustomThemeTokens(preset.color),
-      },
-    ]),
-  ) as Record<ThemePresetKey, { label: string; color: string; tokens: ThemePresetTokens }>
+export const THEME_PRESETS: Record<
+  ThemePresetKey,
+  { label: string; color: string; tokens: ThemePresetTokens }
+> = Object.fromEntries(
+  Object.entries(THEME_PRESET_DEFINITIONS).map(([key, preset]) => [
+    key,
+    {
+      label: preset.label,
+      color: preset.color,
+      tokens: preset.tokens ?? getCustomThemeTokens(preset.color),
+    },
+  ]),
+) as Record<ThemePresetKey, { label: string; color: string; tokens: ThemePresetTokens }>
 
 export const resolveThemePresetTokens = (settings: ThemeSettings) => {
   return settings.colorSource === 'custom'

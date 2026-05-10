@@ -96,7 +96,9 @@ const router = useRouter()
               </div>
               <pf-text as="h4" class="mb-0">{{ item.title }}</pf-text>
             </div>
-            <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ item.description }}</pf-text>
+            <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{
+              item.description
+            }}</pf-text>
           </button>
         </div>
       </PfCard>
