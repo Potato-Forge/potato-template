@@ -1,6 +1,53 @@
 export type ThemeMode = 'light' | 'dark' | 'system'
 
-export type ThemePresetKey = 'default' | 'ocean' | 'amber' | 'rose'
+type ThemePresetDefinition = {
+  label: string
+  color: string
+  tokens?: ThemePresetTokens
+}
+
+const THEME_PRESET_DEFINITIONS = {
+  default: {
+    label: '湖芯青',
+    color: '#58B19F',
+    tokens: {
+      light: {
+        primary: '169 50% 32%',
+        primaryForeground: '220 22% 92%',
+        selected: '169 34% 85%',
+        selectedForeground: '234 16% 35%',
+      },
+      dark: {
+        primary: '169 50% 55%',
+        primaryForeground: '231 23% 13%',
+        selected: '169 24% 24%',
+        selectedForeground: '227 70% 87%',
+      },
+    },
+  },
+  ocean: {
+    label: '海岸蓝',
+    color: '#1D78C1',
+  },
+  amber: {
+    label: '琥珀金',
+    color: '#D99314',
+  },
+  rose: {
+    label: '暮光玫瑰',
+    color: '#C43A74',
+  },
+  violet: {
+    label: '狂歌紫',
+    color: '#6E56CF',
+  },
+  sage: {
+    label: '雾苔绿',
+    color: '#5F8F6F',
+  },
+} satisfies Record<string, ThemePresetDefinition>
+
+export type ThemePresetKey = keyof typeof THEME_PRESET_DEFINITIONS
 
 export type ThemeColorSource = 'preset' | 'custom'
 
@@ -35,82 +82,11 @@ export const DEFAULT_THEME_SETTINGS: ThemeSettings = {
   customColor: '#58B19F',
 }
 
-export const THEME_PRESETS: Record<ThemePresetKey, { label: string; tokens: ThemePresetTokens }> = {
-  default: {
-    label: '默认青绿',
-    tokens: {
-      light: {
-        primary: '169 50% 32%',
-        primaryForeground: '220 22% 92%',
-        selected: '169 34% 85%',
-        selectedForeground: '234 16% 35%',
-      },
-      dark: {
-        primary: '169 50% 55%',
-        primaryForeground: '231 23% 13%',
-        selected: '169 24% 24%',
-        selectedForeground: '227 70% 87%',
-      },
-    },
-  },
-  ocean: {
-    label: '海岸蓝',
-    tokens: {
-      light: {
-        primary: '203 82% 42%',
-        primaryForeground: '210 40% 98%',
-        selected: '203 81% 90%',
-        selectedForeground: '215 52% 24%',
-      },
-      dark: {
-        primary: '201 90% 68%',
-        primaryForeground: '222 47% 11%',
-        selected: '206 45% 24%',
-        selectedForeground: '210 40% 96%',
-      },
-    },
-  },
-  amber: {
-    label: '琥珀金',
-    tokens: {
-      light: {
-        primary: '35 92% 45%',
-        primaryForeground: '36 100% 97%',
-        selected: '42 100% 88%',
-        selectedForeground: '27 48% 24%',
-      },
-      dark: {
-        primary: '40 96% 64%',
-        primaryForeground: '28 56% 12%',
-        selected: '35 44% 24%',
-        selectedForeground: '48 100% 94%',
-      },
-    },
-  },
-  rose: {
-    label: '暮光玫瑰',
-    tokens: {
-      light: {
-        primary: '339 72% 45%',
-        primaryForeground: '330 100% 98%',
-        selected: '338 100% 92%',
-        selectedForeground: '336 44% 26%',
-      },
-      dark: {
-        primary: '338 83% 72%',
-        primaryForeground: '320 36% 14%',
-        selected: '334 33% 26%',
-        selectedForeground: '330 100% 97%',
-      },
-    },
-  },
-}
-
 const isThemeMode = (value: unknown): value is ThemeMode =>
   value === 'light' || value === 'dark' || value === 'system'
 
 const isThemePresetKey = (value: unknown): value is ThemePresetKey =>
-  value === 'default' || value === 'ocean' || value === 'amber' || value === 'rose'
+  typeof value === 'string' && value in THEME_PRESET_DEFINITIONS
 
 const isThemeColorSource = (value: unknown): value is ThemeColorSource =>
   value === 'preset' || value === 'custom'
@@ -210,7 +186,8 @@ const getTextContrastColor = (hex: string, lightText: string, darkText: string) 
 
 export const getCustomThemeTokens = (hex: string): ThemePresetTokens => {
   const normalizedHex = normalizeHexColor(hex) || DEFAULT_THEME_SETTINGS.customColor
-  const base = rgbToHsl(...Object.values(hexToRgb(normalizedHex)))
+  const { r, g, b } = hexToRgb(normalizedHex)
+  const base = rgbToHsl(r, g, b)
 
   const lightPrimary = adjustHsl(base, {
     s: Math.max(base.s, 44),
@@ -236,6 +213,18 @@ export const getCustomThemeTokens = (hex: string): ThemePresetTokens => {
     },
   }
 }
+
+export const THEME_PRESETS: Record<ThemePresetKey, { label: string; color: string; tokens: ThemePresetTokens }> =
+  Object.fromEntries(
+    Object.entries(THEME_PRESET_DEFINITIONS).map(([key, preset]) => [
+      key,
+      {
+        label: preset.label,
+        color: preset.color,
+        tokens: preset.tokens ?? getCustomThemeTokens(preset.color),
+      },
+    ]),
+  ) as Record<ThemePresetKey, { label: string; color: string; tokens: ThemePresetTokens }>
 
 export const resolveThemePresetTokens = (settings: ThemeSettings) => {
   return settings.colorSource === 'custom'

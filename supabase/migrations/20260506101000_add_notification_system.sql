@@ -273,10 +273,12 @@ drop policy if exists "Allow users to view published announcements" on public.an
 drop policy if exists "Allow admins to manage announcement likes" on public.announcement_likes;
 drop policy if exists "Allow users to manage own announcement likes" on public.announcement_likes;
 drop policy if exists "Allow users to read announcement likes" on public.announcement_likes;
+drop policy if exists "Allow users to delete own announcement likes" on public.announcement_likes;
 drop policy if exists "Allow admins to manage announcement comments" on public.announcement_comments;
 drop policy if exists "Allow users to read visible announcement comments" on public.announcement_comments;
 drop policy if exists "Allow users to create own announcement comments" on public.announcement_comments;
 drop policy if exists "Allow users to update own announcement comments" on public.announcement_comments;
+drop policy if exists "Allow users to delete own announcement comments" on public.announcement_comments;
 drop policy if exists "Allow admins to manage system messages" on public.system_messages;
 drop policy if exists "Allow admins to manage message recipients" on public.system_message_recipients;
 drop policy if exists "Allow users to read own message recipients" on public.system_message_recipients;

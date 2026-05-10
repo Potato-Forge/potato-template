@@ -162,7 +162,7 @@ defineExpose({
             name="text"
             :node="node"
             :stat="stat"
-            :class="isNodeChoosen(stat) ? 'text-selected-foreground' : 'text-on-surface'"
+            :class="isNodeChoosen(stat) ? 'text-selected-foreground' : 'text-foreground'"
             >{{ node.name || node.text }}</slot
           >
         </div>

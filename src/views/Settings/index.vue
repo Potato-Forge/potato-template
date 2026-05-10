@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+import { useRouter } from 'vue-router'
 import PageLayout from '@/layouts/page-layout/PageLayout.vue'
 import {
   THEME_PRESETS,
@@ -9,7 +10,9 @@ import {
   type ThemePresetKey,
 } from '@/lib/theme-settings'
 import { useSystemStore } from '@/store/systemStore'
+import { designNavItems } from '@/views/Help/designGuidelines'
 
+const router = useRouter()
 const systemStore = useSystemStore()
 const { themeSettings, resolvedThemeMode } = storeToRefs(systemStore)
 
@@ -74,7 +77,7 @@ const isCustomColorActive = computed(() => themeSettings.value.colorSource === '
         <div class="space-y-3">
           <pf-text as="h1" class="text-3xl">主题设置</pf-text>
           <pf-text as="p" class="max-w-3xl text-muted-foreground mb-0">
-            管理当前设备的界面模式和主题主色。切换后会立即应用到主按钮、焦点轮廓和选中态。
+            管理当前设备的界面模式和主题主色。默认主色已恢复为原有青绿色 #58B19F，另提供蓝、金、玫瑰、狂歌紫与雾苔绿等可选预设，切换后会立即应用到主按钮、焦点轮廓和选中态。
           </pf-text>
         </div>
 
@@ -140,7 +143,7 @@ const isCustomColorActive = computed(() => themeSettings.value.colorSource === '
         <div class="mb-4 space-y-1">
           <pf-text as="h2" class="text-xl">主题主色</pf-text>
           <pf-text as="p" class="text-muted-foreground mb-0">
-            可以使用预设主题色，也可以通过自定义颜色生成一套自己的主色系统。
+            可以使用 6 组预设主题色，也可以通过自定义颜色生成一套自己的主色系统。预设优先用于常规场景，自定义颜色只建议用于品牌扩展。
           </pf-text>
         </div>
 
@@ -181,6 +184,8 @@ const isCustomColorActive = computed(() => themeSettings.value.colorSource === '
                 ></div>
               </div>
 
+              <pf-text as="p" class="mb-1 text-xs text-primary">{{ preset.color }}</pf-text>
+
               <pf-text as="p" class="text-sm text-muted-foreground mb-0">
                 浅色 / 深色双模式下均提供配套强调色。
               </pf-text>
@@ -215,7 +220,7 @@ const isCustomColorActive = computed(() => themeSettings.value.colorSource === '
               <div class="min-w-0">
                 <pf-text as="p" class="font-medium mb-0">{{ themeSettings.customColor }}</pf-text>
                 <pf-text as="p" class="text-xs text-muted-foreground mb-0">
-                  选择后会自动切换为自定义颜色模式。
+                  只有在现有预设不满足品牌要求时，才建议使用自定义颜色模式。
                 </pf-text>
               </div>
             </div>
@@ -266,6 +271,33 @@ const isCustomColorActive = computed(() => themeSettings.value.colorSource === '
               </PfButton>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="rounded-2xl border border-border bg-card px-5 py-5">
+        <div class="mb-4 space-y-1">
+          <pf-text as="h2" class="text-xl">设计规范</pf-text>
+          <pf-text as="p" class="text-muted-foreground mb-0">
+            如果需要查看当前主题的设计思路、色彩规则和组件使用建议，可以直接从这里进入对应文档页面。
+          </pf-text>
+        </div>
+
+        <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <button
+            v-for="item in designNavItems"
+            :key="item.path"
+            type="button"
+            class="rounded-2xl border border-border bg-background px-4 py-4 text-left transition-colors hover:border-primary/35 hover:bg-muted"
+            @click="router.push(item.path)"
+          >
+            <div class="mb-3 flex items-center gap-3">
+              <div class="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <div :class="item.icon" class="text-lg"></div>
+              </div>
+              <pf-text as="h4" class="mb-0">{{ item.title }}</pf-text>
+            </div>
+            <pf-text as="p" class="mb-0 text-sm text-muted-foreground">{{ item.description }}</pf-text>
+          </button>
         </div>
       </section>
     </section>

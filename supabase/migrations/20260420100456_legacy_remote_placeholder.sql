@@ -1,0 +1,3 @@
+-- Legacy remote migration placeholder.
+-- This file preserves migration history for a previously applied remote migration
+-- whose original SQL is no longer tracked in this repository.

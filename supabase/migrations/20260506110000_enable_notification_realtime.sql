@@ -4,6 +4,18 @@
 @date 2026-05-06
 */
 
-alter publication supabase_realtime add table public.system_message_recipients;
+do $$
+begin
+	if not exists (
+		select 1
+		from pg_publication_tables
+		where pubname = 'supabase_realtime'
+			and schemaname = 'public'
+			and tablename = 'system_message_recipients'
+	) then
+		execute 'alter publication supabase_realtime add table public.system_message_recipients';
+	end if;
+end;
+$$;
 
 alter table public.system_message_recipients replica identity full;

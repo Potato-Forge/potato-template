@@ -62,7 +62,7 @@ defineExpose({
 
 <template>
   <div
-    class="transition-all duration-200"
+    class="h-full min-h-0 w-full overflow-y-auto pr-1 transition-all duration-200"
     :class="props.reordering ? 'opacity-75 saturate-60 pointer-events-none' : ''"
   >
     <PfTree

@@ -26,6 +26,7 @@ begin
 end;
 $$;
 
+drop trigger if exists organizations_set_updated_at on public.organizations;
 create trigger organizations_set_updated_at
   before update on public.organizations
   for each row execute procedure public.set_updated_at();
@@ -60,6 +61,13 @@ comment on table public.org_roles is 'Default roles attached to an organization.
 alter table public.organizations enable row level security;
 alter table public.org_members   enable row level security;
 alter table public.org_roles     enable row level security;
+
+drop policy if exists "admin can manage organizations" on public.organizations;
+drop policy if exists "authenticated users can view organizations" on public.organizations;
+drop policy if exists "admin can manage org_members" on public.org_members;
+drop policy if exists "users can view their own memberships" on public.org_members;
+drop policy if exists "admin can manage org_roles" on public.org_roles;
+drop policy if exists "authenticated users can view org_roles" on public.org_roles;
 
 -- Organizations: admin full access, authenticated read
 create policy "admin can manage organizations"

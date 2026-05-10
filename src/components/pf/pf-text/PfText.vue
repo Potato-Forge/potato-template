@@ -23,23 +23,23 @@ const isAnchor = computed(() => props.href?.startsWith('#'))
 
 const variantClasses = {
   // Heading 1: Manrope ExtraBold / 3.5rem / Tracking-tight
-  h1: 'font-headline text-4xl md:text-[3.5rem] font-extrabold leading-none tracking-tight text-on-surface',
+  h1: 'font-headline text-4xl md:text-[3.5rem] font-extrabold leading-none tracking-tight text-foreground',
   // Heading 2: Manrope Bold / 2.5rem
-  h2: 'font-headline text-3xl md:text-4xl font-bold leading-tight text-on-surface',
+  h2: 'font-headline text-3xl md:text-4xl font-bold leading-tight text-foreground',
   // Heading 3: Manrope Bold / 1.75rem
-  h3: 'font-headline text-2xl md:text-[1.75rem] font-bold leading-tight text-on-surface',
+  h3: 'font-headline text-2xl md:text-[1.75rem] font-bold leading-tight text-foreground',
   // Heading 4: Manrope Bold / 1.25rem
-  h4: 'font-headline text-xl md:text-[1.25rem] font-bold leading-tight text-on-surface',
+  h4: 'font-headline text-xl md:text-[1.25rem] font-bold leading-tight text-foreground',
   // Body: Inter / 1rem / Leading-relaxed
-  body: 'font-body text-base leading-relaxed text-on-surface',
+  body: 'font-body text-base leading-relaxed text-foreground',
   // Caption: Inter / 0.75rem
-  caption: 'font-body text-xs text-on-surface-variant italic',
+  caption: 'font-body text-xs text-muted-foreground italic',
   // Link: Primary Color / Underline Offset
   link: 'text-primary font-medium underline underline-offset-4 decoration-2 hover:opacity-80 transition-opacity inline-flex items-center gap-1 cursor-pointer',
-  // Code: Mono / Surface Container Highest
-  code: 'font-mono text-sm bg-surface-container-highest px-2 py-1 rounded text-primary',
+  // Code: Mono / Muted Surface
+  code: 'font-mono text-sm bg-muted px-2 py-1 rounded-md text-primary',
   // Kbd: Keyboard Action Style
-  kbd: 'px-2.5 py-1.5 rounded-lg bg-surface-container-lowest border-b-2 border-surface-variant shadow-sm text-xs font-bold text-on-surface inline-block mx-0.5',
+  kbd: 'px-2.5 py-1.5 rounded-lg bg-background border border-border shadow-sm text-xs font-bold text-foreground inline-block mx-0.5',
 }
 
 // 权重覆盖映射
@@ -97,7 +97,7 @@ const rootAttrs = computed(() => {
         'pf-text-root antialiased flex items-stretch',
         variantClasses[resolvedVariant],
         props.weight && weightClasses[props.weight],
-        props.dimmed && 'text-on-surface-variant',
+        props.dimmed && 'text-muted-foreground',
         truncateClass,
         externalClass,
       )
@@ -126,7 +126,7 @@ const rootAttrs = computed(() => {
 
 /* 针对 Blockquote 的特殊处理 */
 blockquote.pf-text-root {
-  @apply border-l-4 border-primary-fixed-dim pl-6 py-2 italic bg-surface-container-low/30 rounded-r-lg;
+  @apply rounded-r-lg border-l-4 border-primary/35 bg-muted/40 pl-6 py-2 italic;
 }
 
 .pf-text-clamp {

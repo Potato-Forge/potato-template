@@ -37,8 +37,9 @@ provide('permissionManager', manager)
           >
         </div>
       </template>
-      <div class="flex-1 min-h-0 overflow-y-auto p-2">
+      <div class="h-full min-h-0 flex flex-col overflow-hidden p-2">
         <permission-tree
+          class="min-h-0 flex-1"
           :tree-data="allPermissionTree"
           :choosen="choosenId"
           :draggable="manager.canDragTree.value"

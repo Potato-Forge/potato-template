@@ -50,7 +50,7 @@ inserted AS (
   UNION ALL
   SELECT '用户管理', 'manage:user', 'menu', '/manage/user', 'Manage/User', 'tabler:users', 30, true, id FROM manage_root
   UNION ALL
-  SELECT '系统帮助', 'help:system', 'menu', '/help/system', 'Help/SystemHelp', 'tabler:help-hexagon', 10, true, id FROM help_root
+  SELECT '设计规范', 'help:system', 'menu', '/help/system', 'Help/SystemHelp', 'tabler:book-2', 10, true, id FROM help_root
   UNION ALL
   SELECT '上传示例', 'help:upload', 'menu', '/help/upload', 'Help/UploadDemo', 'tabler:upload', 20, true, id FROM help_root
   RETURNING id, code
@@ -63,6 +63,9 @@ roles_node AS (
 ),
 user_node AS (
   SELECT id FROM inserted WHERE code = 'manage:user'
+),
+design_node AS (
+  SELECT id FROM inserted WHERE code = 'help:system'
 )
 INSERT INTO permissions (name, code, type, path, component, icon, sort, status, parent_id)
 SELECT '新建权限', 'manage:permission:create', 'button', NULL, NULL, NULL, 1, true, id FROM permission_node
@@ -71,7 +74,13 @@ SELECT '角色权限配置', 'manage:roles:permission', 'button', NULL, NULL, NU
 UNION ALL
 SELECT '角色用户绑定', 'manage:roles:user', 'button', NULL, NULL, NULL, 2, true, id FROM roles_node
 UNION ALL
-SELECT '用户角色绑定', 'manage:user:role', 'button', NULL, NULL, NULL, 1, true, id FROM user_node;
+SELECT '用户角色绑定', 'manage:user:role', 'button', NULL, NULL, NULL, 1, true, id FROM user_node
+UNION ALL
+SELECT '色彩规范', 'help:system:colors', 'menu', '/help/system/colors', 'Help/SystemHelp/Colors', 'tabler:palette', 10, true, id FROM design_node
+UNION ALL
+SELECT '排版与空间', 'help:system:foundation', 'menu', '/help/system/foundation', 'Help/SystemHelp/Foundation', 'tabler:spacing-horizontal', 20, true, id FROM design_node
+UNION ALL
+SELECT '组件规范', 'help:system:components', 'menu', '/help/system/components', 'Help/SystemHelp/Components', 'tabler:components', 30, true, id FROM design_node;
 
 INSERT INTO role_permissions (role_code, permission_id)
 SELECT r.role_code, p.id
