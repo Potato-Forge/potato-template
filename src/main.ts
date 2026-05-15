@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 
 import '@unocss/reset/tailwind-v4.css'
+import '@fontsource/monaspace-neon/index.css'
 import 'virtual:uno.css'
 import './assets/main.css'
 import 'viewerjs/dist/viewer.css'

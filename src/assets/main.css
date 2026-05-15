@@ -26,6 +26,7 @@ body {
   --wrapper-bg: hsl(var(--background));
   --cube-color: #0000;
   --highlight-color: hsl(var(--primary));
+  --font-code: 'Monaspace Neon', 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
 }
 
 .dark {
@@ -169,4 +170,8 @@ body {
 
 .face-bottom {
   transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.pf-code-font {
+  font-family: var(--font-code);
 }
